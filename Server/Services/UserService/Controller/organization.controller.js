@@ -1,4 +1,4 @@
-import { where } from "sequelize"
+import { Op, where } from "sequelize"
 import objUserDb from "../Utils/userDB.js"
 export const joinOrg = async (req , res) => {
     //TBD: When adding user to a ORG a mail is sent to Admin and a task will be added in his task list
@@ -15,7 +15,7 @@ export const joinOrg = async (req , res) => {
         }
         switch (JoinMethod){
             case "request":
-                //TBD
+                //TBD:A mail will be sent to Org admin who can accept the request
                 break
             case "referral":
                 const OrganizationJoiningCode = req.body.OrganizationJoiningCode
@@ -93,4 +93,17 @@ export const inviteToOrg = async (req , res) => {
 
 export const leaveOrg = async (req ,res) => {
 
+}
+
+export const acceptOrgRequest = async (req) =>{
+    try {
+        //API Structure: /:userID
+        const userId = req.query?.userId , orgId = req.query?.orgId
+        const isValidUser = await objUserDb.users.findOne({[Op.and]:{where:{userId: userID , organizationId:1}}})
+        if(isValidUser){
+            await objUserDb.users.update({organizationId:orgId} , {where:{userId:userId}})
+        }
+    } catch (error) {
+        await objUserDb.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
+    }
 }

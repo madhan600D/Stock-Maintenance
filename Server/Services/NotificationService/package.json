@@ -1,15 +1,20 @@
 {
-  "name": "userservice",
+  "name": "notificationservice",
   "version": "1.0.0",
-  "main": "User.js",
+  "main": "Notification.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon user.js"
+    "dev": "nodemon Notification.js"
   },
+  "keywords": [],
+  "type": "module",
   "author": "",
   "license": "ISC",
   "description": "",
-  "type": "module",
+  "devDependencies": {
+    "eslint": "^9.32.0",
+    "nodemon": "^3.1.10"
+  },
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "cookie-parser": "^1.4.7",
@@ -20,11 +25,9 @@
     "kafkajs": "^2.2.4",
     "mysql": "^2.18.1",
     "mysql2": "^3.14.1",
+    "nodemailer": "^7.0.5",
     "sequelize": "^6.37.7",
     "sqlite3": "^5.1.7",
     "tedious": "^18.6.1"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.10"
   }
 }
