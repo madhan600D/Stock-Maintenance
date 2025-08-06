@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors'
 import cookieParser from 'cookie-parser';
 import signUpRouter from './Router/signup.router.js'; 
 import objUserDb from './Utils/userDB.js'
@@ -9,6 +10,10 @@ dotenv.config();
 const userServer = express();
 const port = process.env.userPort;
 //Setup Middlewares
+userServer.use(cors({
+    origin:'http://localhost:5173',
+    credentials:true
+}))
 userServer.use(express.json({ limit: '20mb' }));
 userServer.use(cookieParser())
 userServer.use('/api/userservice', signUpRouter);

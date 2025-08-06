@@ -2,17 +2,25 @@ import { kafka } from "../kafka.config.js";
 import { KafkaConsumer } from "../Consumer/KafkaConsumer.js";
 import {objNotificationDB} from '../../Utils/NotificationDB.js'
 import {CreateUserController} from '../../Controller/UserCreation.controller.js'
+import {ConfirmUserController} from '../../Controller/ConfirmUser.controller.js'
 
 export let KafkaConsumers = new Map()
 
-//#region "Instantiate Kafka Consumer {user.create_user.request}"
-const ObjKafkaConsumerCreateUser = new KafkaConsumer(kafka , objNotificationDB , 'user.create_user.request')
-KafkaConsumers.set(ObjKafkaConsumerCreateUser , CreateUserController)
-//#endregion
+
+const DeclareKafkaConsumers = async () => {
+  //#region "Instantiate Kafka Consumer {user.create_user.request}"
+  const ObjKafkaConsumerCreateUser =  await new KafkaConsumer(kafka , objNotificationDB , 'user.create_user.request' , "CreateUserRequest")
+  KafkaConsumers.set(ObjKafkaConsumerCreateUser , CreateUserController)
+
+  const ObjKafkaConsumerConfirmUser = await new KafkaConsumer(kafka , objNotificationDB , 'user.confirm_user.request' , "ConfirmUserRequest")
+  KafkaConsumers.set(ObjKafkaConsumerConfirmUser , ConfirmUserController)
+    //#endregion
+}
 
 export async function InitializeKafkaConsumers(AllKafkaConsumers){
   try {
-    AllKafkaConsumers.forEach(async (KafkaController , KafkaConsumerObject) => {  
+    await DeclareKafkaConsumers()
+    await AllKafkaConsumers.forEach(async (KafkaController , KafkaConsumerObject) => {  
         await KafkaConsumerObject.ConnectToBroker()
         await KafkaConsumerObject.SubscribeToTopic()
         await KafkaConsumerObject.ListenForEvents(KafkaController)

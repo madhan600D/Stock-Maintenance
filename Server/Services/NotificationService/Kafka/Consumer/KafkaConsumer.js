@@ -1,15 +1,12 @@
-
-
 export class KafkaConsumer{
-    constructor(Kafka , DataBase , Topic){
+    constructor(Kafka , DataBase , Topic , ConsumerGroup){
         try {
-            this.NotificationConsumer = Kafka.consumer({groupId:'NotificationService'})
+            this.NotificationConsumer = Kafka.consumer({groupId:ConsumerGroup})
             this.DataBase = DataBase
             this.Topic = Topic
         } catch (error) {
             console.log("Error while instantiating consumer")
         }
-
     }
     ConnectToBroker = async () => {
         try {
@@ -32,8 +29,10 @@ export class KafkaConsumer{
             eachMessage: async ({ topic, partition, message }) => 
             {   
                 const ParsedData = JSON.parse(message.value.toString())
-                console.log(`Notification Service got a event: ${topic} and message: ${ParsedData}`)
-                CallBack(topic , partition , ParsedData)
+                console.log(`Notification Service got a event: ${topic} and message: ${ParsedData.Data.toString()}`)
+                
+                const IsSuccess = await CallBack(topic , partition , ParsedData)
+                await this.LogEvents(ParsedData , IsSuccess)
             },
             })
 
@@ -41,7 +40,17 @@ export class KafkaConsumer{
             console.log(`Error while listening to events from --${this.Topic}-- Topic`)
         }
     }
-    LogEvents = async () => {
-
+    LogEvents = async (Event , IsSuccess) => {
+        try {
+            const NewConsumerLog = await this.DataBase.ConsumedEvents.create({
+                Topic:this.Topic , 
+                Event:JSON.stringify(Event),
+                ResponseID:Event.EventID,
+                IsSuccess:IsSuccess.success,
+                Error:IsSuccess.success == false ? IsSuccess.message : "Handled"
+            })
+        } catch (error) {
+            console.log("Erorr while logging event" + Event.Event)
+        }
     }
 }

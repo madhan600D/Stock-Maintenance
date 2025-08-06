@@ -1,4 +1,3 @@
-
 export default (Sequelize , DataTypes) => {
     const ConfigurationSettingsModel = Sequelize.define('ConfigurationSetting' , 
         {

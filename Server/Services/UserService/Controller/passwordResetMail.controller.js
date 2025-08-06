@@ -7,6 +7,7 @@ export const sendResetMail = async (req , res) => {
     //Generate a OTP and call mail service to send a mail to user
     try {
         //Random return between 0 to 1 in float we round to 6 digits
+        
         const otp = await Math.floor(100000 + Math.random() * 900000);
         const userData = await objUserDb.users.findOne({where:{userName:req.body.userName.toLowerCase()}})
         if(!userData){

@@ -1,0 +1,13 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\Server",
+    "\\Server\\Services",
+    "\\Server\\Services\\NotificationService",
+    "\\Server\\Services\\NotificationService\\Declarations",
+    "\\Server\\Services\\NotificationService\\NodeMailer",
+    "\\Server\\Services\\UserService"
+  ],
+  "SelectedNode": "\\Server\\Services\\NotificationService\\NodeMailer\\PushNotification.class.js",
+  "PreviewInSolutionExplorer": false
+}

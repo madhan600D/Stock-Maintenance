@@ -12,13 +12,13 @@ export class UserCreation{
             let KafkaResponse
             const IsValidUser = await this.UserDataValidations(UserName , UserMail)
             if (!IsValidUser.success) {
-                throw new Error("User validation failed: " + IsValidUser.message);
+                console.log("User validation failed: " + IsValidUser.message);
             } 
             this.UserData = { UserName, UserMail }
 
             const IsDataAddedAtUserTable = await this.AddUserToUsersTable(this.UserData)
             if (!IsDataAddedAtUserTable.success) {
-                throw new Error("User Creation failed: " , IsDataAddedAtUserTable.message)
+                console.lo("User Creation failed: " , IsDataAddedAtUserTable.message)
             } 
             this.UserData.UserID = IsDataAddedAtUserTable.NewUser.UserID
             const IsDataAddedAtCoolDownTable = await this.AddUserToCoolDownTable(this.UserData)
@@ -26,7 +26,7 @@ export class UserCreation{
                 throw new Error("User Creation failed: ", IsDataAddedAtCoolDownTable.message)
             }
             //TBD:Send Verification Email
-            const IsEmailSent = await this.ObjVerificationEmail.SendEmailVerification(RequestHash)
+            const IsEmailSent = await this.ObjVerificationEmail.SendEmailVerification(RequestHash , "Verification")
             //TBD: Produce a kafka response: User Added Succesfully
             if(IsEmailSent){
                 KafkaResponse.Event = 'EmailSent'
@@ -91,5 +91,11 @@ export class UserCreation{
             throw error
         }
     }
-
+    SendKafkaResponse = async (success , ) => {
+        try {
+            
+        } catch (error) {
+            console.log(`Error while producing kafka response:` + error.toString())
+        }
+    }
 }

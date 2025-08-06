@@ -8,47 +8,30 @@ import { Op } from 'sequelize'
 import {ObjUserKafkaProducer} from '../Kafka/Producer/kafkaProducer.js'
 dotenv.config();
 export const signUpUser = async (req , res) => {
-    try {  
+    try {
         let KafkaMessage = {}
-        //regex states : one upper case , one number  , one special character
-        const Passwordregex = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/ , 
-              userNameRegex = /^[a-zA-Z0-9]+$/ , 
-              EmailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-
-        const isUserDataTaken = await objUserDb.users.findOne({where:{[Op.or]:{userName:req.body.userName , userMail:req.body.userMail}}})
-    
-        if(typeof req.body.userName !== 'string' || isUserDataTaken){
-            return res.status(400).json({success:false , message:'userName or MailId is invalid or already present'})
-        }
-
-        if(! userNameRegex.test(req.body.userName) && req.body.userName?.length >= 10){
-            return res.status(400).json({success:false , message:"Invalid user name [a-z] & [0-9] are only allowed"})
-        }             
-        if(! EmailRegex.test(req.body.userMail)){
-            return res.status(400).json({success:false , message:"Invalid Email Provided"})
-        }
-        if((req.body.password.length < 6 && req.body.password.length > 20) || ! Passwordregex.test(req.body.password)){
-            return res.status(400).json({success:false , message:'Enter a strong password(One upper case , One Number & One special charcter)'})
-        }
-
         const isDataAtPendingUser = await objUserDb.pendingUsers.findOne({where:{userMail:req.body.userMail}})
 
         if(isDataAtPendingUser?.isVerified){
             return res.status(400).json({success:false , message:"E-Mail already used"})
         }
-
-        //Hash the password
-        const passwordSalt = await bcrypt.genSalt(10)
-        const passwordHash = await bcrypt.hash(req.body.password , passwordSalt)
-        //TBD: Verify Email with OTP after we can add the user to DB
+        else if (isDataAtPendingUser?.isVerified === false){
         
-        if(isDataAtPendingUser){
-            KafkaMessage.Event = 'ResendVerificationEmail'
-            await objUserDb.pendingUsers.destroy({where:{userMail:isDataAtPendingUser.userMail}})
+            //Re trigger ResendVerificationEmail at KAFKA Notification service 
+            KafkaMessage.Event = "ResendVerificationEmail"
+            KafkaMessage.Data = {UserMail:isDataAtPendingUser.userMail , UserName:isDataAtPendingUser.userName ,            VerificationHash:isDataAtPendingUser.verificationHash}
+
+            await ObjUserKafkaProducer.ProduceEvent("ResendVerificationEmail" , "user.create_user.request" , KafkaMessage)
+            return res.status(200).json({success:true , message:"Verfication email resent ...!"})
         }
         else{
             KafkaMessage.Event = 'SendVerificationEmail'
         }
+        //Hash the password
+        const passwordSalt = await bcrypt.genSalt(10)
+        const passwordHash = await bcrypt.hash(req.body.password , passwordSalt)
+
+        
 
         const newPendingUser = await objUserDb.pendingUsers.create({
             userName:req.body.userName.toLowerCase(), 
@@ -66,7 +49,7 @@ export const signUpUser = async (req , res) => {
         KafkaMessage.Data = {ReqID:UpdatedPendingUser[0].reqID ,
                             userName:UpdatedPendingUser[0].userName,
                             userMail:UpdatedPendingUser[0].userMail,
-                            verificationHash:HashedRequestIdentification
+                            verificationHash:HashedRequestIdentification 
                         }
         const IsEventProduced = ObjUserKafkaProducer.ProduceEvent(KafkaMessage.Event , 'user.create_user.request' , KafkaMessage)
 
@@ -84,9 +67,7 @@ export const signUpUser = async (req , res) => {
 export const addUser = async (req , res) => {
     try {
         const {userName , userMail , password} = req.body
-        const isUserMailVerified = await objUserDb.pendingUsers.findOne({where:{userMail:userMail}})
-        
-        if(isUserMailVerified.isVerified){
+        if(isUserMailVerified?.isVerified){
             const passwordSalt = await bcrypt.genSalt(10)
             const passwordHash = await bcrypt.hash(password , passwordSalt)
 
@@ -97,7 +78,8 @@ export const addUser = async (req , res) => {
                     password:passwordHash,
                     profilePic:''
                 })
-            const JwtToken = GenerateJWT(newUser.userId)
+            const JwtToken = GenerateJWT(newUser.userId);
+
             //Add session Data
             const currentTime = new Date()
             await objUserDb.sessions.create({userId:newUser.userId , loggedInAt:new Date(TimeFormatter(currentTime)) , LoggedOutAt:'' , isActive:true})
@@ -122,14 +104,18 @@ export const eMailConfirm = async (req , res) => {
     //A email with confirm button will be sent 
     //API Structure: {/user?reqId=12345}
     try { 
+        let KafkaMessage = {}
+        KafkaMessage.Event = "UserVerified"
         const reqID = req.query?.reqID
         if(!reqID){
             return
         }
         await verifyPendingUser(reqID) 
-            .then((verifiedUser) => console.log(`user: ${verifiedUser.userName} && mail: ${verifiedUser.userMail}
-                                                verified successfully...!`))
-                                    
+            .then(async(UserData) => {
+                //Kakfa Event and Add to Users Table
+                KafkaMessage.Data = {userMail:UserData.userMail , userName:UserData.userName}
+                await ObjUserKafkaProducer.ProduceEvent("UserVerified" , 'user.confirm_user.request' , KafkaMessage)
+            })
             .catch(console.log("User Verification failed...!"))        
     } catch (error) {
         console.log(error)
@@ -138,7 +124,7 @@ export const eMailConfirm = async (req , res) => {
 export const logInUser = async (req , res) => {
     //API Structure:{userName,userPassword,userMail(optional),closeSession(optional)}
     try {
-        const userName = req.body.userName.toString() , userPassword = req.body.password , userMail = req.body?.userMail || '',closeSession = req.body?.closeSession;
+        const userName = req.body.userName.toString()  , userPassword = req.body.password , userMail = req.body?.userMail || '', closeSession = req.body?.closeSession;
         const userCredentials = await objUserDb.users.findOne({where:{[Op.or]:{userName:userName , userMail:userMail}}})
         if(!userCredentials){
             return res.status(400).json({success:false , message:"Invalid userName ....!"})
@@ -161,10 +147,11 @@ export const logInUser = async (req , res) => {
             if(isActiveSession){
                 if(closeSession){
                     await objUserDb.sessions.update({isActive:false , LoggedOutAt:currentTime} , {where:{userId:userCredentials.userId}})
+                    //TBD:Socket server to manually log out the logged in user
                 }
                 else{
                     //Compare active session in frontend and show close session popup accordingly
-                    return res.status(400).json({success:false , message:'ActiveSession'}) //dont change message value
+                    return res.status(400).json({success:false , message:'User already logged in , Check Close Session and log in again'}) //dont change message value
                 }
             }
             const JwtToken = await GenerateJWT(userCredentials)

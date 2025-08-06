@@ -213,9 +213,9 @@ export class EmailVerification extends PushMail{
         this.ParentMailOptions.UserName = UserName
     }
 
-    SendEmailVerification = async (reqID) => {
+    SendEmailVerification = async (reqID , TypeOfHTML) => {
         try {
-            const IsHTMLPrepared = await this.PrepareHTML(reqID)
+            const IsHTMLPrepared = await this.PrepareHTML(reqID , TypeOfHTML)
             if (!IsHTMLPrepared.success) {
                 console.log("Error at EmailVerification class")
                 return 
@@ -233,9 +233,9 @@ export class EmailVerification extends PushMail{
             throw error
         }
     }
-    PrepareHTML = async (reqID) => {
+    PrepareHTML = async (reqID , TypeOfHTML) => {
         try {
-            let VerificationEmailHTML  = await ImportEmailHTML()
+            let VerificationEmailHTML  = await ImportEmailHTML(TypeOfHTML)
 
             VerificationEmailHTML = VerificationEmailHTML.replace('{user}' , this.ParentMailOptions.to.toString().toUpperCase())
             VerificationEmailHTML = VerificationEmailHTML.replace('{Verification_API}', ENV_VerificationEndpoint.concat(`/?reqID=${reqID}`))

@@ -1,0 +1,15 @@
+{
+  "version": "0.2.1",
+  "tasks": [
+    {
+      "taskLabel": "task-PushNotification.class",
+      "appliesTo": "Server/Services/NotificationService/NodeMailer/PushNotification.class.js",
+      "type": "launch"
+    },
+    {
+      "taskLabel": "task-Stock Maintenance",
+      "appliesTo": "/",
+      "type": "launch"
+    }
+  ]
+}

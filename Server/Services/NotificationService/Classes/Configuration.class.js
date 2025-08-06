@@ -6,7 +6,7 @@ export class PublicConfigVariables{
         this.MailBucketCoolDownTime
         this.DateTimeOptions = {dateStyle: 'short', timeStyle: 'short', hour12: false}
     }
-    FillConfigFromDataBase =  async () => {
+    FillConfigFromDataBase =  async () => { 
         try {
             const ConfigData =  await objNotificationDB.ConfigurationSettings.findAll()
             this.MailBucketLimit = ConfigData.find(configs => configs.configName == "MailBucketLimit").configValue

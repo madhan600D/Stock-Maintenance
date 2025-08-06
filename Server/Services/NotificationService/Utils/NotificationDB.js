@@ -6,6 +6,9 @@ import NotificationCoolDownModel from "../Models/NotificationCoolDownModel.js";
 import NotificationDeliveryModel from "../Models/NotificationDeliveryStatusModel.js";
 import NotificationModel from "../Models/NotificationModel.js"; 
 import UserModel from "../Models/UserModel.js";
+import ConsumedEventsModel from "../Models/ConsumedEventsModel.js";
+import ProducedEventsModel from '../Models/ProducedEventsModel.js'
+
 class NotificationDatabase {
   constructor() {
     // Database config
@@ -24,9 +27,12 @@ class NotificationDatabase {
     this.NotificationDeliveryStatus = NotificationDeliveryModel(this.NotificationDB , DataTypes)
     this.Notifications = NotificationModel(this.NotificationDB , DataTypes)
     this.Users = UserModel(this.NotificationDB , DataTypes)
+    this.ProducedEvents = ProducedEventsModel(this.NotificationDB , DataTypes)
+    this.ConsumedEvents = ConsumedEventsModel(this.NotificationDB , DataTypes)
     this.allModels = {ConfigurationSettings:this.ConfigurationSettings ,NotificationBuckets:this.NotificationBuckets , 
         NotificationCoolDown:this.NotificationCoolDown ,NotificationDeliveryStatus:this.NotificationDeliveryStatus ,
-        Notifications:this.Notifications , Users:this.Users}
+        Notifications:this.Notifications , Users:this.Users , ConsumedEvents:this.ConsumedEvents , ProducedEvents:this.ProducedEvents}
+        
     Object.values(this.allModels).forEach((parmModel) => {
         if(parmModel.associate){ 
             parmModel.associate(this.allModels) 

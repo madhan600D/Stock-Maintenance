@@ -1,0 +1,66 @@
+.Main-Div{
+    display: flex;
+    align-items: center;
+    padding: 0;
+    width: 100%;
+}
+.Logo-Div{
+    flex: 0 0 8%;
+    margin: 0;
+    background-color: aqua;
+    justify-content: center;
+    /* height: 100%; */
+    display: flex;
+    padding: 0.6rem;
+}
+.TexBoxAndLogo-Div{
+    flex: 2;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.TextBox-Input{
+    color: #2b2724;
+    width: 100%;
+    height: 2rem;
+    max-width: 30rem;
+    background: #ffffff;
+    border-top-right-radius: 1.5px;
+    border-bottom-right-radius: 1.5px;
+    transition: all 0.2s ease;
+    border: 0.6px solid rgba(255, 255, 255, 0.3);
+    box-shadow: inset 0 0 10px rgba(68, 65, 65, 0.356);
+    font-family: poppins;
+    font-size: 0.8rem;
+}
+.TextBox-Label {
+    color: #2b2724;
+    user-select: none;
+    pointer-events: none;
+    font-size: 0.8rem;
+    position: absolute;
+    background: transparent;
+    transform: translate(0.5rem , 0);
+    transition: all 0.2s ease;
+    font-family: poppins;
+    opacity: 0.6;
+}
+.TextBox-Input:focus +  .TextBox-Label
+{
+    font-size: 0.8rem;
+    transform: translate(0,-2rem);
+    opacity: 1;
+}
+.TextBox-Input:focus{
+    transform: none;
+    border-radius: none;
+}
+
+@media (max-width: 768px) {
+  .TextBox-Input {
+    width: 100%;
+    font-size: 0.6rem;
+  }
+}
+
+

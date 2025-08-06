@@ -48,3 +48,4 @@ export class KafkaProducer{
 
 //Instantiate Kafka Producer Object
 export const ObjNotificationKafkaProducer = new KafkaProducer(kafka , objNotificationDB)
+ObjNotificationKafkaProducer.ConnectProducer()
