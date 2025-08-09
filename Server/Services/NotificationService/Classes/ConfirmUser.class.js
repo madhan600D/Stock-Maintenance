@@ -14,7 +14,7 @@ export class ConfirmUser {
                 return {success:false , message:"User is already active...! or Invalid user Data"} 
             }
 
-        const [UpdatedUserCount,UpdatedUser] = await objNotificationDB.Users.update({isActive:true} , {where:{UserMail:this.UserData.UserMail} , returning:true})
+        const [UpdatedUserCount,UpdatedUser] = await objNotificationDB.Users.update({isActive:true} , {where:{UserMail:this.UserData.userMail} , returning:true})
 
         if(!UpdatedUser){
             return {success:false , message:"Invalid user to confirm"} 

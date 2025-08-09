@@ -13,6 +13,7 @@ export class UserCreation{
             const IsValidUser = await this.UserDataValidations(UserName , UserMail)
             if (!IsValidUser.success) {
                 console.log("User validation failed: " + IsValidUser.message);
+                return {success:false , message:"User validation failed"}
             } 
             this.UserData = { UserName, UserMail }
 

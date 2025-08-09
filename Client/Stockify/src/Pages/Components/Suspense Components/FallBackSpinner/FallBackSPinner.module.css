@@ -1,0 +1,21 @@
+.Circle-Div{
+    border-radius: 45%;
+    width: 0.5rem;
+    height: 0.5rem;
+    border: 0.3rem solid transparent;
+    border-top-color: aliceblue;
+    border-bottom-color: aliceblue;
+    animation: Spin 1s ease-in-out infinite;
+}
+
+@keyframes Spin {
+    0% {
+        transform: scale(1) rotate(0deg);
+    }
+    50% {
+        transform: scale(0.5) rotate(180deg);
+    }
+    100% {
+        transform: scale(1) rotate(-360deg);
+    }
+}

@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import AxiosInstance from '../Lib/AxiosInstance.js';
-import ShowToast from '../Pages/Components/Toast/Toast.js';
 const useUser = create((set , get) => ({
     IsAuthenticated:false,
     
@@ -8,8 +7,14 @@ const useUser = create((set , get) => ({
     IsSignUpLoading:false,
     IsLoginLoading:false,
     IsAddUserLoading:false,
+    IsUserValidationLoading:false,
+    IsPageLoading:false,
+    SuspenseTexts:[],
+    UserData:{},
+    OrganizationData:{},
+    CurrentOrg:null,
+    IsError:null,
 
-    UserData:null,
     SignUp: async (UserCredentials) => {
         try {
             //API Structure:{userName , userMail , password}
@@ -19,10 +24,13 @@ const useUser = create((set , get) => ({
                 return {success:false , message:Validation.message}
         }
         const res = await AxiosInstance.put('/api/userservice/signup' , UserCredentials)
-        const DataFromBackend = res.data.data;
+        const DataFromBackend = res.data;
+        if(DataFromBackend.success){
+            return {success:true , message:DataFromBackend.message}
+        }
         } catch (error) {
-            console.log(error.message)
-            return {success:false , message:error.message}
+            console.log(error)
+            return {success:false , message:error.response.data.message}
         }
         finally{
             set({IsSignUpLoading:false});
@@ -36,17 +44,41 @@ const useUser = create((set , get) => ({
             if(!Validation){
                 return {success:false , message:Validation.message}
             }
-            const res = await AxiosInstance.put('add-user' , UserCredentials)
-            const DataFromBackend = res.data.data;
+            const res = await AxiosInstance.put('/api/userservice/add-user' , UserCredentials)
+            const DataFromBackend = res.data;
             //Set UserData
-            set({UserData:{UserName:UserCredentials.UserName , UserMail:UserCredentials.UserMail , Password:UserCredentials.Password}})
+            set({UserData:{UserName:UserCredentials.userName , UserMail:UserCredentials.userMail , Password:UserCredentials.password}})
+            set({IsAuthenticated:true})
             return {success:true , message:DataFromBackend.message};
 
         } catch (error) {
-            return{success:false , message:error.message};
+            console.log(error)
+            return{success:false , message:error.response.data ?error.response.data.message : error.message };
         }
         finally{
             set({IsAddUserLoading:false})
+        }
+    },
+    ValidateUser:async () => {
+        set({IsPageLoading:true})
+        try {
+            const res = await AxiosInstance.get('api/userservice/validate-user');
+            const DataFromBackend = res.data;
+            if(DataFromBackend.data){
+                set({UserData:DataFromBackend.data});
+                set({IsAuthenticated:true});
+                return {success:true , message:DataFromBackend.message}
+            }
+            else{
+                set({IsAuthenticated:true});
+                set({UserData:{}})
+                return {success:false , message:DataFromBackend.message}
+            }
+        } catch (error) {
+            return{success:false , message:error.response ? error.response.data.message : error.message};
+        }
+        finally{
+            set({IsPageLoading:false})
         }
     },
     Login:async (UserCredentials) => {
@@ -56,14 +88,41 @@ const useUser = create((set , get) => ({
             if(!Validation.success){
                 return {success:false , message:Validation.message}
             }
-            const res = await AxiosInstance.get('/login' , UserCredentials);
-            set({UserData:{UserName:UserCredentials.UserName , UserMail:UserCredentials.UserMail , Password:UserCredentials.Password}})
-            return {success:true , message:DataFromBackend.message};
+            const res = await AxiosInstance.post('/api/userservice/login' , UserCredentials);
+            const DataFromBackend = res.data;
+            set({
+                IsAuthenticated: true,
+                UserData: {
+                    UserName: DataFromBackend.data.UserName,
+                    UserMail: DataFromBackend.data.UserMail,
+                    UserID: DataFromBackend.data.UserID
+                },
+                OrganizationData: {
+                    OrganizationID: DataFromBackend.data.OrganizationID,
+                    OrganizationName: DataFromBackend.data.OrganizationName
+                }
+            });
+            return {success:true , message:DataFromBackend.message , data:DataFromBackend};
         } catch (error) {
-            return{success:false , message:error.message};
+            console.log(error)
+            return{success:false , message:error.response ? error.response.data.message : error.message};
         }
         finally{
             set({IsLoginLoading:false})
+        }
+    },
+    GetLoadingTexts: async () => {
+        set({IsPageLoading:true});
+        try {
+            const res = await AxiosInstance.get('/api/userservice/get-loadingtexts')
+            const DataFromBackend = res.data.data;
+            set({SuspenseTexts:DataFromBackend.map(TextData => TextData.Text)})
+            return {success:true , message:"Suspense Texts Loaded...!"}
+        } catch (error) {
+            return {success:false , message:error.message}
+        }
+        finally{
+            set({IsPageLoading:false});
         }
     }
 }))
@@ -77,8 +136,8 @@ const Validate = async (ValidationType , Data) => {
         return {success:true , message:"Validation successfull ...!"}
     }
     if(ValidationType === "LogIn"){
-        const {userName , password} = Data;
-        if(!userName || !password){
+        const {userName , password , closeSession} = Data;
+        if(!userName || !password || !closeSession){
             return {success:false , message:"Please fill all the fields ...!"}
         }
         return {success:true , message:"Validation successfull ...!"}

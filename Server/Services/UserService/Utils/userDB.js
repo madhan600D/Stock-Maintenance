@@ -11,6 +11,7 @@ import pendingUserModel from "../Models/pendingUser.js";
 import configurationSettingsModel from "../Models/configurationSettingsModel.js";
 import ConsumedEventsModel from '../Models/consumedEventsModel.js'
 import producedEventsModel from "../Models/producedEventsModel.js";
+import LoadingTextsModel from "../Models/LoadingTexts.js";
 class UserDatabase {
   constructor() {
     try {
@@ -35,10 +36,10 @@ class UserDatabase {
     this.configurationSettings = configurationSettingsModel(this.userDB , DataTypes)
     this.ConsumedEvents = ConsumedEventsModel(this.userDB , DataTypes)
     this.producedEvents = producedEventsModel(this.userDB , DataTypes)
-
+    this.LoadingTexts = LoadingTextsModel(this.userDB , DataTypes)
     this.allModels = {users:this.users ,userRoles:this.userRoles , organizations:this.organizations ,
       sessions:this.sessions ,admins:this.admins , otps:this.otps , pendingUsers:this.pendingUsers , configurationSettings:this.configurationSettings , ConsumedEvents:this.ConsumedEvents , 
-      producedEvents:this.ProducedEvents}   
+      producedEvents:this.ProducedEvents , LoadingTexts:this.LoadingTexts}   
     
       //Make primary and foreign key constraints   
     Object.values(this.allModels).forEach((parmModel) => {

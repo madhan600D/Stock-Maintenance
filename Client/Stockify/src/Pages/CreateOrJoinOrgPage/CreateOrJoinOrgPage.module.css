@@ -1,0 +1,75 @@
+.Main-Div{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-direction: row;
+    width: 100vw;
+    height: 100vh;
+}
+.CreateOrg-Div{
+  background-image: url('../../assets/CreateOrJoinOrg/LeftSide.png');
+  height: 100vh;
+  flex: 0.5;
+  display: flex;
+  justify-content:flex-end;
+  object-position: 10%;
+  filter: grayscale(100%);
+  background-size: cover;
+  align-items: center;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: all 0.5s ease;
+}
+.CreateOrg-Div:hover{
+    filter: grayscale(0%);
+    cursor: pointer;
+}
+.TextHolder-Div{
+    
+}
+.OrgText-Lbl{
+    padding: 1rem;
+    padding-right: 0;
+    backdrop-filter: blur(10px); 
+    -webkit-backdrop-filter: blur(10px); 
+    border: 1px solid wheat;
+    font-size: xx-large;
+    font-family: poppins;
+}
+.OrgText-Lbl:nth-child(2){
+    justify-content: flex-end;
+}
+.JoinOrg-Div{
+  background-image: url('../../assets/CreateOrJoinOrg/RightSide.png');
+  height: 100vh;
+  flex: 0.5;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  background-size: cover;
+  background-position: center;
+  filter: grayscale(100%);
+  background-repeat: no-repeat;
+  transition: all 0.5s ease;
+}
+
+.JoinOrg-Div:hover{
+    cursor: pointer;
+    filter: grayscale(0%);
+}
+
+@media (max-width: 768px) {
+    .Main-Div{
+        flex-direction: column;
+    }
+    .CreateOrg-Div{
+        width: 100vw;
+    }
+    .JoinOrg-Div{
+        width: 100vw;
+    }
+    .OrgText-Lbl{
+        width: 100%;
+        font-size: large;
+    }
+}

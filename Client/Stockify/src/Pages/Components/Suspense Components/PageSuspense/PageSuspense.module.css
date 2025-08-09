@@ -1,0 +1,61 @@
+.Main-Div{
+    background: radial-gradient(circle at center, #4343437d 0%, #00000054 100%);
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: Pulse 1s ease;
+}
+.LoadingText-Div{
+    display: flex;
+    justify-content:center;
+    flex-direction: column;
+    align-items: center;
+    
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.54);
+    border:1px solid wheat;
+    padding: 2rem;
+    border-radius: 10px;
+    height: 10rem;
+    width: 30rem;
+    
+}
+.LoadingTextHeader-Div{
+    display: flex;
+    justify-content: center;
+    width: 34rem;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    position: absolute;
+    font-weight: bolder;
+    transform: translate(0 , -270%);
+    background-color: bisque;
+    font-family: poppins;
+    color: rgb(41, 41, 41);
+    font-size:x-large;
+}
+.LoadingTextBody-Label{
+    margin: 0;
+    margin-bottom: 1rem;
+    font-family: poppins;
+    font-size: large;
+    font-weight:400;
+    color: rgb(209, 209, 209);
+}
+
+
+@keyframes Pulse{
+    0%{
+        filter: saturate(25%);
+    }
+    50%{
+        filter: saturate(50%);
+    }
+    75%{
+        filter: saturate(75%);
+    }
+    100%{
+        filter: saturate(110%);
+    }
+}

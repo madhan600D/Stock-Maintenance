@@ -1,12 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react'
-import Styles from './TextBoxWithButton.module.css'
+import Styles from './TextBoxWithSwitchButton.module.css'
 
 import FallBackSpinner from '../Suspense Components/FallBackSpinner/FallBackSpinner';
-function TextBoxWithButton({Logo , ButtonLogo , IsMandatory , FloatingText , Type , ButtonCallBack , TBCallBack , Reference , IsSuspense ,ColorPallete}) {
+function TextBoxWithSwitchButton({Logo , ButtonLogo , IsMandatory , FloatingText , Type , ButtonCallBack , TBCallBack , ToolTip , Reference , IsSuspense ,ColorPallete}) {
     //Hooks
     const [TextBoxData , SetTextBoxData] = useState('');
     const [DataTypeRegex , SetDataTypeRegex] = useState();
     const [IsTextBoxFocused , SetIsTextBoxFocused] = useState(false);
+    const [IsChecked , SetIsChecked] = useState(false);
+    const [ShowToolTip , SetShowToolTip] = useState(false);
     useEffect(() => {
         TBCallBack()
     } , [TextBoxData])
@@ -15,9 +17,22 @@ function TextBoxWithButton({Logo , ButtonLogo , IsMandatory , FloatingText , Typ
         SetDataType()
     } , [])
 
+    //Destructure
+    const [FirstComponent , SecondComponent] = ButtonLogo;
+
     //Functions
     const HandleInput = async (e) => {
         SetTextBoxData(e.target.value)
+    }
+
+    const HandleCheckButtonClick = async () => {
+        if(IsChecked){
+            SetIsChecked(false)
+        }
+        else{
+            SetIsChecked(true)
+        }
+        ButtonCallBack()
     }
 
     const HandleEnterKey = async (e) => {
@@ -55,9 +70,13 @@ function TextBoxWithButton({Logo , ButtonLogo , IsMandatory , FloatingText , Typ
                 color:TextBoxData.length > 0 ? ColorPallete[1] : ColorPallete[1] , fontWeight:IsTextBoxFocused ? "bold" : ""
             }}>{IsMandatory ? "* " + FloatingText : FloatingText}
             </p>
-            <button className = {Styles['TextBox-Btn']} style={{backgroundColor:ColorPallete[0]}} onClick={() => ButtonCallBack()}>
-                {IsSuspense ? <FallBackSpinner /> : <ButtonLogo />}
+            <button className = {Styles['TextBox-Btn']} style={{backgroundColor:ColorPallete[0] , '--ToolTipEdge': ColorPallete[0]}} onClick={() => HandleCheckButtonClick()} onMouseEnter={() => {SetShowToolTip(true)}} onMouseLeave={() => {SetShowToolTip(false)}}>
+                {IsSuspense ? <FallBackSpinner /> : IsChecked ? <FirstComponent/> : <SecondComponent />}
             </button>
+            {ShowToolTip ? <label className = {Styles['ToolTip-Lbl']} style={{backgroundColor:ColorPallete[1]}}>
+                {IsChecked ? ToolTip[0] : ToolTip[1]}
+            </label> : ''}
+            
         </div>
         
                 
@@ -65,4 +84,4 @@ function TextBoxWithButton({Logo , ButtonLogo , IsMandatory , FloatingText , Typ
   )
 }
 
-export default TextBoxWithButton
+export default TextBoxWithSwitchButton

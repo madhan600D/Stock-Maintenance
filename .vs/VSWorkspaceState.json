@@ -8,6 +8,5 @@
     "\\Server\\Services\\NotificationService\\NodeMailer",
     "\\Server\\Services\\UserService"
   ],
-  "SelectedNode": "\\Server\\Services\\NotificationService\\NodeMailer\\PushNotification.class.js",
   "PreviewInSolutionExplorer": false
 }

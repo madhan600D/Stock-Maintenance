@@ -4,7 +4,7 @@ const ShowToast = (success , message) => {
   if (success == true) {
     toast(`✅ ${message}` || 'Task Successful', {
       position: "top-center",
-      autoClose: 1000,
+      autoClose: 2000,
       hideProgressBar: true,
       closeOnClick: true,
       pauseOnHover: true,
@@ -15,7 +15,7 @@ const ShowToast = (success , message) => {
   } else {
     toast.warn(message, {
     position: "top-center",
-    autoClose: 1000,
+    autoClose: 2000,
     hideProgressBar: true,
     closeOnClick: true,
     pauseOnHover: true,

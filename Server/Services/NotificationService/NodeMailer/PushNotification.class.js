@@ -174,6 +174,7 @@ SendMail = async (UserName) => {
             }
         } catch (error) {
             console.log("Error at CoolDown Computation" , error.message)
+            return {success:false , message:`Failed at IsUserCoolDown: ${error.message}` }
         }
     }
     AddMailToBucket = async (UserName) => {

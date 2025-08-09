@@ -7,10 +7,10 @@ export const ConfirmUserController = async (Topic , Partition , Message) => {
             const ObjConfirmUser = new ConfirmUser(Message.Data.userMail , Message.Data.userName)
             const IsUserVerified = await ObjConfirmUser.ConfirmUser()
             
-            return {success:IsUserVerified , message:""}
+            return IsUserVerified ? {success:true , message:"User confirmed at Notification service end"} : {success:false , message:"User confirmation failed at Notification service end"}
         }
     } catch (error) {
-      console.log("Error while confirming user" + error.toString())  
+      return {success:false , message:`Notification Server side error at User confirmation Controller` + error.message}
     } 
     
 } 

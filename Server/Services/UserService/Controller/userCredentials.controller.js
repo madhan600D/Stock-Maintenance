@@ -9,7 +9,7 @@ import {ObjUserKafkaProducer} from '../Kafka/Producer/kafkaProducer.js'
 dotenv.config();
 export const signUpUser = async (req , res) => {
     try {
-        let KafkaMessage = {}
+        let KafkaMessage = {} 
         const isDataAtPendingUser = await objUserDb.pendingUsers.findOne({where:{userMail:req.body.userMail}})
 
         if(isDataAtPendingUser?.isVerified){
@@ -60,14 +60,14 @@ export const signUpUser = async (req , res) => {
         return res.status(200).json({success:true , message :`A verification mail has been sent to ${req.body.userMail} ,Please verify to proceed further`})
         
     } catch (error) {
-        console.log(error)
-        return res.status(500).json({success:false , message:"(Server Side)Error while creating a user...!"})
+        await objUserDb.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
+        return req.status(500).json({success:false , message:error.message})   
     }
 }
-export const addUser = async (req , res) => {
+export const addUser = async (req , res) => { 
     try {
         const {userName , userMail , password} = req.body
-        if(isUserMailVerified?.isVerified){
+        
             const passwordSalt = await bcrypt.genSalt(10)
             const passwordHash = await bcrypt.hash(password , passwordSalt)
 
@@ -78,7 +78,7 @@ export const addUser = async (req , res) => {
                     password:passwordHash,
                     profilePic:''
                 })
-            const JwtToken = GenerateJWT(newUser.userId);
+            const JwtToken = GenerateJWT(newUser.userId); 
 
             //Add session Data
             const currentTime = new Date()
@@ -89,16 +89,23 @@ export const addUser = async (req , res) => {
                     httpOnly:true,
                     secure:process.env.NODE_ENV !== "development",})
                 .status(200)
-                .json({success:true , message:'User created successfully'})
-        }
-        else{
-            return res.status(400).json({success:false , message:"Please verify the verification mail sent to the mentioned Email"})
-        }
+                .json({success:true , message:'User created successfully'})        
+
     } catch (error) {
-        console.log(error)
+        await objUserDb.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
         return res.status(500).json({success:false , message:"(Server Side)Error while creating a user...!"})
+        
     }
 }
+
+export const ValidateUser = async (req , res) => {
+    if(req.user){
+
+        return res.status(200).json({success:true , message:"Valid user",data:req.user})
+    }
+    return res.status(400).json({success:false , message:"Invalid user"}) 
+}
+
 //This handles the mail verification
 export const eMailConfirm = async (req , res) => {
     //A email with confirm button will be sent 
@@ -118,23 +125,32 @@ export const eMailConfirm = async (req , res) => {
             })
             .catch(console.log("User Verification failed...!"))        
     } catch (error) {
-        console.log(error)
+        await objUserDb.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
+        return req.status(500).json({success:false , message:error.message})   
+    }
+}
+
+export const GetLoadingTexts = async (req , res) => {
+    //API Structure:{}
+    try {
+        const LoadingTexts = await objUserDb.LoadingTexts.findAll()
+        return res.status(200).json({success:true , data:LoadingTexts})
+    } catch (error) {
+     await objUserDb.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
+     return req.status(500).json({success:false , message:error.message})   
     }
 }
 export const logInUser = async (req , res) => {
-    //API Structure:{userName,userPassword,userMail(optional),closeSession(optional)}
+    //API Structure:{userName,userPassword,userMail(optional),closeSession(optional)} 
     try {
         const userName = req.body.userName.toString()  , userPassword = req.body.password , userMail = req.body?.userMail || '', closeSession = req.body?.closeSession;
-        const userCredentials = await objUserDb.users.findOne({where:{[Op.or]:{userName:userName , userMail:userMail}}})
+        const userCredentials = await objUserDb.users.findOne({
+                                                        include:[{model:objUserDb.organizations , attributes:['organizationId' , 'organizationName']}] , 
+                                                        where:{[Op.or]:{userName:userName , userMail:userName}}})
         if(!userCredentials){
             return res.status(400).json({success:false , message:"Invalid userName ....!"})
         }
-        const currentTime = new Date()
-        const isActiveSession = await objUserDb.sessions.findAll({
-                                include:{model:objUserDb.users,
-                                where:{[Op.and]:{userName:userName}},
-                                attributes:['userName']} , 
-                                where:{isActive:true}})
+        const currentTime = new Date()  
                                 
         if(userCredentials.userName || userCredentials.userMail){
             
@@ -144,9 +160,14 @@ export const logInUser = async (req , res) => {
                 return res.status(400).json({success:false , message:"Incorrect password for entered UserName...!"})
             }
             //Check for active session
+            const isActiveSession = await objUserDb.sessions.findAll({
+                                include:{model:objUserDb.users,
+                                where:{[Op.and]:{userName:userName}},
+                                attributes:['userName']} , 
+                                where:{isActive:true}})
             if(isActiveSession){
                 if(closeSession){
-                    await objUserDb.sessions.update({isActive:false , LoggedOutAt:currentTime} , {where:{userId:userCredentials.userId}})
+                    await objUserDb.sessions.update({isActive:false , loggedOutAt:currentTime} , {where:{userId:userCredentials.userId}})
                     //TBD:Socket server to manually log out the logged in user
                 }
                 else{
@@ -158,13 +179,14 @@ export const logInUser = async (req , res) => {
             //TBD:Setup a socket protocol to logout the currrently logged in user
             //Kill the old session if exsits 
             const newSession = await objUserDb.sessions.create({userId:userCredentials.userId , loggedInAt:currentTime , LoggedOutAt:'' , isActive:true})
+            const userData = {UserID:userCredentials.userId , UserMail:userCredentials.userMail , UserName:userCredentials.userName , OrganizationID:userCredentials.organization.organizationId , OrganizationName:userCredentials.organization.organizationName}
             return res.cookie("jwt",
                 JwtToken , {
                     maxAge: 60 * 60 * 1000,
                     httpOnly:true,
                     secure:process.env.NODE_ENV !== "development",})
                 .status(200)
-                .json({success:true , message:'User logged-IN successfully'})
+                .json({success:true , message:'User logged-IN successfully' , data:userData})
         }
 
         else{
@@ -273,7 +295,7 @@ export const verifyOTP = async (OTP) => {
 //DB call Promises
 const verifyPendingUser =  async (reqId) =>{
     return new Promise(async (resolve , reject) => {
-        const isUserAvailableAndNotVerified = await objUserDb.pendingUsers.findOne({where:{[Op.or]:{verificationHash:reqId , isVerified:false}}})
+        const isUserAvailableAndNotVerified = await objUserDb.pendingUsers.findOne({where:{[Op.and]:{verificationHash:reqId , isVerified:false}}})
         if(isUserAvailableAndNotVerified){
             const verifiedUser = await objUserDb.pendingUsers.update({isVerified:true} , {where:{verificationHash:reqId}})
             resolve(verifiedUser)
