@@ -89,7 +89,7 @@ export const addUser = async (req , res) => {
                     httpOnly:true,
                     secure:process.env.NODE_ENV !== "development",})
                 .status(200)
-                .json({success:true , message:'User created successfully'})        
+                .json({success:true , message:'User created successfully'});     
 
     } catch (error) {
         await objUserDb.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
@@ -143,7 +143,7 @@ export const GetLoadingTexts = async (req , res) => {
 export const logInUser = async (req , res) => {
     //API Structure:{userName,userPassword,userMail(optional),closeSession(optional)} 
     try {
-        const userName = req.body.userName.toString()  , userPassword = req.body.password , userMail = req.body?.userMail || '', closeSession = req.body?.closeSession;
+        const userName = req.body.userName.toString().toLowerCase()  , userPassword = req.body.password , userMail = req.body?.userMail || '', closeSession = req.body?.closeSession;
         const userCredentials = await objUserDb.users.findOne({
                                                         include:[{model:objUserDb.organizations , attributes:['organizationId' , 'organizationName']}] , 
                                                         where:{[Op.or]:{userName:userName , userMail:userName}}})
@@ -153,7 +153,6 @@ export const logInUser = async (req , res) => {
         const currentTime = new Date()  
                                 
         if(userCredentials.userName || userCredentials.userMail){
-            
             //Password Validation
             const isPasswordCorrect = await bcrypt.compare(userPassword , userCredentials.password);
             if(!isPasswordCorrect){
@@ -164,7 +163,7 @@ export const logInUser = async (req , res) => {
                                 include:{model:objUserDb.users,
                                 where:{[Op.and]:{userName:userName}},
                                 attributes:['userName']} , 
-                                where:{isActive:true}})
+                                where:{isActive:true}});
             if(isActiveSession){
                 if(closeSession){
                     await objUserDb.sessions.update({isActive:false , loggedOutAt:currentTime} , {where:{userId:userCredentials.userId}})

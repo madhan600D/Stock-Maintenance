@@ -8,10 +8,10 @@ function CreateOrJoinOrgPage() {
   //UseEffects
   useEffect(() => {
     if(CurrentPage === 'CreateOrg'){
-      navigate('create-org');
+      navigate('../create-org');
     }
     else if(CurrentPage === 'JoinOrg'){
-      navigate('join-org');
+      navigate('../join-org');
     }
   } , [CurrentPage])
   return (

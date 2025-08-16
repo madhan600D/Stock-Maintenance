@@ -5,15 +5,24 @@ import {ENV_VerificationEndpoint , ObjPublicConfigVariables} from '../Declaratio
 import {objNotificationDB} from "../Utils/NotificationDB.js";
 import {ObjNotificationKafkaProducer} from '../Kafka/Producer/KafkaProducer.js'
 import {Op} from 'sequelize'
-import { kafka } from '../Kafka/kafka.config.js';
 export class PushMail{
     constructor(mailOptions){
-        //From and To and domain
-        this.ParentMailOptions = mailOptions
+        //Single Mail
+        if(!Array.isArray(mailOptions)){
+            this.ParentMailOptions = mailOptions
+        }
+        //Group Mail
+        else{
+            //Array Of objects
+            for (const Email of mailOptions){
+                this.ParentMailOptions.push(Email)
+            }
+        }
+        
         this.UserData
         this.NotificationData
     }
-SendMail = async (UserName) => {
+SendMail = async () => {
     try {
         const result = await this.IsUserAtCoolDown(this.ParentMailOptions.UserName);
         let KafkaResponse = {}
@@ -96,8 +105,10 @@ SendMail = async (UserName) => {
         throw error;
     }
 };
+    GroupMail = async() => {
+        //Push groupMail
 
-
+    }
     IsUserAtCoolDown = async (UserName) => {
         try {
             let CurrentTime = this.ConvertToDateTimeFormat(new Date())
@@ -206,7 +217,6 @@ SendMail = async (UserName) => {
         }
     }
 }
-
 export class EmailVerification extends PushMail{
     constructor(UserMail , UserName) {
         super({})

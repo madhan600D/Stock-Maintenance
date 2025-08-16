@@ -1,5 +1,11 @@
-import { Op, where } from "sequelize"
+import { Op } from "sequelize"
+
+//DataBase
 import objUserDb from "../Utils/userDB.js"
+
+//Kafka
+import {ObjUserKafkaProducer} from '../Kafka/Producer/kafkaProducer.js'
+
 export const joinOrg = async (req , res) => {
     //TBD: When adding user to a ORG a mail is sent to Admin and a task will be added in his task list
     //API Structure:{JoinId , userName , userId} request
@@ -32,18 +38,17 @@ export const joinOrg = async (req , res) => {
                     return res.status(400).json({success:false , message:errorMessage})
                 }
                 //Update the users Table organizationId
-                await objUserDb.users.update({organizationId:isOrgCodeExists.organizationId} , 
+                const joinedOrg = await objUserDb.users.update({organizationId:isOrgCodeExists.organizationId} , 
                                                                  {where:{userId:userId}})
                 
                 const updatedUser = await objUserDb.users.findOne({include:[{
-                    model:objUserDb.organizations, attributes:['organizationName']}
-                ]},{where:{userName:userName}}) 
-                return res.status(200).json({success:true , message:  `Sucessfully joined ${updatedUser.organization.organizationName} `})
-                break
+                        model:objUserDb.organizations, attributes:['organizationName']}
+                    ]},{where:{userName:userName}}) 
+                    return res.status(200).json({success:true , message:  `Sucessfully joined ${updatedUser.organization.organizationName}` , data:joinedOrg})
         }
     } catch (error) {
         await objUserDb.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
-        return req.status(500).json({success:false , message:error.message})
+        return req.status(500).json({success:false , message:error.message});
     }
 }
 export const createOrg = async (req , res) => {
@@ -53,13 +58,7 @@ export const createOrg = async (req , res) => {
     try {
         //API Structure: {organizationName , typeOfBusiness , street , city , country , pincode , userId}
         let errorMessage , OrganizationCode
-        const {organizationName , typeOfBusiness , street , city , country , pincode , userId} = req.body
-        const isOrgExist = await objUserDb.organizations.findOne({where:{organizationName:organizationName.toUpperCase()}})
-        if(isOrgExist){
-            errorMessage = "Organization name exists"
-            await objUserDb.userErrorLog.create({ErrorDescription:errorMessage , ClientorServer:'client'})
-            return res.status(400).json({success:false , message:errorMessage})
-        }
+        const {OrganizationName , BusinessType , Street , City , Country , PinCode} = req?.body
         //8 Digit unique ID --> Generate untill no Id is Found in DB
         OrganizationCode = Math.floor(10000000 + Math.random() * 90000000);
         let isIDExist = await objUserDb.organizations.findOne({where:{OrganizationJoiningCode:OrganizationCode}})
@@ -68,27 +67,39 @@ export const createOrg = async (req , res) => {
                 isIDExist = await objUserDb.organizations.findOne({where:{OrganizationJoiningCode:OrganizationCode}})
         }
         //Add in Org Table and Admin Table
-        const newOrganization = await objUserDb.organizations.create({organizationName:organizationName.toUpperCase() , 
-                                        typeofBusiness:typeOfBusiness,
-                                        street:street,
-                                        city:city,
-                                        country:country,
-                                        pincode:pincode,
+        const newOrganization = await objUserDb.organizations.create({organizationName:OrganizationName.toUpperCase() , 
+                                        typeofBusiness:BusinessType,
+                                        street:Street,
+                                        city:City,
+                                        country:Country,
+                                        pincode:PinCode,
                                         OrganizationJoiningCode:OrganizationCode
         })
         await objUserDb.admins.create({organizationId:newOrganization.organizationId , 
-                                       adminId:userId,
-                                       organizationName:organizationName.toUpperCase()
+                                       adminId:req.user.userId,
+                                       organizationName:OrganizationName.toUpperCase()
                                        
         })
-        //TBD:Call mail service and send mail to Admin with welcome details
+        //TBD:Call mail service and send mail to Admin with welcome details:Kafka
+        return res.status(200).json({success:true , message:`Sucessfully created organization ${newOrganization.organizationName}` , data:newOrganization});
+        
     } catch (error) {
         await objUserDb.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
         return res.status(500).json({success:false , message:error.message})
     }
 }
-export const inviteToOrg = async (req , res) => {
-
+export const groupInviteToOrg = async (req , res ) => {
+    //API Structure:{GroupOfUsers:[array]}
+    try {
+        let KafkaEvent = {GroupOfUsers:req.body.GroupOfUsers , OrganizationJoiningCode:req.OrganizationData.OrganizationJoiningCode , OrganizationName:req.OrganizationData.OrganizationName};
+        const IsSuccess = ObjUserKafkaProducer.ProduceEvent("Invite_Users" , "user.group_mail" , KafkaEvent);
+        if(!IsSuccess){
+            res.status(500).json({success:false , message:"Can't invite users to organization , Server failed ...!"})
+        }
+        res.status(200).json({success:false , message:"Organization invitation mail sent to mentioned users ...!"});
+    } catch (error) {
+     res.status(500).json({success:false , message:"Group invitation failed at server side"})   
+    }
 }
 
 export const leaveOrg = async (req ,res) => {

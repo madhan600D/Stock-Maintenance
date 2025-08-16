@@ -65,16 +65,30 @@ const useUser = create((set , get) => ({
             const res = await AxiosInstance.get('api/userservice/validate-user');
             const DataFromBackend = res.data;
             if(DataFromBackend.data){
+                console.log(DataFromBackend.data)
                 set({UserData:DataFromBackend.data});
-                set({IsAuthenticated:true});
+                set({
+                IsAuthenticated: true,
+                UserData: {
+                    UserName: DataFromBackend.data.UserName,
+                    UserMail: DataFromBackend.data.UserMail,
+                    UserID: DataFromBackend.data.UserID
+                },
+                OrganizationData: {
+                    OrganizationID: DataFromBackend.data.OrganizationID,
+                    OrganizationName: DataFromBackend.data.OrganizationName
+                }
+            });
                 return {success:true , message:DataFromBackend.message}
             }
             else{
                 set({IsAuthenticated:true});
-                set({UserData:{}})
+                set({UserData:{}});
+                set({OrganizationData:{}})
                 return {success:false , message:DataFromBackend.message}
             }
         } catch (error) {
+            set({IsAuthenticated:false})
             return{success:false , message:error.response ? error.response.data.message : error.message};
         }
         finally{

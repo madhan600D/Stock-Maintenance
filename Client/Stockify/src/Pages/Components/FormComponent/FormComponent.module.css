@@ -1,0 +1,68 @@
+.Main-Div{
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(33, 33, 33, 0.648);
+    padding: 1rem;
+    border: 2px solid wheat;
+    box-shadow: 0 0 10px rgba(17, 17, 17, 0.563);
+    border-radius: 5px;
+}
+
+.Sections-Div{
+    display: grid;
+    grid-template-columns: auto auto auto;
+    justify-content: space-between;
+    column-gap: 3rem;
+    row-gap: 1.5rem;
+    border-bottom: 1px solid wheat;
+    border-right: 1px solid wheat;
+    padding: 2rem;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(136, 136, 136, 0.221);
+    margin-bottom: 0.5rem;
+    display: grid;
+    
+}
+
+.Sections-Label{
+    width: 100%;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    text-decoration:double;
+}
+.Submit-Btn{
+    margin-top: 1rem;
+    background-color: transparent;
+    border: 1px solid wheat;
+    padding: 1rem;
+    font-weight: 400;
+    transition: all 0.3s ease-in;
+
+}
+
+.Submit-Btn:hover{
+    background-color: bisque;
+    color: black;
+}
+.Loader-Div{
+    background-color: linear-gradient(to right #414040 #6a6a6a #a6a6a6);
+    animation: BackGroundLoadingAnimation 1s ease-in-out infinite;
+}
+
+@keyframes BackGroundLoadingAnimation{
+    0%{
+        background-color: linear-gradient(to right #414040 #6a6a6a #a6a6a6);
+    }
+    25%{
+        background-color: linear-gradient(to right #6a6a6a #a6a6a6 #d3d3d3);   
+    }
+    50%{
+        background-color: linear-gradient(to right #a6a6a6 #d3d3d3 #e9e9e9bc);   
+    }
+    75%{
+        background-color: linear-gradient(to right #a6a6a6 #e9e9e9bc #ededed81)
+    }
+    100%{
+        background-color: linear-gradient(to right #414040 #6a6a6a #a6a6a6);
+    }
+}

@@ -12,11 +12,15 @@ const DeclareKafkaConsumers = async () => {
   const ObjKafkaConsumerCreateUser =  await new KafkaConsumer(kafka , objNotificationDB , 'user.create_user.request' , "CreateUserRequest")
   KafkaConsumers.set(ObjKafkaConsumerCreateUser , CreateUserController)
 
-  const ObjKafkaConsumerConfirmUser = await new KafkaConsumer(kafka , objNotificationDB , 'user.confirm_user.request' , "ConfirmUserRequest")
+  const ObjKafkaConsumerConfirmUser = await new KafkaConsumer(kafka , objNotificationDB , 'user.confirm_user.request' , "ConfirmUserRequest");
   KafkaConsumers.set(ObjKafkaConsumerConfirmUser , ConfirmUserController)
+  
+  const ObjKafkaConsumerGroupMail = await new KafkaConsumer(kafka , objNotificationDB , "user.group_mail" , "Group_Mail");
+  KafkaConsumers.set(ObjKafkaConsumerGroupMail , )
     //#endregion
 }
 
+//This makes listed kafka consumers to listen for events from mentioned topics
 export async function InitializeKafkaConsumers(AllKafkaConsumers){
   try {
     await DeclareKafkaConsumers()
