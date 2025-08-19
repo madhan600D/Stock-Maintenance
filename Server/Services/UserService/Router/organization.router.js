@@ -1,5 +1,5 @@
 import express from 'express'
-import { joinOrg ,  createOrg} from '../Controller/organization.controller.js';
+import { joinOrg ,  createOrg , groupInviteToOrg} from '../Controller/organization.controller.js';
 import { cookieValidation } from '../MiddleWares/cookieValidation.js';
 import {CreateOrgValidate , GroupInviteToOrgValidate} from '../MiddleWares/EndPointValidations/Org.validate.js'
 

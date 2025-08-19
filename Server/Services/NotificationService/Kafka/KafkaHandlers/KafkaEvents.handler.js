@@ -3,6 +3,7 @@ import { KafkaConsumer } from "../Consumer/KafkaConsumer.js";
 import {objNotificationDB} from '../../Utils/NotificationDB.js'
 import {CreateUserController} from '../../Controller/UserCreation.controller.js'
 import {ConfirmUserController} from '../../Controller/ConfirmUser.controller.js'
+import {OrganizationEvents} from '../../Controller/OrganizationEvents.controller.js'
 
 export let KafkaConsumers = new Map()
 
@@ -16,7 +17,7 @@ const DeclareKafkaConsumers = async () => {
   KafkaConsumers.set(ObjKafkaConsumerConfirmUser , ConfirmUserController)
   
   const ObjKafkaConsumerGroupMail = await new KafkaConsumer(kafka , objNotificationDB , "user.group_mail" , "Group_Mail");
-  KafkaConsumers.set(ObjKafkaConsumerGroupMail , )
+  KafkaConsumers.set(ObjKafkaConsumerGroupMail , OrganizationEvents)
     //#endregion
 }
 

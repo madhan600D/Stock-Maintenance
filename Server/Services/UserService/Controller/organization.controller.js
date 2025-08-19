@@ -80,6 +80,10 @@ export const createOrg = async (req , res) => {
                                        organizationName:OrganizationName.toUpperCase()
                                        
         })
+        await objUserDb.users.update(
+            { organizationId: newOrganization.organizationId }, 
+            { where: { userId: req.user.userId } }        
+        );
         //TBD:Call mail service and send mail to Admin with welcome details:Kafka
         return res.status(200).json({success:true , message:`Sucessfully created organization ${newOrganization.organizationName}` , data:newOrganization});
         
@@ -89,16 +93,18 @@ export const createOrg = async (req , res) => {
     }
 }
 export const groupInviteToOrg = async (req , res ) => {
-    //API Structure:{GroupOfUsers:[array]}
+    //API Strcuture = {GroupOfUsers[Array]}
     try {
-        let KafkaEvent = {GroupOfUsers:req.body.GroupOfUsers , OrganizationJoiningCode:req.OrganizationData.OrganizationJoiningCode , OrganizationName:req.OrganizationData.OrganizationName};
-        const IsSuccess = ObjUserKafkaProducer.ProduceEvent("Invite_Users" , "user.group_mail" , KafkaEvent);
+        let KafkaMessage  = {}
+        KafkaMessage.Data = {GroupOfUsers:req.body.GroupOfUsers , Organization:req.OrganizationData, UserData:req.UserData};
+        KafkaMessage.Event = "GroupMailInvitation"
+        const IsSuccess = await ObjUserKafkaProducer.ProduceEvent("GroupMailInvitation" , "user.group_mail" , KafkaMessage);
         if(!IsSuccess){
             res.status(500).json({success:false , message:"Can't invite users to organization , Server failed ...!"})
         }
         res.status(200).json({success:false , message:"Organization invitation mail sent to mentioned users ...!"});
     } catch (error) {
-     res.status(500).json({success:false , message:"Group invitation failed at server side"})   
+     res.status(500).json({success:false , message:"Group invitation failed at server side"});
     }
 }
 

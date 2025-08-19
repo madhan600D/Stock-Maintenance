@@ -9,24 +9,31 @@ export class GroupInvitation{
         //3.Send Mail
         //Initializaing Push Mail class
         //Array of objects{to , subject , HTML}
+        //Organization(OrganizationJoiningCode , OrganizationName)
         this.GroupOfUsers = GroupOfUsers;
         this.Organization = Organization;
         this.UserData = UserData;
+        this.ObjGroupMail = new GroupMail([] , UserData);
     }
-    SendGroupInvitation = async (From) => {
-        let ObjGroupMail = new GroupMail([] , From);
+    SendGroupInvitation = async () => {
+
         let InvitationHTMLTemplateGlobal = await ImportEmailHTML('Invitation');
+        let MailObjectArray = []
         for(let EmailIndex = 0 ; EmailIndex <= this.GroupOfUsers.length - 1 ; EmailIndex += 1){
             //1.Prepare HTML
             //2.Add UserMail to GroupMail class
-            InvitationHTMLTemplateGlobal = ''
-            this.PrepareHTML(InvitationHTMLTemplateGlobal , this.Organization , this.GroupOfUsers[EmailIndex].UserMail , "TBD" , EmailIndex);
+            let MailObject = {}
+            let InvitationHTMLTemplateLocal = InvitationHTMLTemplateGlobal
+            this.PrepareHTML(InvitationHTMLTemplateLocal , this.Organization , this.GroupOfUsers[EmailIndex] , "TBD" , MailObject);
             //Initializting Group Mail object
-            ObjGroupMail.ParentMailOptions.push(GroupOfUsers[EmailIndex]);
+            MailObjectArray.push(MailObject);
         }
-        ObjGroupMail.UserData = this.UserData;
+        //Sender
+        this.ObjGroupMail.UserData = this.UserData;
         //Push group mail
-        const IsGroupInvitationSent = await ObjGroupMail.PushGroupMail;
+        this.ObjGroupMail.ParentMailOptions = MailObjectArray
+
+        const IsGroupInvitationSent = await this.ObjGroupMail.PushGroupMail();
         if(IsGroupInvitationSent.success){
             return {success:true}
         }
@@ -34,15 +41,17 @@ export class GroupInvitation{
             return {success:false}
         }
     }
-    PrepareHTML = async (HTML , Organization , Email , URL , Index) => {
+    PrepareHTML = async (HTML , Organization  , Email , URL , MailObject) => {
         try {
             HTML = HTML.replace('{Email}' , Email.toString().toLowerCase());
-            HTML = HTML.replace('{Organization}', Organization);
+            HTML = HTML.replace('{Organization}', Organization.OrganizationName);
             HTML = HTML.replace('{URL}' , URL);
-            this.GroupOfUsers[Index].subject = `Email Invitation to join ${Organization}`;
-            this.GroupOfUsers[Index].html = HTML
+            HTML = HTML.replace('{OTP}' , Organization.OrganizationJoiningCode);
+            MailObject.subject = `Email Invitation to join ${Organization.OrganizationName}`;
+            MailObject.html = HTML
+            MailObject.to = Email
         } catch (error) {
-            console.log("Error at SendGroupInvite class:", error)
+            console.log("Error at SendGroupInvite class:", error);
             return false
         }
     }

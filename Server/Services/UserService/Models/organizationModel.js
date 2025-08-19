@@ -1,6 +1,6 @@
 // Organization Model
 export default (sequelize , DataTypes) => {
-    const organizationModel = sequelize.define('organization', {
+    const organizationModel = sequelize.define('organizations', {
     organizationId: {
       type: DataTypes.INTEGER,
       allowNull: false,

@@ -47,8 +47,12 @@ export class UserCreation{
     UserDataValidations = async (UserName , UserMail) => {
         try {
             const IsDuplicateUser = await objNotificationDB.Users.findOne({where:{ [Op.or]: [{ UserName: UserName}, {UserMail: UserMail }] }})
-            if (IsDuplicateUser) {
-                return {success:false , message: "Duplicate User"}
+            if (IsDuplicateUser.isActive !== true) {
+                await objNotificationDB.Users.findOne({} , {where:{[Op.or]:{UserName:UserName , UserMail:UserMail}}})
+                return {success:true , message: "New credentials updated...!"}
+            }
+            else if(IsDuplicateUser.isActive == true){
+                return {success:false , message:"Account already registered"}
             }
             return { success: true, message: "Valid User" } 
         }

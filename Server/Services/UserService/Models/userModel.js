@@ -1,7 +1,7 @@
 
 
 export default (Sequelize , DataTypes) => {
-    const UserModel = Sequelize.define('user' , 
+    const UserModel = Sequelize.define('users' , 
         {
             userId:{
                 type:DataTypes.INTEGER,

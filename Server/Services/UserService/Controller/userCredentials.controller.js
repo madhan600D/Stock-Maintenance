@@ -82,7 +82,7 @@ export const addUser = async (req , res) => {
 
             //Add session Data
             const currentTime = new Date()
-            await objUserDb.sessions.create({userId:newUser.userId , loggedInAt:new Date(TimeFormatter(currentTime)) , LoggedOutAt:'' , isActive:true})
+            await objUserDb.sessions.create({userId:newUser.userId , loggedInAt:Date(TimeFormatter(currentTime)) , LoggedOutAt:'' , isActive:true})
             return res.cookie("jwt",
                 JwtToken , {
                     maxAge: 60 * 60 * 1000,
@@ -100,10 +100,20 @@ export const addUser = async (req , res) => {
 
 export const ValidateUser = async (req , res) => {
     if(req.user){
+        const UserAndOrgData = await objUserDb.users.findOne({
+                                where: { userId: req.user.userId },
+                                include: [
+                                    {
+                                    model: objUserDb.organizations,
+                                    attributes: ['organizationName', 'organizationId']
+                                    }
+                                ]
+                                });
 
-        return res.status(200).json({success:true , message:"Valid user",data:req.user})
-    }
-    return res.status(400).json({success:false , message:"Invalid user"}) 
+        const UserData = {UserName:UserAndOrgData.userName , UserMail:UserAndOrgData.userMail , UserID:UserAndOrgData.userId , OrganizationID:UserAndOrgData.organization.organizationId , OrganizationName:UserAndOrgData.organization.organizationName}
+        return res.status(200).json({success:true , message:"Valid user",data:UserData})
+    } 
+    return res.status(200).json({success:false , message:"Invalid user"}) 
 }
 
 //This handles the mail verification

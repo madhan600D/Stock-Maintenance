@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import './App.css'
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useAsyncError } from "react-router-dom";
 
 //Global States 
 import useUser from './Stores/UserStore';
@@ -8,11 +8,13 @@ import useUser from './Stores/UserStore';
 //Pages
 import LoginPage from './Pages/LoginPage/LoginPage';
 import CreateOrJoinOrgPage from './Pages/CreateOrJoinOrgPage/CreateOrJoinOrgPage.jsx';
+import InviteToOrgPage from './Pages/InviteToOrgPage/InviteToOrgPage.jsx';
 import HomePage from './Pages/HomePage/HomePage.jsx';
 import { ToastContainer } from 'react-toastify';
 import ShowToast from './Pages/Components/Toast/Toast.js';
 import PageSuspense from './Pages/Components/Suspense Components/PageSuspense/PageSuspense.jsx';
 import CreateOrgPage from './Pages/CreateOrgPage/CreateOrgPage.jsx';
+import SideBar from './Pages/Components/SideBar/SideBar.jsx';
 
 
 //UseEffects
@@ -21,31 +23,73 @@ import CreateOrgPage from './Pages/CreateOrgPage/CreateOrgPage.jsx';
 
 
 function App() {
+ 
   const { IsAuthenticated , UserData , ValidateUser , GetLoadingTexts , IsPageLoading , OrganizationData} = useUser();
   useEffect(() => {
-     const response = ValidateUser()
-     ShowToast(response.success , response.message)
+    const AsyncUserValidate = async () =>{
+      const response =  await ValidateUser()
+      ShowToast(response.success , response.message)
+    }
+    AsyncUserValidate()
   } , []);
 
   useEffect(() => {
      GetLoadingTexts();
      
   } , []);
+
+  //Protected Routing
+  const ProtectedOrgRoute = ({Route , Url}) => {
+    try {
+      if(IsPageLoading){
+        return <PageSuspense />
+      }
+      if (IsAuthenticated){
+        if(OrganizationData.OrganizationID === 1){
+            return <Navigate to={'/create-join-org'} />
+          }
+
+      }
+      else{
+          return <Navigate to={'/login'} replace/>
+      }
+      SetCurrentRedirect(Url);
+      return Route;
+    } catch (error) {
+      console.log("Error at React-Router-Dom: Routing to login Page")
+      return <Navigate to={'/login'} replace/>
+    }
+  }
+
+
   return (
     <div className='Screen'>
+      
       <BrowserRouter>
         <Routes>
-          <Route path='/login' element = {IsAuthenticated ? OrganizationData.OrganizationID !== 1 ? <Navigate to={'/home'} /> : IsPageLoading ? <PageSuspense /> : <Navigate to={'/create-join-org'} /> : <Navigate to={"/login"} /> } />
-          
-          <Route path = {'/' || '/home' } element = {IsAuthenticated ? <HomePage /> : IsPageLoading ? <PageSuspense /> : <LoginPage />} />
+          <Route path="/login" element={IsAuthenticated ? <Navigate to={'/home'} /> : <LoginPage />} />
 
-          <Route path = '/create-join-org'  element = {IsPageLoading ? <PageSuspense /> : IsAuthenticated ? OrganizationData.OrganizationID == 1 ? <CreateOrJoinOrgPage /> : <Navigate to = {'/home'}/ > : <Navigate to = {'/login'} />}/>
-          
-          <Route path='/create-org' element = {IsAuthenticated ? IsPageLoading ? <PageSuspense /> : OrganizationData.OrganizationID == 1  ?  <CreateOrgPage /> : <Navigate to={"/home"} /> : <Navigate to={"/login"} />} />
+          <Route
+            path="/home"
+            element={IsAuthenticated ? OrganizationData.OrganizationID !== 1 ? <HomePage /> : <Navigate to={'/create-join-org'} /> : <LoginPage />}
+          />
 
-          {/* <Route path='/invite-to-org' element = {IsAuthenticated ? OrganizationData.OrganizationID !== 1 ? } */}
-        </Routes>
-      </BrowserRouter>
+          <Route
+            path="/create-join-org"
+            element={IsAuthenticated ? OrganizationData.OrganizationID !== 1 ? <Navigate to={'/home'} /> : <CreateOrJoinOrgPage /> : <LoginPage />}
+          />
+
+          <Route
+            path="/create-org"
+            element={IsAuthenticated ? OrganizationData.OrganizationID !== 1 ? <Navigate to={'/home'} /> : <CreateOrgPage /> : <LoginPage />}
+          />
+
+          <Route
+            path="/invite-to-org"
+            element = {<InviteToOrgPage />}
+          />
+    </Routes>
+  </BrowserRouter>
       <ToastContainer />
     </div>
   )

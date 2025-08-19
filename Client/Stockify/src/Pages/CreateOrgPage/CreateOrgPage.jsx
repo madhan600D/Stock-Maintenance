@@ -18,6 +18,7 @@ import { LiaCommentSolid } from "react-icons/lia";
 
 //Stores
 import useOrg from '../../Stores/OrgStore.js';
+import { useNavigate } from 'react-router-dom';
 
 function CreateOrgPage() {
   //Hooks
@@ -33,6 +34,7 @@ function CreateOrgPage() {
 
   //Destructure
   const {IsCreateOrgLoading , CreateOrg , OrganizationData} = useOrg();
+  const navigate = useNavigate();
   const HandleTextBoxChange = () => {
     SetFormData({
       OrganizationName: OrganizationNameRef.current?.value , BusinessType:BusinessTypeRef.current?.value , Street:StreetRef.current?.value , City:CityRef.current?.value , Country:CountryRef.current?.value , PinCode:PinCodeRef.current?.value
@@ -110,6 +112,8 @@ function CreateOrgPage() {
     if(NewOrganizationCreated.success){
       ShowToast(true , NewOrganizationCreated.message);
       //Route to Invite Page
+      navigate('/invite-to-org');
+      
     }
     else{
       ShowToast(false , NewOrganizationCreated.message);
@@ -120,7 +124,7 @@ function CreateOrgPage() {
       <div className={Styles["Main-Div"]}>
         <FormComponent 
         Inputs={TextBoxes} 
-        LoadingState={true}
+        LoadingState={false}
         LoadingComponent={FallBackSpinner}
         BtnCallBack={HandleSubmitButtonClick}
         />

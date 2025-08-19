@@ -7,6 +7,7 @@ import {Op} from 'sequelize'
 export class GroupMail{
     constructor(MailOptions , UserData){
         this.UserData = UserData
+        //Array of Objects {to , subject , body}
         this.ParentMailOptions = MailOptions
         this.NotificationData
         //{to , subject , body}
@@ -14,9 +15,9 @@ export class GroupMail{
     PushGroupMail = async () => {
         try {
             //Loop through class ParentMailOptions and send mail
-            let KafkaResponse;
+            let KafkaResponse = {};
             for(let Index = 0 ; Index <= this.ParentMailOptions.length - 1 ; Index += 1){
-                const IsSuccess = this.SendMail(Index)
+                const IsSuccess = await this.SendMail(Index)
                 if(!IsSuccess?.success){
                     KafkaResponse.Event = 'GroupMailSent'
                     KafkaResponse.Data = {Success : false , UserID : this.UserData.UserID , UserName : this.UserData.UserName , UserMail:this.ParentMailOptions[Index].to}
@@ -33,7 +34,7 @@ export class GroupMail{
         
     }
 
-    SendMail = async () => {
+    SendMail = async (Index) => {
         try {
             const result = await this.IsUserAtCoolDown(this.UserData.UserName);
 
@@ -61,7 +62,7 @@ export class GroupMail{
             } else {
                 const NotificationData = await objNotificationDB.Notifications.create({
                     Subject: this.ParentMailOptions[Index].subject,
-                    Body: this.ParentMailOptions[Index].text ? this.ParentMailOptions[Index].text : '<html>',
+                    Body: this.ParentMailOptions[Index]?.text ? this.ParentMailOptions[Index].text : '<html>',
                     ReceiverID: this.UserData.UserID
                 });
 

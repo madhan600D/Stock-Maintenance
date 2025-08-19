@@ -29,7 +29,7 @@ export class KafkaConsumer{
             eachMessage: async ({ topic, partition, message }) => 
             {   
                 const ParsedData = JSON.parse(message.value.toString())
-                console.log(`Notification Service got a event: ${topic} and message: ${ParsedData.Data.toString()}`)
+                console.log(`Notification Service got a event: ${topic} and message`)
                 
                 const IsSuccess = await CallBack(topic , partition , ParsedData)
                 await this.LogEvents(ParsedData , IsSuccess)

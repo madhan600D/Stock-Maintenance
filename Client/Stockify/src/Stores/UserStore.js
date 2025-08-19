@@ -60,7 +60,9 @@ const useUser = create((set , get) => ({
         }
     },
     ValidateUser:async () => {
-        set({IsPageLoading:true})
+        set({IsPageLoading:true , 
+            IsInitialLoad:false
+        })
         try {
             const res = await AxiosInstance.get('api/userservice/validate-user');
             const DataFromBackend = res.data;

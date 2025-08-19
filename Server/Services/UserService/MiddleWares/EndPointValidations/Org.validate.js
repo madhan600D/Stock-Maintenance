@@ -18,16 +18,16 @@ export const CreateOrgValidate = async (req , res , next) => {
         await objUserDb.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
         return res.status(500).json({success:false , message:error.message})
     }   
-}
+} 
 
 export const GroupInviteToOrgValidate = async (req , res , next) => {
     try {
         //API Structure {GroupOfUsers:[array]}
         const GroupOfUsers= req.body?.GroupOfUsers;
-        let UserID = req.users.userId
-        const IsValidAdmin = objUserDb.admins.findOne({
-                                                      include:[{model:objUserDb.users , attributes:['adminId' , 'organizationName']} , 
-                                                               {model:objUserDb.organizations , attributes:['OrganizationJoiningCode']}],
+        let UserID = req.user.userId;
+        const IsValidAdmin = await objUserDb.admins.findOne({
+                                                      include:[{model:objUserDb.users , attributes:['userName']}, 
+                                                               {model:objUserDb.organizations , attributes:['OrganizationJoiningCode' , 'organizationName']}],
                                                       where:{adminId:UserID}
                                                       })
         //If requester is not valid admin to an organization
@@ -39,7 +39,10 @@ export const GroupInviteToOrgValidate = async (req , res , next) => {
             res.status(400).json({success:false , message:"5 Users can be invited at a time...!"})
         }
         //Attach Org Data to the next middle ware
-        req.OrganizationData = {OrganizationName:IsValidAdmin.organizationName , OrganizationJoiningCode:IsValidAdmin.                 OrganizationJoiningCode};
+        req.OrganizationData = {OrganizationName:IsValidAdmin.organization.organizationName ,
+                                OrganizationJoiningCode:IsValidAdmin.organization.OrganizationJoiningCode};
+
+        req.UserData = {UserName:IsValidAdmin.user.userName , UserID:UserID}
 
         next();
     } catch (error) {

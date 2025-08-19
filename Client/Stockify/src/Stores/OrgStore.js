@@ -13,7 +13,7 @@ const useOrg = create((set , get) => ({
             const res = await AxiosInstance.put('./api/userservice/org/create-org' , OrgData);
             //NewOrg Data
             const DataFromBackend = res.data.data;
-            set({OrganizationData:{OrganizationName:DataFromBackend.organizationName , OrganizationID: organizationId , OrganizationJoiningCode: OrganizationJoiningCode}});
+            set({OrganizationData:{OrganizationName:DataFromBackend.organizationName , OrganizationID: DataFromBackend.organizationId , OrganizationJoiningCode: DataFromBackend.OrganizationJoiningCode}});
             return {success:true , message:`Congratulations on creating ${DataFromBackend.organizationName} ...!`}
         } catch (error) {
             return {success:false , message:DataFromBackend.data?.message || error.response.data.message || "Error while creating new organization ...!"}

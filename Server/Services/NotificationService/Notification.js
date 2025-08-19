@@ -2,7 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import {objNotificationDB} from './Utils/NotificationDB.js'
 import {ObjNotificationKafkaProducer} from './Kafka/Producer/KafkaProducer.js'
-import {KafkaConsumers , InitializeKafkaConsumers} from './Kafka/KafkaHandlers/UserCreation.handler.js'
+import {KafkaConsumers , InitializeKafkaConsumers} from './Kafka/KafkaHandlers/KafkaEvents.handler.js'
 dotenv.config();
 
 const NotificationServer = express();
@@ -15,11 +15,6 @@ const StartUp = async () => {
     await ObjNotificationKafkaProducer.ConnectProducer()
     await InitializeKafkaConsumers(KafkaConsumers)
     console.log("Notifications Service started Successfully ...!")
-    //Listen for all Kafka Events
-    //1.
-    
-
-    //2.
   } catch (error) {
     
   }
