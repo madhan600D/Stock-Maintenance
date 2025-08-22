@@ -1,6 +1,6 @@
 export default (sequelize, DataTypes) => {
   // UserRole Model
-  const UserRoleModel = sequelize.define('userRole', {
+  const UserRoleModel = sequelize.define('roles', {
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -26,6 +26,7 @@ export default (sequelize, DataTypes) => {
     },
   }, { 
     tableName: 'roles',
+    timeStamps:false
   });
  
   UserRoleModel.associate = (models) => {

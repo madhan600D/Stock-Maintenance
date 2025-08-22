@@ -5,8 +5,9 @@
     width: 100%;
 }
 .Logo-Div{
-    flex: 0 0 8%;
+    flex: 0 0 10%;
     margin: 0;
+    align-items: center;
     background-color: aqua;
     justify-content: center;
     /* height: 100%; */
@@ -14,18 +15,19 @@
     padding: 0.6rem;
 }
 .TexBoxAndLogo-Div{
-    flex: 2;
+    flex: 0 1 100%;
     display: flex;
     flex-direction: row;
     align-items: center;
+    width: 100%;
 }
 .TextBox-Input{
+    flex: 1;
     color: #2b2724;
-    width: 15rem;
     width: 100%;
     height: 2rem;
     max-width: 30rem;
-    background: #ffffff;
+    background: #ffffffcc;
     border-top-right-radius: 1.5px;
     border-bottom-right-radius: 1.5px;
     transition: all 0.2s ease;

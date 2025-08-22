@@ -1,0 +1,46 @@
+.Main-Div{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    flex-direction: column;
+    gap: 3rem;
+    backdrop-filter: blur(10px);
+}
+.Form-Div{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3rem;
+    padding: 2rem;
+    border-radius: 10px;
+    background-color: rgba(240, 248, 255, 0.475);
+}
+.Page-Div{
+    display: flex;
+    flex-direction: column;
+}
+
+
+
+.Submit-Btn{
+    margin-top: 1rem;
+    background-color: transparent;
+    border: 1px solid rgba(20, 25, 34, 0.696);
+    padding: 1rem;
+    font-weight: 400;
+    transition: all 0.3s ease;
+    margin-top: 3rem;
+
+}
+
+.Submit-Btn:hover{
+    border: 1px dotted rgba(20, 25, 34, 0.696);
+    background-color: rgba(28, 36, 49, 0.696);;
+    color: black;
+}
+.Code-Lbl{
+    font-weight: 100;
+    margin-top: 3rem;
+}

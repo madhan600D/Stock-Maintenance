@@ -1,9 +1,12 @@
 import React from 'react'
 import Styles from './InviteToOrgPage.module.css'
+import ItemAdder from '../Components/ItemAdder/ItemAdder.jsx'
 function InviteToOrgPage() {
   return (
     <div className = {Styles['Main-Div']}>
-        InviteToOrg
+            <ItemAdder 
+                ButtonText={"ADD"}
+            />
     </div>
   )
 }

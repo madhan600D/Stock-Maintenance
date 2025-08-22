@@ -42,7 +42,6 @@ const LoginPage = () => {
 
   //Functions
   const HandlePageChange = async (Param) => {
-    ShowToast(true , "Test")
     SetCurrentPage(Param)
   }
   const HandleEmailVerificationButtonClick = async () => {
@@ -110,14 +109,13 @@ const LoginPage = () => {
             <PageSelector
               CurrentPage={CurrentPage}
               SetCurrentPage={SetCurrentPage}
+              PageHeader={["LOGIN" , "SIGN UP"]}
             />
             <div className = {Styles['TextBox-Div']}>
-              <TextBoxWithSwitchButton
+              <TextBoxWithLogo
               Logo={FaUser}
               ButtonLogo={[FaUser , FaUserAltSlash]}
               IsMandatory={false}
-              ButtonCallBack={HandleKillSessionButtonClick}
-              ToolTip={["Kill Session" , "Keep Session"]}
               FloatingText={"USER NAME / E-MAIL"}
               Type={"STRING"}
               TBCallBack={HandleTextBoxChange}
@@ -175,6 +173,7 @@ const LoginPage = () => {
               <PageSelector
                 CurrentPage={CurrentPage}
                 SetCurrentPage={SetCurrentPage}
+                PageHeader={["LOGIN" , "SIGN UP"]}
               />
               <div className = {Styles['TextBox-Div']}>
                 <TextBoxWithLogo 
@@ -184,6 +183,7 @@ const LoginPage = () => {
                 Type={"STRING"}
                 TBCallBack={HandleTextBoxChange}
                 Reference={UserNameRef}
+                IsLoading={IsSignUpLoading}
                 ColorPallete={["#3fb1d5" , "#4085badf"]}
               />
               <TextBoxWithButton 
@@ -215,6 +215,7 @@ const LoginPage = () => {
                 FloatingText={"CONFIRM PASSWORD"}
                 TBCallBack={HandleTextBoxChange}
                 Type={"STRING"}
+                IsLoading={IsSignUpLoading}
                 Reference={ConfirmPasswordRef}
                 ColorPallete={["#d53f3fff" , "#ff7e7ee7"]}
               />

@@ -1,17 +1,49 @@
 /* Side Bar Component */
 .Main-Div{
-    width:35%;
+    width:25%;
     display: flex;
     flex-direction: column;
+    background-color: #161a23;
+    border-radius: 10px;
     border-right: 1px solid rgba(156, 156, 156, 0.853);
 }
 .Top-Div{
+    border-bottom: 1px solid rgba(255, 255, 255, 0.421);
+    background-color: #34373f;
+    box-shadow:  0 0 3px  #15171a;;
     display: flex;
-    justify-content:left;
-    margin-left: 1rem;
+    justify-content:space-evenly;
+    gap: 2rem;
+    /* margin-left: 1rem; */
     align-items: center;
     height: 10%;
+    position: relative;
     font-weight: 700;
+}
+
+.Top-Div label{
+    margin: 0;
+    left: 0.5rem;
+    background: linear-gradient(90deg, #ff7e5f, #feb47b); /* Gradient colors */
+    -webkit-background-clip: text;   
+    -webkit-text-fill-color: transparent;
+    background-clip: text;           
+    color: transparent; 
+    position: relative;
+}
+.SideBar-Svg{
+    position: absolute;
+    right:0;
+    transform: translate(0.8rem,0);
+    top: 0;
+    height: 1.5rem;
+    width: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.SideBar-Svg:hover{
+    cursor: pointer;
+    box-shadow: 0 0 10px#feb47b;
 }
 .Content-Div{
     width: 100%;
@@ -20,7 +52,7 @@
     align-items: center;
     gap: 0.6rem;   
     padding: 0.2rem;
-    margin-left: 0.2rem;
+    margin-left: 0.1rem;
     width: 100%;
     margin-top: 1rem;
 }

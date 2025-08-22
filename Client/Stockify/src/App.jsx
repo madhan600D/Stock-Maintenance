@@ -15,6 +15,7 @@ import ShowToast from './Pages/Components/Toast/Toast.js';
 import PageSuspense from './Pages/Components/Suspense Components/PageSuspense/PageSuspense.jsx';
 import CreateOrgPage from './Pages/CreateOrgPage/CreateOrgPage.jsx';
 import SideBar from './Pages/Components/SideBar/SideBar.jsx';
+import JoinOrgPage from './Pages/JoinOrgPage/JoinOrgPage.jsx';
 
 
 //UseEffects
@@ -88,6 +89,10 @@ function App() {
             path="/invite-to-org"
             element = {<InviteToOrgPage />}
           />
+
+          <Route
+            path='/join-org'
+            element = {IsPageLoading ? <PageSuspense /> : IsAuthenticated ? OrganizationData.OrganizationID == 1 ? <JoinOrgPage /> : <Navigate to = {'/home'} /> : <Navigate to = {'/login'} />} />
     </Routes>
   </BrowserRouter>
       <ToastContainer />

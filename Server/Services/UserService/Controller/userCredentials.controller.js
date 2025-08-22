@@ -153,7 +153,8 @@ export const GetLoadingTexts = async (req , res) => {
 export const logInUser = async (req , res) => {
     //API Structure:{userName,userPassword,userMail(optional),closeSession(optional)} 
     try {
-        const userName = req.body.userName.toString().toLowerCase()  , userPassword = req.body.password , userMail = req.body?.userMail || '', closeSession = req.body?.closeSession;
+        const userName = req.body.userName.toString().toLowerCase()  , userPassword = req.body.password , userMail = req.body?.userMail || '';
+        let closeSession = true
         const userCredentials = await objUserDb.users.findOne({
                                                         include:[{model:objUserDb.organizations , attributes:['organizationId' , 'organizationName']}] , 
                                                         where:{[Op.or]:{userName:userName , userMail:userName}}})

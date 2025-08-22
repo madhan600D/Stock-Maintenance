@@ -11,10 +11,11 @@ export const joinOrg = async (req , res) => {
     //API Structure:{JoinId , userName , userId} request
     //API Structure:{JoinMethod , userName , userId , OrganizationJoiningCode} referral
     try {
-        const {JoinMethod , userName , userId} = req.body
+        const JoinOrgTransaction = objUserDb.userDB.transaction()
+        const {JoinMethod} = req.body
         let errorMessage
-        let isUserExists = await objUserDb.users.findOne({where:{userId:userId}})
-        if(!isUserExists){
+        let ValidUser = await objUserDb.users.findOne({where:{[Op.and]:{userId:req.user.userId , organizationId:1}}})
+        if(!ValidUser){
             errorMessage = "Invalid user, Cannot join organization ...!"
             await objUserDb.userErrorLog.create({ErrorDescription:errorMessage , ClientorServer:'client'})
             return res.status(400).json({success:false , message:errorMessage})
@@ -39,15 +40,22 @@ export const joinOrg = async (req , res) => {
                 }
                 //Update the users Table organizationId
                 const joinedOrg = await objUserDb.users.update({organizationId:isOrgCodeExists.organizationId} , 
-                                                                 {where:{userId:userId}})
+                                                                 {where:{userId:req.user.userId} , transaction:JoinOrgTransaction})
                 
                 const updatedUser = await objUserDb.users.findOne({include:[{
                         model:objUserDb.organizations, attributes:['organizationName']}
-                    ]},{where:{userName:userName}}) 
-                    return res.status(200).json({success:true , message:  `Sucessfully joined ${updatedUser.organization.organizationName}` , data:joinedOrg})
+                    ]},{where:{userName:req.user.userId} , transaction:JoinOrgTransaction}) 
+
+                const NewRole = await objUserDb.userRoles.create({userId:req.user.userId , roleId:3 , role:"Staff" , organizationId:joinOrg.organizationId} , {transaction:JoinOrgTransaction})
+                
+                const DataToClient = {organizationName:updatedUser.organizatinName , organizationId:updatedUser.organizationId , }
+
+                await JoinOrgTransaction.commit()
+                return res.status(200).json({success:true , message:  `Sucessfully joined ${updatedUser.organization.organizationName}` , data:DataToClient})
         }
     } catch (error) {
         await objUserDb.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
+        await JoinOrgTransaction.rollback()
         return req.status(500).json({success:false , message:error.message});
     }
 }
@@ -57,6 +65,7 @@ export const createOrg = async (req , res) => {
     //Entering the code will add the user to the org
     try {
         //API Structure: {organizationName , typeOfBusiness , street , city , country , pincode , userId}
+        const CreateOrgTransaction = objUserDb.userDB.transaction();
         let errorMessage , OrganizationCode
         const {OrganizationName , BusinessType , Street , City , Country , PinCode} = req?.body
         //8 Digit unique ID --> Generate untill no Id is Found in DB
@@ -74,21 +83,26 @@ export const createOrg = async (req , res) => {
                                         country:Country,
                                         pincode:PinCode,
                                         OrganizationJoiningCode:OrganizationCode
-        })
+        } , {transaction:CreateOrgTransaction})
         await objUserDb.admins.create({organizationId:newOrganization.organizationId , 
                                        adminId:req.user.userId,
                                        organizationName:OrganizationName.toUpperCase()
-                                       
-        })
+        } , {transaction:CreateOrgTransaction})
+
         await objUserDb.users.update(
             { organizationId: newOrganization.organizationId }, 
-            { where: { userId: req.user.userId } }        
+            { where: { userId: req.user.userId } , transaction:CreateOrgTransaction }        
         );
+
+        //Add to Roles table
+        await objUserDb.userRoles.create({userId:req.user.userId , roleId:1 , role:"Admin" , organizationId:newOrganization.organizationId})
+        await CreateOrgTransaction.commit()
         //TBD:Call mail service and send mail to Admin with welcome details:Kafka
         return res.status(200).json({success:true , message:`Sucessfully created organization ${newOrganization.organizationName}` , data:newOrganization});
         
     } catch (error) {
         await objUserDb.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
+        await CreateOrgTransaction.rollback()
         return res.status(500).json({success:false , message:error.message})
     }
 }

@@ -152,8 +152,8 @@ const Validate = async (ValidationType , Data) => {
         return {success:true , message:"Validation successfull ...!"}
     }
     if(ValidationType === "LogIn"){
-        const {userName , password , closeSession} = Data;
-        if(!userName || !password || !closeSession){
+        const {userName , password} = Data;
+        if(!userName || !password){
             return {success:false , message:"Please fill all the fields ...!"}
         }
         return {success:true , message:"Validation successfull ...!"}

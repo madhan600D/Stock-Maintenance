@@ -1,0 +1,22 @@
+.Main-Div{
+    display: flex;
+    flex-direction: row;
+    background-color: aliceblue;
+    justify-content: center;
+    align-items: center;
+
+}
+
+
+.Add-Svg{
+    height:1.5rem;
+    width: 1.5rem;
+}
+
+.Div {
+        display: flex;
+    flex-direction: column;
+    background-color: aliceblue;
+    justify-content: center;
+    align-items: center;
+}

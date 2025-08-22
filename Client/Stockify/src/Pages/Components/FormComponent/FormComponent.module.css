@@ -2,16 +2,23 @@
     display: flex;
     flex-direction: column;
     background-color: rgba(33, 33, 33, 0.648);
-    padding: 1rem;
+    height: 100vh;
+    overflow-y: auto; 
+    overflow-x: hidden; 
+    padding: 1rem;;
+    width: 75%;
+    position: relative;
+    position: sticky;
     border: 2px solid wheat;
+    overflow: scroll;
     box-shadow: 0 0 10px rgba(17, 17, 17, 0.563);
     border-radius: 5px;
 }
 
 .Sections-Div{
-    display: grid;
-    grid-template-columns: auto auto auto;
-    justify-content: space-between;
+    display: flex;
+    align-items: center;
+    width:75%;
     column-gap: 3rem;
     row-gap: 1.5rem;
     border-bottom: 1px solid wheat;
@@ -19,7 +26,7 @@
     padding: 2rem;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(136, 136, 136, 0.221);
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
     display: grid;
     
 }
@@ -35,7 +42,11 @@
     background-color: transparent;
     border: 1px solid wheat;
     padding: 1rem;
+    width: 50%;
     font-weight: 400;
+    left: 25%;
+    position:sticky;
+    bottom: 0;
     transition: all 0.3s ease-in;
 
 }

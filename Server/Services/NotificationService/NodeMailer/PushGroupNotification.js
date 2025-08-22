@@ -41,7 +41,7 @@ export class GroupMail{
             let KafkaResponse = {}
             if (result.success === false) {
                 // TBD: Kafka response as userName is at CoolDown 
-                KafkaResponse.Event = UserInCooldown
+                KafkaResponse.Event = "UserInCooldown"
                 KafkaResponse.Data = {Success:false , UserID : this.UserData.UserID , UserName : this.UserData.UserName , UserMail:this.UserData.UserMail}
                 ObjNotificationKafkaProducer.ProduceEvent('UserInCooldown' , 'user.group_mail.response' ,KafkaResponse )
                 return { success: false, message: result?.message ? result.message : "User cool down validation failed." };
@@ -111,7 +111,7 @@ export class GroupMail{
 
         } catch (error) {
             console.error("Error in SendMail:", error);
-            throw error;
+            ;
         }
     };
 

@@ -9,6 +9,10 @@ import { LuListTodo } from "react-icons/lu";
 import { IoIosArrowDown } from "react-icons/io";
 import { BiCaretRight } from "react-icons/bi";
 import { IoSettings } from "react-icons/io5";
+import { FaWindowClose } from "react-icons/fa";
+import { BsLayoutTextSidebarReverse } from "react-icons/bs";
+
+
 
 import Styles from './SideBar.module.css'
 import { Link } from 'react-router-dom';
@@ -28,6 +32,7 @@ function SideBar() {
         <label>
           E-Nventory
         </label>
+        <FaWindowClose className={Styles['SideBar-Svg']} />
       </div>
       <div className = {Styles['Content-Div']}>
         <Menu 

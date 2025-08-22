@@ -1,6 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Styles from './TextBoxWithLogo.module.css'
-function TextBoxWithLogo({Logo , IsMandatory , FloatingText , Type , TBCallBack , Reference ,ColorPallete}) {
+
+//Components
+import FallBackSpinner from '../Suspense Components/FallBackSpinner/FallBackSpinner';
+import TypingSuspense from '../Suspense Components/TypingSuspense/TypingSuspense';
+function TextBoxWithLogo({Logo , IsMandatory , FloatingText , Type , TBCallBack , Reference , IsLoading ,ColorPallete}) {
     //Hooks
     const [TextBoxData , SetTextBoxData] = useState('');
     const [DataTypeRegex , SetDataTypeRegex] = useState();
@@ -43,8 +47,9 @@ function TextBoxWithLogo({Logo , IsMandatory , FloatingText , Type , TBCallBack 
 
   return (
     <div className= {Styles['Main-Div']}>
-        <div className = {Styles['Logo-Div']} style = {{background:ColorPallete[0]}}>
-            <Logo />
+        <div className = {Styles['Logo-Div']} style = {{background:ColorPallete[0]}}>    
+            {IsLoading ? <FallBackSpinner /> : <Logo />}
+            
         </div>
         <div className = {Styles['TexBoxAndLogo-Div']}>
             <input value={TextBoxData} ref={Reference} onChange={HandleInput} pattern = {DataTypeRegex}  className= {Styles['TextBox-Input']} onFocus={() => SetIsTextBoxFocused(true)} onBlur={() => SetIsTextBoxFocused(false)} onKeyDown={HandleEnterKey}/>

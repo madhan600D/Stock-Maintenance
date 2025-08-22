@@ -103,7 +103,8 @@ function CreateOrgPage() {
         Reference={DescriptionRef}
         ColorPallete={["#3c3c3cff", "#7e7e7eff"]}
         TBCallBack={HandleTextBoxChange}
-      />]})
+      /> 
+    ]})
       
   );
   }, []);
