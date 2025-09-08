@@ -5,6 +5,7 @@ import objUserDb from "../Utils/userDB.js"
 
 //Kafka
 import {ObjUserKafkaProducer} from '../Kafka/Producer/kafkaProducer.js'
+import { raw } from "express"
 
 export const joinOrg = async (req , res) => {
     //TBD: When adding user to a ORG a mail is sent to Admin and a task will be added in his task list
@@ -113,7 +114,7 @@ export const groupInviteToOrg = async (req , res ) => {
         KafkaMessage.Data = {GroupOfUsers:req.body.GroupOfUsers , Organization:req.OrganizationData, UserData:req.UserData};
         KafkaMessage.Event = "GroupMailInvitation"
         const IsSuccess = await ObjUserKafkaProducer.ProduceEvent("GroupMailInvitation" , "user.group_mail" , KafkaMessage);
-        if(!IsSuccess){
+        if(!IsSuccess){ 
             res.status(500).json({success:false , message:"Can't invite users to organization , Server failed ...!"})
         }
         res.status(200).json({success:false , message:"Organization invitation mail sent to mentioned users ...!"});
@@ -124,6 +125,15 @@ export const groupInviteToOrg = async (req , res ) => {
 
 export const leaveOrg = async (req ,res) => {
 
+}
+export const getOrganizations = async (req , res) => {
+    try {
+        const AllOrganizations = await objUserDb.organizations.findAll({where:{organizationName:{[Op.ne]:'New'}}, attributes:['organizationName'] , raw:true})
+
+        return res.status(200).json({success:true , data:AllOrganizations})
+    } catch (error) {
+        
+    }
 }
 
 export const acceptOrgRequest = async (req) =>{

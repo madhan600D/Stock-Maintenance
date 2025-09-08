@@ -36,7 +36,7 @@ export class KafkaProducer{
         try {
             const ProducedEvent = await this.DataBase.producedEvents.create({
                 Topic:topic,
-                Event:JSON.stringify(event),
+                Event:JSON.stringify(event.Data),
                 IsResponseReceived:false
             })
             return ProducedEvent.ProducedEventID

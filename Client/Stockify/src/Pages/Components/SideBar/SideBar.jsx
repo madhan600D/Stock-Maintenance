@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import Styles from './SideBar.module.css'
+
 import { useNavigate } from 'react-router-dom';
 //Logos
 import { IoMdHome } from "react-icons/io";
@@ -10,12 +12,14 @@ import { IoIosArrowDown } from "react-icons/io";
 import { BiCaretRight } from "react-icons/bi";
 import { IoSettings } from "react-icons/io5";
 import { FaWindowClose } from "react-icons/fa";
+import { TbReportAnalytics } from "react-icons/tb";
+import { AiOutlineStock } from "react-icons/ai";
+import { MdOutlineInventory } from "react-icons/md";
+import { FaUsers } from "react-icons/fa";
 import { BsLayoutTextSidebarReverse } from "react-icons/bs";
 
-
-
-import Styles from './SideBar.module.css'
-import { Link } from 'react-router-dom';
+//Stores
+import useOrg from '../../../Stores/OrgStore';
 
 function SideBar() {
   //Hooks
@@ -25,6 +29,10 @@ function SideBar() {
   const HandleInviteToOrgClick = async () => {
       navigate('/invite-to-org')
   }
+
+  //Destructure
+
+  const {OrganizationData} = useOrg();
   const MaxTextLimit = 10;
   return (
     <div className = {Styles['Main-Div']}>
@@ -36,24 +44,8 @@ function SideBar() {
       </div>
       <div className = {Styles['Content-Div']}>
         <Menu 
-          MenuLogo={IoMdHome}
-          MenuText={"Home"}
-        />
-        <Menu 
-          MenuLogo={CgProfile}
-          MenuText={"Profile"}
-          ArrayOfSubMenus={[
-              {MenuText:"Edit Profile"},
-              {MenuText:"Update Profile"}
-            ]}      
-        />
-        <Menu 
-          MenuLogo={FaTasks}
-          MenuText={"Tasks"}
-          ArrayOfSubMenus={[
-              {MenuText:"My Tasks"},
-              {MenuText:"Update Tasks"}
-            ]}   
+          MenuLogo={MdOutlineInventory}
+          MenuText={"Inventory"}
         />
         <Menu 
           MenuLogo={GoOrganization}
@@ -62,6 +54,44 @@ function SideBar() {
               {MenuText:"Invite to org" , Callback:HandleInviteToOrgClick },
               {MenuText:"Edit Organization"}
             ]}   
+        />
+        <Menu 
+          MenuLogo={AiOutlineStock}
+          MenuText={"Stock"}
+          ArrayOfSubMenus={[
+              {MenuText:"ForeCast Stocks"},
+              {MenuText:"Stock Settings"}
+            ]}   
+        />
+        <Menu 
+          MenuLogo={FaUsers}
+          MenuText={"Users"}
+          ArrayOfSubMenus={[
+              {MenuText:"User Management"},
+              {MenuText:"Group Buzz"},
+              {MenuText:"Chat"}
+            ]}      
+        />
+        <Menu 
+          MenuLogo={TbReportAnalytics}
+          MenuText={"Reports"}
+          ArrayOfSubMenus={[
+              {MenuText:"CurrentDay Report"},
+              {MenuText:"PNL Report"},
+              {MenuText:"History Data"}
+            ]}      
+        />
+        <Menu 
+          MenuLogo={FaTasks}
+          MenuText={"Tasks"}
+        />
+        <Menu 
+          MenuLogo={CgProfile}
+          MenuText={"Profile"}
+          ArrayOfSubMenus={[
+              {MenuText:"Edit Profile"},
+              {MenuText:"Update Profile"}
+            ]}      
         />
         <Menu 
           MenuLogo={IoSettings}

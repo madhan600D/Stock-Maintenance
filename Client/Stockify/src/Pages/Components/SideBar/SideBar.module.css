@@ -34,7 +34,6 @@
 .SideBar-Svg{
     position: absolute;
     right:0;
-    transform: translate(0.8rem,0);
     top: 0;
     height: 1.5rem;
     width: 1.5rem;
@@ -52,7 +51,6 @@
     align-items: center;
     gap: 0.6rem;   
     padding: 0.2rem;
-    margin-left: 0.1rem;
     width: 100%;
     margin-top: 1rem;
 }

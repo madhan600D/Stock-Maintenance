@@ -6,9 +6,11 @@ import FormComponent from '../Components/FormComponent/FormComponent'
 import PageSelector from '../Components/PageSelector/PageSelector'
 import TextBoxWithLogo from '../Components/TextBoxWithLogo/TextBoxWithLogo';
 import ShowToast from '../Components/Toast/Toast.js'
+import SideBar from '../Components/SideBar/SideBar.jsx'
 
 //Logos
 import { IoQrCodeOutline } from "react-icons/io5";
+import { IoSearchCircle } from "react-icons/io5";
 
 //Hooks
 
@@ -18,19 +20,29 @@ import useOrg from '../../Stores/OrgStore';
 import PageSuspense from '../Components/Suspense Components/PageSuspense/PageSuspense';
 import TypingSuspense from '../Components/Suspense Components/TypingSuspense/TypingSuspense';
 import ItemAdder from '../Components/ItemAdder/ItemAdder.jsx';
+import SearchBox from '../Components/SearchBox/SearchBox.jsx';
+
 function JoinOrgPage() {
     //Login: Code , SignUp: Refferal
     const [CurrentPage , SetCurrentPage] = useState("Login");
     const [FormData , SetFormData] = useState({JoinMethod:"" ,OrganizationJoiningCode:"" , OrganizatinName:""})
     const [OTP , SetOTP] = useState();
     const OTPRef = useRef();
+    //Store
+    const {IsJoiningOrg , JoinOrg , GetAllOrganizations , AllOrganizations} = useOrg()
 
     //UseEffect to set The current page
     useEffect(() => {
-        SetFormData((Prev) => ({...Prev , JoinMethod: CurrentPage === "Login" ? "Code" : "request"}))
+        SetFormData((Prev) => ({...Prev , JoinMethod: CurrentPage === "Login" ? "referral" : "request"}))
     } , [CurrentPage])
-    //Store
-    const {IsJoiningOrg , JoinOrg} = useOrg()
+
+    useEffect( () => {
+        const GetOrgs = async() =>{
+            await GetAllOrganizations()
+        }   
+        GetOrgs()
+    } , [])
+    
 
     //functions
     const HandleSubmitButtonClick = async () =>{
@@ -47,7 +59,7 @@ function JoinOrgPage() {
     }
 
     const HandlePageChange = async () => {
-        SetCurrentPage(CurrentPage === "Login" ? "Sign up" : "Login")
+        SetCurrentPage(CurrentPage === "Login" ? "SignUp" : "Login")
     }
   return (
     <div className= {Styles["Main-Div"]}>
@@ -83,8 +95,16 @@ function JoinOrgPage() {
         
         
         :<div className= {Styles["Page-Div"]}>
-            <ItemAdder 
-                ButtonText={"ADD"}
+            <SearchBox 
+            Data={AllOrganizations}
+            MaxItems={3}
+            InitialFocus={true}
+            PlaceHolder='Enter the org name to join ...'
+            Logo={IoSearchCircle}
+            ColorPallete={["red" , "red"]}
+            DataType={"STRING"}
+            FilterType={"InitialString"}
+            OnSelection={() => {console.log("On selection called")}}
             />
         </div> 
         }
@@ -92,5 +112,4 @@ function JoinOrgPage() {
     </div>
   )
 }
-
 export default JoinOrgPage

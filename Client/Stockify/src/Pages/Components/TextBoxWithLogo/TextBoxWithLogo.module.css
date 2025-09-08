@@ -2,45 +2,48 @@
     display: flex;
     align-items: center;
     padding: 0;
-    width: 100%;
 }
 .Logo-Div{
-    flex: 0 0 10%;
+    flex: 0 0 8%;
+    border-bottom-left-radius: 2.5px;
+    border-top-left-radius: 2.5px;
     margin: 0;
     align-items: center;
-    background-color: aqua;
     justify-content: center;
-    /* height: 100%; */
     display: flex;
     padding: 0.6rem;
 }
 .TexBoxAndLogo-Div{
-    flex: 0 1 100%;
+    flex: 1 0 auto;
     display: flex;
+    position: relative;
     flex-direction: row;
     align-items: center;
-    width: 100%;
+    min-width: 10rem; 
+    flex-wrap: wrap;
 }
 .TextBox-Input{
-    flex: 1;
+    flex: 0 0 100%;
     color: #2b2724;
-    width: 100%;
+    min-width: 10rem;
     height: 2rem;
-    max-width: 30rem;
     background: #ffffffcc;
     border-top-right-radius: 1.5px;
     border-bottom-right-radius: 1.5px;
     transition: all 0.2s ease;
     border: 0.6px solid rgba(255, 255, 255, 0.3);
+    outline: none;
     box-shadow: inset 0 0 10px rgba(68, 65, 65, 0.356);
     font-family: poppins;
     font-size: 0.8rem;
 }
 .TextBox-Label {
+    max-width: 100%;
     color: #2b2724;
     user-select: none;
     pointer-events: none;
     font-size: 0.8rem;
+    white-space: nowrap;
     position: absolute;
     background: transparent;
     transform: translate(0.5rem , 0);
@@ -51,9 +54,20 @@
 .TextBox-Input:focus +  .TextBox-Label
 {
     font-size: 0.8rem;
-    transform: translate(0,-2rem);
+    transform: translate(0,-2.2rem);
     opacity: 1;
 }
+
+.Logo-Svg{
+    transition: all 0.5s ease;
+}
+.TextBox-Input:focus + .Logo-Svg{
+
+    transform: rotate(180deg);
+    height: 100px;
+    opacity: 0.75;
+}
+
 .TextBox-Input:focus{
     transform: none;
     border-radius: none;

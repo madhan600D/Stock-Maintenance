@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import Styles from './TextBoxWithSwitchButton.module.css'
 
 import FallBackSpinner from '../Suspense Components/FallBackSpinner/FallBackSpinner';
-function TextBoxWithSwitchButton({Logo , ButtonLogo , IsMandatory , FloatingText , Type , ButtonCallBack , TBCallBack , ToolTip , Reference , IsSuspense ,ColorPallete}) {
+function TextBoxWithSwitchButton({Logo , ButtonLogo , IsMandatory , FloatingText , Type , ButtonCallBack  , TBCallBack , ToolTip , Reference , IsSuspense ,ColorPallete}) {
     //Hooks
     const [TextBoxData , SetTextBoxData] = useState('');
     const [DataTypeRegex , SetDataTypeRegex] = useState();

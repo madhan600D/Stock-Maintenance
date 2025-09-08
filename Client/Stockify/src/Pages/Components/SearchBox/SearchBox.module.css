@@ -1,0 +1,50 @@
+.Main-Div{
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    flex-direction: column;
+    gap: 0.3rem;
+    width: 100%;
+}
+
+.Input-Div{
+    width: 100%;
+}
+.Query-Div{
+    display: flex;
+    flex-direction: column;
+    width: 101%;
+    overflow: hidden;
+    transform: translate(0.15rem , 0);
+    transition: all 0.5s ease;
+    border: 1px solid #ccc;    
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    background-color: #ffffff90;   
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1); 
+    color: black;
+}
+.Query-Div > div {
+    overflow: hidden;
+}
+.Bar-Div {
+    display: flex;
+    flex-direction: row;
+    width: 90%;
+    padding: 10px 15px;     
+    border-bottom: 1px solid #eee;
+    color: #333;
+    cursor: pointer;        
+    font-weight: 400; 
+    transition: background-color 0.2s;
+}
+
+.Bar-Div:last-child {
+  border-bottom: none;       /* Remove border for last item */
+}
+
+.Bar-Div:hover {
+  background-color: #afafaf; /* Highlight on hover */
+}

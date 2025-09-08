@@ -13,7 +13,9 @@ const useUser = create((set , get) => ({
     UserData:{},
     OrganizationData:{},
     CurrentOrg:null,
+    IsAdmin:false,
     IsError:null,
+
 
     SignUp: async (UserCredentials) => {
         try {

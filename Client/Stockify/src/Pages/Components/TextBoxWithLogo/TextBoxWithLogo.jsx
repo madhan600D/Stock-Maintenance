@@ -4,13 +4,16 @@ import Styles from './TextBoxWithLogo.module.css'
 //Components
 import FallBackSpinner from '../Suspense Components/FallBackSpinner/FallBackSpinner';
 import TypingSuspense from '../Suspense Components/TypingSuspense/TypingSuspense';
-function TextBoxWithLogo({Logo , IsMandatory , FloatingText , Type , TBCallBack , Reference , IsLoading ,ColorPallete}) {
+function TextBoxWithLogo({Logo , IsMandatory , FloatingText , Type , TBCallBack , EnterCallBack , Reference , IsLoading ,ColorPallete}) {
     //Hooks
     const [TextBoxData , SetTextBoxData] = useState('');
     const [DataTypeRegex , SetDataTypeRegex] = useState();
     const [IsTextBoxFocused , SetIsTextBoxFocused] = useState(false);
     //To Call the text box change Callback
     useEffect(() => {
+        if(Reference.current.value == ""){
+            SetTextBoxData("")
+        }
         TBCallBack()
     } , [TextBoxData])
     //To set the initial DataType for Datatype
@@ -27,6 +30,7 @@ function TextBoxWithLogo({Logo , IsMandatory , FloatingText , Type , TBCallBack 
         if(e.key === "Enter"){
             Reference.current.blur()
         }
+        EnterCallBack(e)
     }
     const SetDataType = async () => {
         if(Type == "STRING"){
@@ -48,7 +52,7 @@ function TextBoxWithLogo({Logo , IsMandatory , FloatingText , Type , TBCallBack 
   return (
     <div className= {Styles['Main-Div']}>
         <div className = {Styles['Logo-Div']} style = {{background:ColorPallete[0]}}>    
-            {IsLoading ? <FallBackSpinner /> : <Logo />}
+            {IsLoading ? <FallBackSpinner /> : <Logo className = {Styles['Logo-Svg']} />}
             
         </div>
         <div className = {Styles['TexBoxAndLogo-Div']}>

@@ -1,5 +1,11 @@
 {
   "devDependencies": {
-    "eslint": "^9.32.0"
+    "concurrently": "^9.2.1",
+    "eslint": "^9.32.0",
+    "nodemon": "^3.1.10"
+  },
+  "scripts": {
+    "All": "concurrently -n Notification,User,Client -c red,blue,green \"npm run dev --prefix ./Server/Services/NotificationService\" \"npm run dev --prefix ./Server/Services/UserService\" \"npm run dev --prefix ./Client/Stockify\""
+
   }
 }

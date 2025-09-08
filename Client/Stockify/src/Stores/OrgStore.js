@@ -3,7 +3,9 @@ import AxiosInstance from '../Lib/AxiosInstance.js';
 const useOrg = create((set , get) => ({
     IsCreateOrgLoading:false,
     IsJoiningOrg:false,
+    IsBulkMailLoading : false,
     OrganizationData:{},
+    AllOrganizations:[],
     CreateOrg : async (OrgData) => {
         set({IsNewOrgLoading:true});
         try {
@@ -11,7 +13,7 @@ const useOrg = create((set , get) => ({
             if(!IsSuccess.success){
                 return {success:false , message:IsSuccess.message}
             }
-            const res = await AxiosInstance.put('./api/userservice/org/create-org' , OrgData);
+            const res = await AxiosInstance.put('/api/userservice/org/create-org' , OrgData);
             //NewOrg Data
             const DataFromBackend = res.data.data;
             set({OrganizationData:{OrganizationName:DataFromBackend.organizationName , OrganizationID: DataFromBackend.organizationId , OrganizationJoiningCode: DataFromBackend.OrganizationJoiningCode}});
@@ -28,7 +30,7 @@ const useOrg = create((set , get) => ({
                 return {success:false , message:Validation?.message}
             }
 
-            const res = await AxiosInstance.put('./api/userservice/org/join-org' , OrgData);
+            const res = await AxiosInstance.put('/api/userservice/org/join-org' , OrgData);
             const DataFromBackend = res.data.data;
             set({OrganizationData:{OrganizationName:DataFromBackend.organizationName , OrganizationID: DataFromBackend.organizationId}});
             return {success:true , message:`Congratulations on Joining ${DataFromBackend.organizationName} ...! ,Explore Home page to find more about your Organization`}
@@ -38,10 +40,39 @@ const useOrg = create((set , get) => ({
         finally{
             set({IsJoiningOrg:false})
         }
+    },
+    GetAllOrganizations: async() => {
+        try {
+            const res = await AxiosInstance.get('/api/userservice/org/get-organizations');
+            const DataFromBackEnd = res.data.data
+            set({AllOrganizations:DataFromBackEnd.map(Value => Value.organizationName)})
+        } catch (error) {
+            return {success:false , message:"Server side error (Front End)...!"}
+        }
+    },
+    GroupInviteToOrg : async (UserData) => {
+        set({IsBulkMailLoading :true})
+        try {
+            const Validation = Validate("GroupInviteToOrg" , UserData)
+
+            if(!Validation.success){
+                return {success:false , message:"Group invitation validation failed ...!"}
+            }
+            let DataToBackEnd = {GroupOfUsers:''}
+            DataToBackEnd.GroupOfUsers =  UserData.map(Item => Item?.ItemData)
+            const res = await AxiosInstance.put('/api/userservice/org/group-invite-mail' , DataToBackEnd);
+            const DataFromBackEnd = res.body
+            return DataFromBackEnd;
+        } catch (error) {
+            return {success:false , message:"Server side error (Front End)...!"}
+        }
+        finally{
+            set({IsBulkMailLoading :false})
+        }
     }
 }))
 
-const Validate = async (ValidationType , Data) => {
+const Validate =  (ValidationType , Data) => {
     try {
         if(ValidationType === "CreateOrg"){
             const {OrganizationName , BusinessType , Street , City , Country , PinCode} = Data;
@@ -58,6 +89,16 @@ const Validate = async (ValidationType , Data) => {
                 }
                 return {success:true}
             }
+        }
+        else if(ValidationType == "GroupInviteToOrg"){
+            if(!Data){
+                return {success:false}
+            }
+            if(Data.length < 1){
+                return {success:false}
+            }
+            Data.shift()
+            return {success:true}
         }
     } catch (error) {
         return {success:false , message:"Error at organization validation ...!"}

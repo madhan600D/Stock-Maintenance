@@ -1,0 +1,44 @@
+.Main-Div {
+  perspective: 1000px; 
+}
+
+.Main-Btn {
+  height: 100%;
+  width: 100%;
+  padding: 1.2rem;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.25s ease; 
+}
+
+.Main-Btn:hover {
+  transform: rotateY(180deg);
+}
+
+.Main-Btn:active{
+    transform: scale(0.7) rotateY(180deg);
+    
+}
+
+.Front, .Back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;         
+  box-sizing: border-box; 
+  padding: 0.2rem; 
+  font-weight: bold;
+  backface-visibility: hidden; 
+}
+
+
+.Back {
+  transform: rotateY(180deg);
+  font-size:x-small;
+  font-family: poppins;
+  margin: 0;
+}
+
+

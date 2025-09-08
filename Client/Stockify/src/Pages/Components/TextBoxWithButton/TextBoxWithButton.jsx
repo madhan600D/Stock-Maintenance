@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import Styles from './TextBoxWithButton.module.css'
 
 import FallBackSpinner from '../Suspense Components/FallBackSpinner/FallBackSpinner';
-function TextBoxWithButton({Logo , ButtonLogo , IsMandatory , FloatingText , Type , ButtonCallBack , TBCallBack , Reference , IsSuspense ,ColorPallete}) {
+function TextBoxWithButton({Logo , ButtonLogo , IsMandatory , FloatingText , Type , ButtonCallBack , EnterCallBack , TBCallBack , Reference , IsSuspense ,ColorPallete}) {
     //Hooks
     const [TextBoxData , SetTextBoxData] = useState('');
     const [DataTypeRegex , SetDataTypeRegex] = useState();
@@ -24,6 +24,7 @@ function TextBoxWithButton({Logo , ButtonLogo , IsMandatory , FloatingText , Typ
         if(e.key === "Enter"){
             Reference.current.blur()
         }
+        EnterCallBack(e)
     }
     const SetDataType = async () => {
         if(Type == "STRING"){

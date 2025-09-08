@@ -23,8 +23,11 @@ export const CreateOrgValidate = async (req , res , next) => {
 export const GroupInviteToOrgValidate = async (req , res , next) => {
     try {
         //API Structure {GroupOfUsers:[array]}
-        const GroupOfUsers= req.body?.GroupOfUsers;
+        const {GroupOfUsers}= req?.body;
         let UserID = req.user.userId;
+        if(!GroupOfUsers){
+            res.status(400).json({success:false , message:"Add users to invite to organization ...!"})
+        }
         const IsValidAdmin = await objUserDb.admins.findOne({
                                                       include:[{model:objUserDb.users , attributes:['userName']}, 
                                                                {model:objUserDb.organizations , attributes:['OrganizationJoiningCode' , 'organizationName']}],
