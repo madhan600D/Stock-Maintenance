@@ -129,11 +129,30 @@ const useUser = create((set , get) => ({
             set({IsLoginLoading:false})
         }
     },
+    Logout: async () => {
+        try {
+            const res = await AxiosInstance.get('/api/userservice/logout');
+            await get().ValidateUser();
+            return {success:true , message:"Logged out successfully...!"}
+        } catch (error) {
+            return {success:true , message:"Logged out failed...!"}
+        }
+    },
     GetLoadingTexts: async () => {
         set({IsPageLoading:true});
         try {
+            //Store in Local Storage
+            const LoadingTexts = localStorage.getItem("LoadingTexts")
+            if(LoadingTexts){
+                set({SuspenseTexts:JSON.parse(LoadingTexts).map(TextData => TextData.Text)})
+                return 
+            }
             const res = await AxiosInstance.get('/api/userservice/get-loadingtexts')
             const DataFromBackend = res.data.data;
+            
+            //Load in Local Storage
+            localStorage.setItem("LoadingTexts" , JSON.stringify(DataFromBackend))
+
             set({SuspenseTexts:DataFromBackend.map(TextData => TextData.Text)})
             return {success:true , message:"Suspense Texts Loaded...!"}
         } catch (error) {

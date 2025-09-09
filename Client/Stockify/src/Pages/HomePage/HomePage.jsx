@@ -7,7 +7,7 @@ import SideBar from '../Components/SideBar/SideBar';
 function HomePage() {
   return (
     <div className = {Styles['Main-Div']}>
-      <SideBar />
+      {/* <SideBar /> */}
       <div className = {Styles['Content-Div']}>
         test
       </div>

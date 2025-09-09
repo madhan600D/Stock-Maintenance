@@ -12,6 +12,8 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    width: 350px;
+    height:fit-content;
     gap: 3rem;
     padding: 2rem;
     border-radius: 10px;
@@ -19,7 +21,16 @@
 }
 .Page-Div{
     display: flex;
+    align-items: center;
+    justify-content: center;
     flex-direction: column;
+}
+.Page-Heading{
+    text-decoration: underline;
+    color: rgb(255, 255, 255);
+}
+.Description-Label{
+    color: rgb(64, 59, 59);
 }
 
 

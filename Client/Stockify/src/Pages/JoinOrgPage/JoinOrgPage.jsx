@@ -73,6 +73,10 @@ function JoinOrgPage() {
         //Render Code
         (
             <div className= {Styles["Page-Div"]}>
+            <h2 className= {Styles["Page-Heading"]}>Join organization with code</h2>
+            <label className= {Styles["Description-Label"]}>A OTP would have been sent to your Email by the Organanization Admin, Please enter the 6 digit code below to join the Organization.</label>
+            <br />
+            <br />
                 <TextBoxWithLogo 
                     className = {Styles['OTP-Txt']}
                     Logo={IoQrCodeOutline}
@@ -86,15 +90,17 @@ function JoinOrgPage() {
                     />
                 <button className = {Styles['Submit-Btn']} onClick={() => {HandleSubmitButtonClick()}}>VALIDATE
                 </button>
-                <label className = {Styles['Code-Lbl']}>
-                    A OTP would have been sent to your Email by the Organanization Admin, Please enter the 6 digit code above to join the Organization.
-                </label>
                 
             </div>
         ) 
         
         
         :<div className= {Styles["Page-Div"]}>
+            <h2 className= {Styles["Page-Heading"]}>Send request to organization admin</h2>
+            <label className= {Styles["Description-Label"]}>Enter the organization you wish to join below. A request mail will be sent to the admin. You may join the specified organization once the admin accepts your request. 
+            If your organization accepts your request please refresh this page and you will be routed to organization's home page.</label>
+            <br />
+            <br />
             <SearchBox 
             Data={AllOrganizations}
             MaxItems={3}
@@ -103,7 +109,7 @@ function JoinOrgPage() {
             Logo={IoSearchCircle}
             ColorPallete={["red" , "red"]}
             DataType={"STRING"}
-            FilterType={"InitialString"}
+            FilterType={"SubString"}
             OnSelection={() => {console.log("On selection called")}}
             />
         </div> 

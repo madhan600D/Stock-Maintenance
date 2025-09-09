@@ -66,23 +66,30 @@ function App() {
   return (
     <div className='Screen'>
       
+      <div className='Routes'>
       <BrowserRouter>
+        <ToastContainer />
+        <SideBar />
         <Routes>
           <Route path="/login" element={IsAuthenticated ? <Navigate to={'/home'} /> : <LoginPage />} />
 
           <Route
             path="/home"
-            element={IsAuthenticated ? OrganizationData.OrganizationID !== 1 ? <HomePage /> : <Navigate to={'/create-join-org'} /> : <LoginPage />}
+            element={IsAuthenticated ? OrganizationData.OrganizationID !== 1 ? <HomePage /> : <Navigate to={'/create-join-org'} /> : <Navigate to={'/login'} />}
+          />
+          <Route
+            path="/"
+            element={IsAuthenticated ? OrganizationData.OrganizationID !== 1 ? <HomePage /> : <Navigate to={'/create-join-org'} /> : <Navigate to={'/login'} />}
           />
 
           <Route
             path="/create-join-org"
-            element={IsAuthenticated ? OrganizationData.OrganizationID !== 1 ? <Navigate to={'/home'} /> : <CreateOrJoinOrgPage /> : <LoginPage />}
+            element={IsAuthenticated ? OrganizationData.OrganizationID !== 1 ? <Navigate to={'/home'} /> : <CreateOrJoinOrgPage /> : <Navigate to={'/login'} />}
           />
 
           <Route
             path="/create-org"
-            element={IsAuthenticated ? OrganizationData.OrganizationID !== 1 ? <Navigate to={'/home'} /> : <CreateOrgPage /> : <LoginPage />}
+            element={IsAuthenticated ? OrganizationData.OrganizationID !== 1 ? <Navigate to={'/home'} /> : <CreateOrgPage /> : <Navigate to={'/login'} />}
           />
 
           <Route
@@ -95,6 +102,7 @@ function App() {
             element = {IsPageLoading ? <PageSuspense /> : IsAuthenticated ? OrganizationData.OrganizationID == 1 ? <JoinOrgPage /> : <Navigate to = {'/home'} /> : <Navigate to = {'/login'} />} />
     </Routes>
   </BrowserRouter>
+  </div>
       <ToastContainer />
     </div>
   )

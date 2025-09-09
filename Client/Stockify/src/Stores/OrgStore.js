@@ -97,7 +97,6 @@ const Validate =  (ValidationType , Data) => {
             if(Data.length < 1){
                 return {success:false}
             }
-            Data.shift()
             return {success:true}
         }
     } catch (error) {

@@ -23,13 +23,13 @@ export const CreateOrgValidate = async (req , res , next) => {
 export const GroupInviteToOrgValidate = async (req , res , next) => {
     try {
         //API Structure {GroupOfUsers:[array]}
-        const {GroupOfUsers}= req?.body;
+        let {GroupOfUsers}= req?.body;
         let UserID = req.user.userId;
         if(!GroupOfUsers){
             res.status(400).json({success:false , message:"Add users to invite to organization ...!"})
         }
         const IsValidAdmin = await objUserDb.admins.findOne({
-                                                      include:[{model:objUserDb.users , attributes:['userName']}, 
+                                                      include:[{model:objUserDb.users , attributes:['userName' , 'userMail']}, 
                                                                {model:objUserDb.organizations , attributes:['OrganizationJoiningCode' , 'organizationName']}],
                                                       where:{adminId:UserID}
                                                       })
@@ -41,6 +41,10 @@ export const GroupInviteToOrgValidate = async (req , res , next) => {
         if(GroupOfUsers?.length > 5){
             res.status(400).json({success:false , message:"5 Users can be invited at a time...!"})
         }
+        //Validate if self invitation is triggered
+        GroupOfUsers = GroupOfUsers.filter((User) => User !== IsValidAdmin.user.userMail && User !== '');
+
+        console.log(GroupOfUsers)
         //Attach Org Data to the next middle ware
         req.OrganizationData = {OrganizationName:IsValidAdmin.organization.organizationName ,
                                 OrganizationJoiningCode:IsValidAdmin.organization.OrganizationJoiningCode};

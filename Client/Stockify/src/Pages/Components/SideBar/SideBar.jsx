@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Styles from './SideBar.module.css'
 
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 //Logos
 import { IoMdHome } from "react-icons/io";
 import { FaTasks } from "react-icons/fa";
@@ -10,7 +10,8 @@ import { GoOrganization } from "react-icons/go";
 import { LuListTodo } from "react-icons/lu";
 import { IoIosArrowDown } from "react-icons/io";
 import { BiCaretRight } from "react-icons/bi";
-import { IoSettings } from "react-icons/io5";
+
+import { IoSettings , IoPowerSharp} from "react-icons/io5";
 import { FaWindowClose } from "react-icons/fa";
 import { TbReportAnalytics } from "react-icons/tb";
 import { AiOutlineStock } from "react-icons/ai";
@@ -20,21 +21,156 @@ import { BsLayoutTextSidebarReverse } from "react-icons/bs";
 
 //Stores
 import useOrg from '../../../Stores/OrgStore';
+import useUser from '../../../Stores/UserStore';
+import { ToastContainer } from 'react-toastify';
+import ShowToast from '../Toast/Toast';
 
 function SideBar() {
+  const Location = useLocation()
   //Hooks
-  const navigate = useNavigate();
+ 
+  const [CurrentURL , SetCurrentURL] = useState();
+  const [CurrentMenus , SetCurrentMenus] = useState([]);
 
+  //UseEffects
+  useEffect (() => {
+    SetCurrentURL(Location.pathname)
+    console.log(Location.pathname)
+  } , [Location])
+
+  useEffect(() => {
+    //Dynamically allocate Menus
+    const BuildMenu =  () => {
+      //AllocateMenus
+      if(CurrentURL == '/home' || CurrentURL == '/'){
+        SetCurrentMenus(HomePage.map((menu , index) => {
+          return <Menu
+            key={index}
+            MenuLogo={menu.MenuLogo}
+            MenuText={menu.MenuText}
+            Callback={menu.Callback}
+            ArrayOfSubMenus={menu.ArrayOfSubMenus || []}
+          />
+        }))
+      }
+      else if(CurrentURL == '/join-org' || CurrentURL == '/create-org'){
+        SetCurrentMenus(CreateOrJoinOrg.map((menu , index) => {
+          return <Menu
+            key={index}
+            MenuLogo={menu.MenuLogo}
+            MenuText={menu.MenuText}
+            Callback={menu.Callback}
+            ArrayOfSubMenus={menu.ArrayOfSubMenus || []}
+          />
+        }))
+        
+      }
+      else{
+          SetCurrentMenus([])
+        }
+      
+    }
+
+    BuildMenu()
+    
+  } , [CurrentURL])
   //SideBar Functions
   const HandleInviteToOrgClick = async () => {
       navigate('/invite-to-org')
   }
+  const HandleLogout = async () => {
+    console.log("Logout method called")
+    const res = await Logout()
+    ShowToast({success:res.success , message:res.message})
+  }
+  //Dynamic SideBar
+  const HomePage = [{
+    MenuLogo: MdOutlineInventory,
+    MenuText: "Inventory"
+  },
+  {
+    MenuLogo: GoOrganization,
+    MenuText: "Organization",
+    ArrayOfSubMenus: [
+      { MenuText: "Invite to org", Callback: HandleInviteToOrgClick },
+      { MenuText: "Edit Organization" }
+    ]
+  },
+  {
+    MenuLogo: AiOutlineStock,
+    MenuText: "Stock",
+    ArrayOfSubMenus: [
+      { MenuText: "ForeCast Stocks" },
+      { MenuText: "Stock Settings" }
+    ]
+  },
+  {
+    MenuLogo: FaUsers,
+    MenuText: "Users",
+    ArrayOfSubMenus: [
+      { MenuText: "User Management" },
+      { MenuText: "Group Buzz" },
+      { MenuText: "Chat" }
+    ]
+  },
+  {
+    MenuLogo: TbReportAnalytics,
+    MenuText: "Reports",
+    ArrayOfSubMenus: [
+      { MenuText: "CurrentDay Report" },
+      { MenuText: "PNL Report" },
+      { MenuText: "History Data" }
+    ]
+  },
+  {
+    MenuLogo: FaTasks,
+    MenuText: "Tasks"
+  },
+  {
+    MenuLogo: CgProfile,
+    MenuText: "Profile",
+    ArrayOfSubMenus: [
+      { MenuText: "Edit Profile" },
+      { MenuText: "Update Profile" }
+    ]
+  },
+  {
+    MenuLogo: IoSettings,
+    MenuText: "Settings"
+  },
+  {
+    MenuLogo: IoPowerSharp,
+    MenuText: "Logout",
+    Callback:HandleLogout
+  }]
+
+  const CreateOrJoinOrg = [{
+    MenuLogo: CgProfile,
+    MenuText: "Profile",
+    ArrayOfSubMenus: [
+      { MenuText: "Edit Profile" },
+      { MenuText: "Update Profile" }
+    ]
+  },
+  {
+    MenuLogo: IoSettings,
+    MenuText: "Settings"
+  },
+  {
+    MenuLogo: IoPowerSharp,
+    MenuText: "Logout",
+    Callback:HandleLogout
+  }]
+  
+  
 
   //Destructure
-
-  const {OrganizationData} = useOrg();
+  const navigate = useNavigate();
+  const {OrganizationData } = useOrg();
+  const {Logout} = useUser();
   const MaxTextLimit = 10;
-  return (
+  if(CurrentMenus?.length > 1){
+    return (
     <div className = {Styles['Main-Div']}>
       <div className = {Styles['Top-Div']}>
         <label>
@@ -43,66 +179,15 @@ function SideBar() {
         <FaWindowClose className={Styles['SideBar-Svg']} />
       </div>
       <div className = {Styles['Content-Div']}>
-        <Menu 
-          MenuLogo={MdOutlineInventory}
-          MenuText={"Inventory"}
-        />
-        <Menu 
-          MenuLogo={GoOrganization}
-          MenuText={"Organization"}
-          ArrayOfSubMenus={[
-              {MenuText:"Invite to org" , Callback:HandleInviteToOrgClick },
-              {MenuText:"Edit Organization"}
-            ]}   
-        />
-        <Menu 
-          MenuLogo={AiOutlineStock}
-          MenuText={"Stock"}
-          ArrayOfSubMenus={[
-              {MenuText:"ForeCast Stocks"},
-              {MenuText:"Stock Settings"}
-            ]}   
-        />
-        <Menu 
-          MenuLogo={FaUsers}
-          MenuText={"Users"}
-          ArrayOfSubMenus={[
-              {MenuText:"User Management"},
-              {MenuText:"Group Buzz"},
-              {MenuText:"Chat"}
-            ]}      
-        />
-        <Menu 
-          MenuLogo={TbReportAnalytics}
-          MenuText={"Reports"}
-          ArrayOfSubMenus={[
-              {MenuText:"CurrentDay Report"},
-              {MenuText:"PNL Report"},
-              {MenuText:"History Data"}
-            ]}      
-        />
-        <Menu 
-          MenuLogo={FaTasks}
-          MenuText={"Tasks"}
-        />
-        <Menu 
-          MenuLogo={CgProfile}
-          MenuText={"Profile"}
-          ArrayOfSubMenus={[
-              {MenuText:"Edit Profile"},
-              {MenuText:"Update Profile"}
-            ]}      
-        />
-        <Menu 
-          MenuLogo={IoSettings}
-          MenuText={"Settings"}
-        />
+        {CurrentMenus}
       </div>
       <div className = {Styles['Footer-Div']}>
-        Footer
+        <ToastContainer />
       </div>
     </div>
   )
+  }
+  
 }
 
 
@@ -114,10 +199,11 @@ function Menu({MenuLogo , MenuText , ArrayOfSubMenus , Callback}){
   //Functions
   const HandleDropDown = async () => {
     SetSubMenuVisible((prev) => (prev === '0fr' ? '1fr' : '0fr'));
+    Callback()
   }
 
   const HandleCallBack = async () => {
-    if(ArrayOfSubMenus?.length < 0 || ! ArrayOfSubMenus){
+    if(ArrayOfSubMenus?.length < 0){
       Callback()
     } 
   }

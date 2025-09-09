@@ -1,7 +1,7 @@
 import { toast, Bounce } from 'react-toastify';
 
 const ShowToast = (success , message) => {
-  if (success == true) {
+  if (success) {
     toast(`✅ ${message}` || 'Task Successful', {
       position: "top-center",
       autoClose: 2000,
