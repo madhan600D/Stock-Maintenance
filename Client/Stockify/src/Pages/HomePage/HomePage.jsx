@@ -2,14 +2,16 @@ import React from 'react';
 import Styles from './HomePage.module.css';
 
 //Components
-import SideBar from '../Components/SideBar/SideBar';
+import TopBar from '../Components/TopBar/TopBar.jsx';
+import PageHolder from '../Components/PageHolder/PageHolder.jsx';
+
 
 function HomePage() {
   return (
     <div className = {Styles['Main-Div']}>
-      {/* <SideBar /> */}
       <div className = {Styles['Content-Div']}>
-        test
+        <TopBar />
+        <PageHolder />
       </div>
     </div>
   )

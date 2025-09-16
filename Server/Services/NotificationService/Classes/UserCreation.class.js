@@ -6,13 +6,13 @@ export class UserCreation{
     constructor(UserMail , UserName){
         this.UserData
         this.ObjVerificationEmail =  new EmailVerification(UserMail , UserName)
-        this.KafkaResponse
+        this.KafkaResponse = {}
         this.ErrorObj = {success:true , message:""}
     }
     CreateUser = async (UserName , UserMail , RequestHash , transaction) => {
         try {
             
-
+            
             await this.UserDataValidations(UserName , UserMail)
             if (!this.ErrorObj.success) {
                 return {success:false , message:"User validation failed"}
@@ -34,15 +34,16 @@ export class UserCreation{
             //TBD:Send Verification Email
             const IsEmailSent = await this.ObjVerificationEmail.SendEmailVerification(RequestHash , "Verification" , transaction)
             //TBD: Produce a kafka response: User Added Succesfully
-            if(IsEmailSent){
-                this.KafkaResponse.Event = 'EmailSent'
-                this.KafkaResponse.Data = {Success:true , UserName:this.UserData.UserName , UserMail:this.UserData.UserMail}
-                await ObjNotificationKafkaProducer.ProduceEvent(KafkaResponse.Event , 'user.create_user.response' , KafkaResponse)
+            if(IsEmailSent?.success){
+                // let KafkaResponse = {}
+                // this.KafkaResponse.Event = 'EmailSent'
+                // this.KafkaResponse.Data = {Success:true , UserName:this.UserData.UserName , UserMail:this.UserData.UserMail}
+                // await ObjNotificationKafkaProducer.ProduceEvent(KafkaResponse.Event , 'user.create_user.response' , this.KafkaResponse)
+                return {success:true}
             }
             else{
-                this.KafkaResponse.Event = 'EmailSent'
-                this.KafkaResponse.Data = {Success:false , UserName:this.UserData.UserName , UserMail:this.UserData.UserMail}
-                await ObjNotificationKafkaProducer.ProduceEvent(KafkaResponse.Event , 'user.create_user.response' , KafkaResponse)   
+                // 5
+                return {success:true}
             }
         }
         catch(error) {

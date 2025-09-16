@@ -17,6 +17,8 @@ import CreateOrgPage from './Pages/CreateOrgPage/CreateOrgPage.jsx';
 import SideBar from './Pages/Components/SideBar/SideBar.jsx';
 import JoinOrgPage from './Pages/JoinOrgPage/JoinOrgPage.jsx';
 
+//Components
+import PageHolder from './Pages/Components/PageHolder/PageHolder.jsx';
 
 //UseEffects
 //TBD:UseEffect to send cookie and validate to reach certain pages
@@ -103,7 +105,7 @@ function App() {
     </Routes>
   </BrowserRouter>
   </div>
-      <ToastContainer />
+      {/* <ToastContainer /> */}
     </div>
   )
 }

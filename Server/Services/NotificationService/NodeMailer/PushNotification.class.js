@@ -49,7 +49,7 @@ SendMail = async (transaction) => {
                 Sender: "Push Notification Service",
                 ReceiverID: this.UserData.UserID,
                 DeliveryStatus: 'Pending'
-            });
+            } , {transaction:transaction});
 
             this.NotificationData = NotificationData;
         }
@@ -67,31 +67,23 @@ SendMail = async (transaction) => {
                 { where: { NotificationID: this.NotificationData.NotificationID } , transaction:transaction},
             );
             KafkaResponse = {}
-            KafkaResponse.Event = 'VerificationMailSent'
-            KafkaResponse.Data = {Success : true , UserID : this.UserData.UserID , UserName : this.UserData.UserName , UserMail:this.UserData.UserMail}
-            ObjNotificationKafkaProducer.ProduceEvent('VerificationMailSent' , 'user.create_user.response' , )
+            // KafkaResponse.Event = 'VerificationMailSent'
+            // KafkaResponse.Data = {Success : true , UserID : this.UserData.UserID , UserName : this.UserData.UserName , UserMail:this.UserData.UserMail}
+            // ObjNotificationKafkaProducer.ProduceEvent('VerificationMailSent' , 'user.create_user.response' , )
             await this.AddMailToBucket(this.UserData.UserName , transaction);
+            return {success:true , message:"Mail added to bucket...!"}
         } else {
-            KafkaResponse = {}
-            KafkaResponse.Event = 'VerificationMailSent'
-            KafkaResponse.Data = {Success : false , UserID : this.UserData.UserID , UserName : this.UserData.UserName , UserMail:this.UserData.UserMail}
-            ObjNotificationKafkaProducer.ProduceEvent('VerificationMailSent' , 'user.create_user.response' , )
+            // KafkaResponse = {}
+            // KafkaResponse.Event = 'VerificationMailSent'
+            // KafkaResponse.Data = {Success : false , UserID : this.UserData.UserID , UserName : this.UserData.UserName , UserMail:this.UserData.UserMail}
+            // ObjNotificationKafkaProducer.ProduceEvent('VerificationMailSent' , 'user.create_user.response' , )
             DeliveryStatus = await objNotificationDB.NotificationDeliveryStatus.update(
                 { DeliveryStatus: 'Failed' },
-                { where: { NotificationID: this.NotificationData.NotificationID } }
+                { where: { NotificationID: this.NotificationData.NotificationID } , transaction:transaction }
             );
             this.ErrorObj.success = false;
+            return {success:false , message:"Mail failed...!"}
         }
-
-        
-
-        if (info?.messageId) {
-            // TBD: Kafka response as Success
-            return true
-        } else {
-            return false
-        }
-
     } catch (error) {
         this.ErrorObj = {success:false , message:"System error in push mail" + error.message};
         console.log("Error at Push mail" , error)
@@ -112,7 +104,7 @@ SendMail = async (transaction) => {
             }
             const IsCoolDown = await objNotificationDB.NotificationCoolDown.findOne(
                 {
-                    where:{UserName:UserName}
+                    where:{UserName:UserName},transaction:transaction
                 }
             )
             if(IsCoolDown.IsCoolDown === true){
@@ -125,7 +117,7 @@ SendMail = async (transaction) => {
                         model: objNotificationDB.Users,
                         attributes: ['UserName'] 
                     }]},
-                    {where:{UserName:UserName}}
+                    {where:{UserName:UserName} , transaction}
                 )
             if(!IsBucketOverFlow){
                 //Create a bucket If not bucket is available: (First Mail to Receipient)
@@ -157,7 +149,7 @@ SendMail = async (transaction) => {
                         model: objNotificationDB.Users,
                         attributes: ['UserName'] 
                     }]},
-                    {where:{UserName:UserName}}
+                    {where:{UserName:UserName} , transaction:transaction}
                 )
                 //Clear old buckets
                 for (const Bucket of ToClear) {
@@ -226,10 +218,10 @@ export class EmailVerification extends PushMail{
             }
            const IsMailSent = await this.SendMail(transaction)
            if(IsMailSent?.success){
-            return true
+            return {success:true}
            }
            else{
-            return false
+            return {success:false}
            }
             
         }
@@ -250,6 +242,15 @@ export class EmailVerification extends PushMail{
             this.ErrorObj = {success:false , message:"System error in push mail" + error.message};
             console.log("Error at Push mail" , error)
             
+        }
+    }
+
+    UserValidation = async () => {
+        try {
+            
+        } catch (error) {
+            this.ErrorObj = {success:false , message:"System error in user validation" + error.message};
+            console.log("Error at Push mail" , error)
         }
     }
     

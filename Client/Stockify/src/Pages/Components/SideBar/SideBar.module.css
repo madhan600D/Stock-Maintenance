@@ -6,6 +6,8 @@
     background-color: #161a23;
     border-radius: 10px;
     border-right: 1px solid rgba(156, 156, 156, 0.853);
+    overflow-y:auto;
+    overflow-x: hidden;
 }
 .Top-Div{
     border-bottom: 1px solid rgba(255, 255, 255, 0.421);
@@ -121,4 +123,51 @@
 label{
     user-select: none;
     margin: 0;
+}
+
+/* Logo container */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-size: 1.8rem;
+  color: #6687bc; /* Slate-800 */
+  
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.3s ease;
+}
+
+/* Logo image */
+.logo img{
+  height: 75px;
+  width: auto;
+  filter: brightness(1);
+  filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.1));
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+/* Hover effect */
+.logo:hover {
+  color: #0ea5e9; /* Sky-500 */
+}
+
+.logo:hover img,
+.logo:hover svg {
+  transform: scale(1.05);
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.15));
+}
+
+/* Responsive scaling */
+@media (max-width: 640px) {
+  .logo {
+    font-size: 1.4rem;
+    gap: 8px;
+  }
+  .logo img,
+  .logo svg {
+    height: 32px;
+  }
 }

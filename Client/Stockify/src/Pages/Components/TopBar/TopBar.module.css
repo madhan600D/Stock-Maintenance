@@ -1,0 +1,41 @@
+.Main-Div{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(0, 255, 255, 0.319);
+    position: relative;
+}
+
+.User-Div{
+    display: flex;
+    place-items: end;
+    right: 0;
+}
+
+.Profile-Div{
+    border: 1px solid white;
+    border-radius: 50%;
+    padding: 0.3rem;
+}
+
+.Profile-Img{
+    width: 30px;
+    height: 30px;
+}
+.UserName-Lbl{
+    font-size: x-small;
+}
+
+.VerticalAlign{
+    display: flex;
+    flex-direction: column;
+
+}
+
+.HorizontalAlign{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+}

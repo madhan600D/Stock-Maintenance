@@ -1,0 +1,25 @@
+
+.logo{
+  display: flex;
+  flex-direction: row;
+  height: fit-content;
+}
+/* Logo image */
+.logo img{
+  height: 70px;
+  width: auto;
+  filter: brightness(1);
+  filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.1));
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+/* Hover effect */
+.logo:hover {
+  color: #0ea5e9; /* Sky-500 */
+}
+
+.logo:hover img,
+.logo:hover svg {
+  transform: scale(1.05);
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.15));
+}

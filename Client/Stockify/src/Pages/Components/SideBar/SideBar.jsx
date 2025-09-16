@@ -17,25 +17,34 @@ import { TbReportAnalytics } from "react-icons/tb";
 import { AiOutlineStock } from "react-icons/ai";
 import { MdOutlineInventory } from "react-icons/md";
 import { FaUsers } from "react-icons/fa";
+import EnventoryLogo from '../../../assets/Logo/EnventoryLogo.png'
 import { BsLayoutTextSidebarReverse } from "react-icons/bs";
 
 //Stores
-import useOrg from '../../../Stores/OrgStore';
-import useUser from '../../../Stores/UserStore';
+import useOrg from '../../../Stores/OrgStore.js';
+import useUser from '../../../Stores/UserStore.js';
+import useApp from '../../../Stores/AppStore.js';
 import { ToastContainer } from 'react-toastify';
 import ShowToast from '../Toast/Toast';
 
 function SideBar() {
   const Location = useLocation()
+  const {CurrentPage , SetCurrentPage} = useApp();
   //Hooks
- 
   const [CurrentURL , SetCurrentURL] = useState();
   const [CurrentMenus , SetCurrentMenus] = useState([]);
+
+  function HandleSubPageChange (SubURL) {
+    //Calls SetCurrentPage from AppStore
+    SetCurrentPage(SubURL)
+    
+  }
+
+
 
   //UseEffects
   useEffect (() => {
     SetCurrentURL(Location.pathname)
-    console.log(Location.pathname)
   } , [Location])
 
   useEffect(() => {
@@ -74,10 +83,12 @@ function SideBar() {
     BuildMenu()
     
   } , [CurrentURL])
+
+  
   //SideBar Functions
-  const HandleInviteToOrgClick = async () => {
-      navigate('/invite-to-org')
-  }
+  // const HandleInviteToOrgClick = async () => {
+  //     navigate('/invite-to-org')
+  // }
   const HandleLogout = async () => {
     console.log("Logout method called")
     const res = await Logout()
@@ -92,7 +103,7 @@ function SideBar() {
     MenuLogo: GoOrganization,
     MenuText: "Organization",
     ArrayOfSubMenus: [
-      { MenuText: "Invite to org", Callback: HandleInviteToOrgClick },
+      { MenuText: "Invite to org", Callback: HandleSubPageChange , URL:'/invite-to-org' },
       { MenuText: "Edit Organization" }
     ]
   },
@@ -171,20 +182,20 @@ function SideBar() {
   const MaxTextLimit = 10;
   if(CurrentMenus?.length > 1){
     return (
-    <div className = {Styles['Main-Div']}>
-      <div className = {Styles['Top-Div']}>
-        <label>
-          E-Nventory
-        </label>
-        <FaWindowClose className={Styles['SideBar-Svg']} />
+      <div className = {Styles['Main-Div']}>
+        <div className = {Styles['Top-Div']}>
+          <div className={Styles['logo']}>
+            <img src = {EnventoryLogo} alt="ENventory Logo" className={Styles['']} />
+          </div>
+          <FaWindowClose className={Styles['SideBar-Svg']} />
+        </div>
+        <div className = {Styles['Content-Div']}>
+          {CurrentMenus}
+        </div>
+        <div className = {Styles['Footer-Div']}>
+          <ToastContainer />
+        </div>
       </div>
-      <div className = {Styles['Content-Div']}>
-        {CurrentMenus}
-      </div>
-      <div className = {Styles['Footer-Div']}>
-        <ToastContainer />
-      </div>
-    </div>
   )
   }
   
@@ -192,21 +203,22 @@ function SideBar() {
 
 
 
-function Menu({MenuLogo , MenuText , ArrayOfSubMenus , Callback}){
+function Menu({MenuLogo , MenuText , ArrayOfSubMenus , Callback , URL}){
   //States
   const [SubMenuVisible , SetSubMenuVisible] = useState('0fr');
-
+  const UniqueID = URL;
   //Functions
-  const HandleDropDown = async () => {
-    SetSubMenuVisible((prev) => (prev === '0fr' ? '1fr' : '0fr'));
-    Callback()
+  const HandleDropDown =  () => {
+    if(ArrayOfSubMenus.length === 0){
+      Callback(UniqueID);
+    }
+    else{
+      SetSubMenuVisible((prev) => (prev === '0fr' ? '1fr' : '0fr'));
+    }
+    
+    
   }
 
-  const HandleCallBack = async () => {
-    if(ArrayOfSubMenus?.length < 0){
-      Callback()
-    } 
-  }
   return (
     <div className = {Styles['AllMenu-Div']}>
       <div className = {Styles['Menu-Div']} onClick={() => HandleDropDown()}>
@@ -222,7 +234,7 @@ function Menu({MenuLogo , MenuText , ArrayOfSubMenus , Callback}){
       <div className = {Styles['SubMenu-Main']} style={{gridTemplateRows:SubMenuVisible}}>
         <div>
             {ArrayOfSubMenus?.length > 0 ? ArrayOfSubMenus.map((SubMenuObject) => 
-            <SubMenu MenuText={SubMenuObject.MenuText} ShowSubMenu={SubMenuVisible} Callback={SubMenuObject.Callback} />) : ""}
+            <SubMenu MenuText={SubMenuObject.MenuText} ShowSubMenu={SubMenuVisible} Callback={SubMenuObject.Callback} URL={SubMenuObject.URL} />) : ""}
         </div>
         
       </div>
@@ -230,11 +242,12 @@ function Menu({MenuLogo , MenuText , ArrayOfSubMenus , Callback}){
   )
 }
 
-function SubMenu({MenuText , Callback}){
+function SubMenu({MenuText , Callback , URL}){
   const MaxTextLimit = 20;
-  const HandleSubMenuCallBack = async () =>{
-    Callback()
-
+  const SubURL = URL
+  const HandleSubMenuCallBack =  () =>{
+    console.log("Called Sub CB")
+    Callback(SubURL)
   }
   return (
     <div className = {Styles['SubMenu-Div']} onClick={HandleSubMenuCallBack}>

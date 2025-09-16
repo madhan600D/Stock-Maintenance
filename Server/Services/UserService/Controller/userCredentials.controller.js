@@ -10,6 +10,7 @@ dotenv.config();
 export const signUpUser = async (req , res) => {
     try {
         let KafkaMessage = {} 
+        let newPendingUser
         const isDataAtPendingUser = await objUserDb.pendingUsers.findOne({where:{userMail:req.body.userMail}})
 
         if(isDataAtPendingUser?.isVerified){
@@ -20,25 +21,23 @@ export const signUpUser = async (req , res) => {
             //Re trigger ResendVerificationEmail at KAFKA Notification service 
             KafkaMessage.Event = "ResendVerificationEmail"
             KafkaMessage.Data = {UserMail:isDataAtPendingUser.userMail , UserName:isDataAtPendingUser.userName ,            VerificationHash:isDataAtPendingUser.verificationHash}
-
+ 
             await ObjUserKafkaProducer.ProduceEvent("ResendVerificationEmail" , "user.create_user.request" , KafkaMessage)
             return res.status(200).json({success:true , message:"Verfication email resent ...!"})
         }
         else{
             KafkaMessage.Event = 'SendVerificationEmail'
+            //Hash the password
+            const passwordSalt = await bcrypt.genSalt(10)
+            const passwordHash = await bcrypt.hash(req.body.password , passwordSalt)
+            newPendingUser = await objUserDb.pendingUsers.create({
+                userName:req.body.userName.toLowerCase(), 
+                password:passwordHash,
+                userMail:req.body.userMail, 
+                isVerified:false
+            })
         }
-        //Hash the password
-        const passwordSalt = await bcrypt.genSalt(10)
-        const passwordHash = await bcrypt.hash(req.body.password , passwordSalt)
-
         
-
-        const newPendingUser = await objUserDb.pendingUsers.create({
-            userName:req.body.userName.toLowerCase(), 
-            password:passwordHash,
-            userMail:req.body.userMail, 
-            isVerified:false
-        })
 
         const RequestIdentification = process.env.Verification_Key + newPendingUser.reqID
         const RequestIdentificationSalt = await bcrypt.genSalt(5)
@@ -189,7 +188,7 @@ export const logInUser = async (req , res) => {
             //TBD:Setup a socket protocol to logout the currrently logged in user
             //Kill the old session if exsits 
             const newSession = await objUserDb.sessions.create({userId:userCredentials.userId , loggedInAt:currentTime , LoggedOutAt:'' , isActive:true})
-            const userData = {UserID:userCredentials.userId , UserMail:userCredentials.userMail , UserName:userCredentials.userName , OrganizationID:userCredentials.organization.organizationId , OrganizationName:userCredentials.organization.organizationName}
+            const userData = {UserID:userCredentials.userId , UserMail:userCredentials.userMail , UserName:userCredentials.userName , OrganizationID:userCredentials.organization.organizationId , OrganizationName:userCredentials.organization.organizationName , ProfilePic:userCredentials.profilePic}
             return res.cookie("jwt",
                 JwtToken , {
                     maxAge: 60 * 60 * 1000,

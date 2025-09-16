@@ -9,9 +9,12 @@ export const signUpUserValidation = async (req , res , next) => {
               userNameRegex = /^[a-zA-Z0-9]+$/ , 
               EmailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
+        const IsUserNameAdded = await objUserDb.pendingUsers.findOne({where:{userName:req.body.userName}}) 
+        const IsUserMailAdded = await objUserDb.pendingUsers.findOne({where:{userMail:req.body.userMail}})
+
         const IsUserNameTaken = await objUserDb.users.findOne({where:{userName:req.body.userName}})
         const IsUserMailTaken = await objUserDb.users.findOne({where:{userName:req.body.userMail}})
-        const IsUserAndMailMatch = await objUserDb.users.findOne({where:{[Op.and]:{userName:req.body.userName , userMail:req.body.userMail}}})
+        const IsUserAndMailMatch = await objUserDb.pendingUsers.findOne({where:{[Op.and]:{userName:req.body.userName , userMail:req.body.userMail}}})
         if(typeof req.body.userName !== 'string' || IsUserNameTaken){
             return res.status(400).json({success:false , message:'UserName Taken ...!'})
         }
@@ -24,14 +27,10 @@ export const signUpUserValidation = async (req , res , next) => {
         if(! EmailRegex.test(req.body.userMail)){
             return res.status(400).json({success:false , message:"Invalid Email Provided"})
         }
-        if(! IsUserAndMailMatch){
-            if(IsUserMailTaken){
-                return res.status(400).json({success:false , message:"Provided User Mail has another User Name linked to it ...!"})
+        if(IsUserNameAdded || IsUserMailAdded){
+            if(!IsUserAndMailMatch){
+               return res.status(400).json({success:false , message:"Provided User Name doesn't match with Email ...!"}) 
             }
-            else if(IsUserNameTaken){
-                return res.status(400).json({success:false , message:"Provided User Name has another mail linked to it ...!"})
-            }
-            
         }
         if((req.body.password.length < 6 && req.body.password.length > 20) || ! Passwordregex.test(req.body.password)){
             return res.status(400).json({success:false , message:'Enter a strong password(One upper case , One Number & One special charcter)'})

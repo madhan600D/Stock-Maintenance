@@ -8,8 +8,8 @@ export const CreateUserController = async (Topic , Partition , Message) =>{
         if(Message.Event == 'SendVerificationEmail'){
             const ObjUserCreation = new UserCreation(Message.Data.userMail , Message.Data.userName)
             const IsUserCreated = await ObjUserCreation.CreateUser(Message.Data.userName , Message.Data.userMail , Message.Data.verificationHash , CreateUserTransaction)
-            if(IsUserCreated){
-                await CreateUserTransaction.commit()
+            if(IsUserCreated?.success){
+                await CreateUserTransaction.commit() 
                  return {success:true , message:"User created at Notification service end"}
             }  
             else{
@@ -21,7 +21,7 @@ export const CreateUserController = async (Topic , Partition , Message) =>{
             //Kafka structure:{Event , Data:{UserMail , UserName , VerificationHash}}
             const ObjVerificationEmail = new EmailVerification(Message.Data.UserMail , Message.Data.UserName)
             const IsVerificationMailReSent =  await ObjVerificationEmail.SendEmailVerification(Message.Data.VerificationHash , "Verification" , CreateUserTransaction) 
-            if(IsVerificationMailReSent){
+            if(IsVerificationMailReSent?.success){
                 await CreateUserTransaction.commit()
                  return {success:true , message:"Verification Mail sent "}
             }  
