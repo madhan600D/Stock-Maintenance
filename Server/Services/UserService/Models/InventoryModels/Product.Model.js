@@ -1,4 +1,4 @@
-// admin Model
+// Product Model
 export default (sequelize , DataTypes) => {
     const ProductModel = sequelize.define('Products', {
     ProductID: {
@@ -18,6 +18,22 @@ export default (sequelize , DataTypes) => {
     ProductName: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    ProductPrice:{
+        type:DataTypes.INTEGER,
+        allowNull:false
+    },
+    CurrencyID:{
+        type:DataTypes.INTEGER,
+        allowNull:false,
+        reference:{
+            model:'Currency',
+            key:'CurrencyID'
+        }
+    },
+    ActualPrice:{
+        type:DataTypes.INTEGER,
+        allowNull:false
     },
     CategoryID:{
         type:DataTypes.STRING, 
@@ -53,6 +69,10 @@ export default (sequelize , DataTypes) => {
         type:DataTypes.DATE,
         allowNull:true,
     },
+    Unit:{
+        type:DataTypes.STRING,
+        allowNull:false
+    },
     Quantity:{
         type:DataTypes.INTEGER,
         allowNull:false
@@ -77,6 +97,10 @@ export default (sequelize , DataTypes) => {
         ProductModel.belongsTo(model.organizations , {
             foreignKey:'OrganizationID',
             targetKey:'organizationId'
+        });
+        ProductModel.belongsTo(model.Currency , {
+            foreignKey:'CurrencyID',
+            targetKey:'CurrencyID'
         })
   }
   return ProductModel

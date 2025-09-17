@@ -1,9 +1,12 @@
+import { Sequelize, DataTypes } from "sequelize";
+
 //Models
-import CategoryModel from "../Models/InventoryModels/Category.Model";
-import ProductModel from "../Models/InventoryModels/Product.Model";
-import VendorModel from "../Models/InventoryModels/Vendor.Model";
+import CategoryModel from "../Models/InventoryModels/Category.Model.js";
+import ProductModel from "../Models/InventoryModels/Product.Model.js";
+import VendorModel from "../Models/InventoryModels/Vendor.Model.js";
 
-
+//All Models
+import AllModels from "./AllModels.js";
 class InventoryDataBase {
   constructor() {
     try {
@@ -21,16 +24,16 @@ class InventoryDataBase {
     this.VendorModel = VendorModel(this.InventoryDB , DataTypes)
 
     //All Models
-    this.allModels = {Category:this.Category ,Products:this.ProductModel , Vendors:this.VendorModel}   
+    this.allModels = AllModels
     
     //Make primary and foreign key constraints   
     Object.values(this.allModels).forEach((parmModel) => {
         if(parmModel.associate){ 
-            parmModel.associate(this.allModels) 
+            parmModel.associate(this.allModels)  
         }
     })
     } catch (error) {
-        console.log(error.message) 
+        console.log(error.message)  
     }
   } 
   // Connect method
@@ -46,4 +49,4 @@ class InventoryDataBase {
 } 
 const objInventoryDataBase = new InventoryDataBase(); 
 
-export default objInventoryDataBase;
+export default objInventoryDataBase; 

@@ -4,6 +4,7 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser';
 import signUpRouter from './Router/signup.router.js'; 
 import objUserDb from './Utils/userDB.js'
+import objInventoryDataBase from './Utils/InventoryDB.js'
 import organizationRouter from './Router/organization.router.js';
 dotenv.config();
 
@@ -25,7 +26,8 @@ try {
   
   userServer.listen(port, () => {
     objUserDb.connectDB();
-    console.log(`User server is running on port: ${port}`);
+    objInventoryDataBase.connectDB();
+    console.log(`Main server is running on port: ${port}`);
   }); 
 } catch (error) {
   console.error("Error initiating server:", error);
