@@ -1,3 +1,5 @@
+
+
 export default (sequelize, DataTypes) => {
   // UserRole Model
   const UserRoleModel = sequelize.define('roles', {
@@ -12,6 +14,10 @@ export default (sequelize, DataTypes) => {
     roleId: { 
       type: DataTypes.INTEGER,
       allowNull: false,
+      references:{
+        model:'RoleDetails',
+        key:'RoleID'
+      }
     },
     role: {
       type: DataTypes.STRING,
@@ -36,6 +42,10 @@ export default (sequelize, DataTypes) => {
     UserRoleModel.belongsTo(models.organizations, {
       foreignKey: 'organizationId',
     });
+    UserRoleModel.belongsTo(models.RoleDetails , {
+      foreignKey:'roleId',
+      targetKey:'RoleID'
+    })
   }; 
 
   return UserRoleModel;

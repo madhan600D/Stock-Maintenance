@@ -11,7 +11,7 @@ export const cookieValidation = async (req , res , next) => {
             if(!Verification){
                 return await res.status(400).json({success:false , message: "Unauthorized access"})
             }
-            const user = await objUserDb.users.findOne({where:{userId:Verification.userId}})
+            const user = await objUserDb.AllModels.users.findOne({where:{userId:Verification.userId}})
 
             if(!user){
                 return await res.status(400).json({success:false , message: "Payload user data not found ...!"})

@@ -1,7 +1,7 @@
 import express from 'express'
-import { joinOrg ,  createOrg , groupInviteToOrg , getOrganizations} from '../Controller/organization.controller.js';
+import { joinOrg ,  createOrg , groupInviteToOrg , getOrganizations} from '../Controller/UserControllers/organization.controller.js';
 import { cookieValidation } from '../MiddleWares/cookieValidation.js';
-import {CreateOrgValidate , GroupInviteToOrgValidate} from '../MiddleWares/EndPointValidations/Org.validate.js'
+import {CreateOrgValidate , GroupInviteToOrgValidate} from '../MiddleWares/EndPointValidations/UserEndPointValidations/Org.validate.js'
 
 const organizationRouter = express.Router() ; 
 

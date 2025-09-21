@@ -19,7 +19,7 @@ export default (sequelize , DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    Description:{
+    CategoryDescription:{
         type:DataTypes.STRING, 
         allowNull:false
     },
@@ -36,8 +36,8 @@ export default (sequelize , DataTypes) => {
   });
   CategoryModel.associate = (model) => {
     CategoryModel.belongsTo(model.organizations , {
-        foreignKey:'OrganizationID',
-        targetKey:'organizationId'
+        foreignKey: 'OrganizationID',
+        targetKey: 'organizationId', 
     })
   }
   return CategoryModel

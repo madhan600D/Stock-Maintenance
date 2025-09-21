@@ -7,9 +7,13 @@ export default (Sequelize , DataTypes) => {
         primaryKey:true,
         autoIncrement:true
     },
-    UserId:{
+    userId:{
         type:DataTypes.INTEGER,
         allowNull:false,
+        references:{
+            model:'users',
+            key:'userId'
+        }
     },
     Task:{
         type:DataTypes.STRING,
@@ -27,9 +31,10 @@ export default (Sequelize , DataTypes) => {
 
 })
 taskBucketModel.associate = (models) =>{
-    models.belongsTo(models.users , {
+    taskBucketModel.belongsTo(models.users , {
         foreignKey:'userId'
-    })
+    }) 
 }
+return taskBucketModel
 }
 

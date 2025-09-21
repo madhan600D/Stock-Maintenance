@@ -1,17 +1,17 @@
 //import models
 import bcrypt from 'bcryptjs'
-import objUserDb from '../Utils/userDB.js'
-import { GenerateJWT } from '../Utils/GenerateJWT.js'
-import { TimeFormatter } from '../Utils/timeFormatter.js'
+import objUserDb from '../../Utils/userDB.js'
+import { GenerateJWT } from '../../Utils/GenerateJWT.js'
+import { TimeFormatter } from '../../Utils/timeFormatter.js'
 import dotenv from 'dotenv'
 import { Op } from 'sequelize'
-import {ObjUserKafkaProducer} from '../Kafka/Producer/kafkaProducer.js'
+import {ObjUserKafkaProducer} from '../../Kafka/Producer/kafkaProducer.js'
 dotenv.config();
 export const signUpUser = async (req , res) => {
     try {
         let KafkaMessage = {} 
         let newPendingUser
-        const isDataAtPendingUser = await objUserDb.pendingUsers.findOne({where:{userMail:req.body.userMail}})
+        const isDataAtPendingUser = await objUserDb.AllModels.pendingUsers.findOne({where:{userMail:req.body.userMail}})
 
         if(isDataAtPendingUser?.isVerified){
             return res.status(400).json({success:false , message:"E-Mail already used"})
@@ -30,7 +30,7 @@ export const signUpUser = async (req , res) => {
             //Hash the password
             const passwordSalt = await bcrypt.genSalt(10)
             const passwordHash = await bcrypt.hash(req.body.password , passwordSalt)
-            newPendingUser = await objUserDb.pendingUsers.create({
+            newPendingUser = await objUserDb.AllModels.pendingUsers.create({
                 userName:req.body.userName.toLowerCase(), 
                 password:passwordHash,
                 userMail:req.body.userMail, 
@@ -43,7 +43,7 @@ export const signUpUser = async (req , res) => {
         const RequestIdentificationSalt = await bcrypt.genSalt(5)
         const HashedRequestIdentification =  await bcrypt.hash(RequestIdentification , RequestIdentificationSalt) 
 
-        const [UpdatedPendingUserCount,UpdatedPendingUser] = await objUserDb.pendingUsers.update({verificationHash:HashedRequestIdentification} , {where:{reqID:newPendingUser.reqID} , returning:true})
+        const [UpdatedPendingUserCount,UpdatedPendingUser] = await objUserDb.AllModels.pendingUsers.update({verificationHash:HashedRequestIdentification} , {where:{reqID:newPendingUser.reqID} , returning:true})
         
         KafkaMessage.Data = {ReqID:UpdatedPendingUser[0].reqID ,
                             userName:UpdatedPendingUser[0].userName,
@@ -59,7 +59,7 @@ export const signUpUser = async (req , res) => {
         return res.status(200).json({success:true , message :`A verification mail has been sent to ${req.body.userMail} ,Please verify to proceed further`})
         
     } catch (error) {
-        await objUserDb.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
+        await objUserDb.AllModels.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
         return req.status(500).json({success:false , message:error.message})   
     }
 }
@@ -70,7 +70,7 @@ export const addUser = async (req , res) => {
             const passwordSalt = await bcrypt.genSalt(10)
             const passwordHash = await bcrypt.hash(password , passwordSalt)
 
-            const newUser = await objUserDb.users.create({
+            const newUser = await objUserDb.AllModels.users.create({
                     organizationId:1, //NewUser
                     userName:userName.toLowerCase(),
                     userMail:userMail,
@@ -81,7 +81,7 @@ export const addUser = async (req , res) => {
 
             //Add session Data
             const currentTime = new Date()
-            await objUserDb.sessions.create({userId:newUser.userId , loggedInAt:Date(TimeFormatter(currentTime)) , LoggedOutAt:'' , isActive:true})
+            await objUserDb.AllModels.sessions.create({userId:newUser.userId , loggedInAt:Date(TimeFormatter(currentTime)) , LoggedOutAt:'' , isActive:true})
             return res.cookie("jwt",
                 JwtToken , {
                     maxAge: 60 * 60 * 1000,
@@ -91,7 +91,7 @@ export const addUser = async (req , res) => {
                 .json({success:true , message:'User created successfully'});     
 
     } catch (error) {
-        await objUserDb.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
+        await objUserDb.AllModels.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
         return res.status(500).json({success:false , message:"(Server Side)Error while creating a user...!"})
         
     }
@@ -99,11 +99,11 @@ export const addUser = async (req , res) => {
 
 export const ValidateUser = async (req , res) => {
     if(req.user){
-        const UserAndOrgData = await objUserDb.users.findOne({
+        const UserAndOrgData = await objUserDb.AllModels.users.findOne({
                                 where: { userId: req.user.userId },
                                 include: [
                                     {
-                                    model: objUserDb.organizations,
+                                    model: objUserDb.AllModels.organizations,
                                     attributes: ['organizationName', 'organizationId']
                                     }
                                 ]
@@ -134,7 +134,7 @@ export const eMailConfirm = async (req , res) => {
             })
             .catch(console.log("User Verification failed...!"))        
     } catch (error) {
-        await objUserDb.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
+        await objUserDb.AllModels.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
         return req.status(500).json({success:false , message:error.message})   
     }
 }
@@ -142,10 +142,10 @@ export const eMailConfirm = async (req , res) => {
 export const GetLoadingTexts = async (req , res) => {
     //API Structure:{}
     try {
-        const LoadingTexts = await objUserDb.LoadingTexts.findAll()
+        const LoadingTexts = await objUserDb.AllModels.LoadingTexts.findAll()
         return res.status(200).json({success:true , data:LoadingTexts})
     } catch (error) {
-     await objUserDb.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
+     await objUserDb.AllModels.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
      return req.status(500).json({success:false , message:error.message})   
     }
 }
@@ -154,8 +154,8 @@ export const logInUser = async (req , res) => {
     try {
         const userName = req.body.userName.toString().toLowerCase()  , userPassword = req.body.password , userMail = req.body?.userMail || '';
         let closeSession = true
-        const userCredentials = await objUserDb.users.findOne({
-                                                        include:[{model:objUserDb.organizations , attributes:['organizationId' , 'organizationName']}] , 
+        const userCredentials = await objUserDb.AllModels.users.findOne({
+                                                        include:[{model:objUserDb.AllModels.organizations , attributes:['organizationId' , 'organizationName']}] , 
                                                         where:{[Op.or]:{userName:userName , userMail:userName}}})
         if(!userCredentials){
             return res.status(400).json({success:false , message:"Invalid userName ....!"})
@@ -169,14 +169,14 @@ export const logInUser = async (req , res) => {
                 return res.status(400).json({success:false , message:"Incorrect password for entered UserName...!"})
             }
             //Check for active session
-            const isActiveSession = await objUserDb.sessions.findAll({
-                                include:{model:objUserDb.users,
+            const isActiveSession = await objUserDb.AllModels.sessions.findAll({
+                                include:{model:objUserDb.AllModels.users,
                                 where:{[Op.and]:{userName:userName}},
                                 attributes:['userName']} , 
                                 where:{isActive:true}});
             if(isActiveSession){
                 if(closeSession){
-                    await objUserDb.sessions.update({isActive:false , loggedOutAt:currentTime} , {where:{userId:userCredentials.userId}})
+                    await objUserDb.AllModels.sessions.update({isActive:false , loggedOutAt:currentTime} , {where:{userId:userCredentials.userId}})
                     //TBD:Socket server to manually log out the logged in user
                 }
                 else{
@@ -187,7 +187,7 @@ export const logInUser = async (req , res) => {
             const JwtToken = await GenerateJWT(userCredentials)
             //TBD:Setup a socket protocol to logout the currrently logged in user
             //Kill the old session if exsits 
-            const newSession = await objUserDb.sessions.create({userId:userCredentials.userId , loggedInAt:currentTime , LoggedOutAt:'' , isActive:true})
+            const newSession = await objUserDb.AllModels.sessions.create({userId:userCredentials.userId , loggedInAt:currentTime , LoggedOutAt:'' , isActive:true})
             const userData = {UserID:userCredentials.userId , UserMail:userCredentials.userMail , UserName:userCredentials.userName , OrganizationID:userCredentials.organization.organizationId , OrganizationName:userCredentials.organization.organizationName , ProfilePic:userCredentials.profilePic}
             return res.cookie("jwt",
                 JwtToken , {
@@ -202,7 +202,7 @@ export const logInUser = async (req , res) => {
             return res.status(400).json({success:false , message:"Entered UserName or UserMail is invalid..!"})
         }
     } catch (error) {
-        await objUserDb.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
+        await objUserDb.AllModels.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
         return req.status(500).json({success:false , message:error.message})
     }
 }
@@ -212,7 +212,7 @@ export const LogOutUser = async (req , res) => {
         //API Structure: {}
         //Session Log
         const currentTime = new Date()
-        const sessionUpdate = await objUserDb.sessions.update({LoggedOutAt:currentTime , isActive:false} , 
+        const sessionUpdate = await objUserDb.AllModels.sessions.update({LoggedOutAt:currentTime , isActive:false} , 
                                                         {where:{userId:req.user.userId}})
         
         res.clearCookie("jwt", {
@@ -222,7 +222,7 @@ export const LogOutUser = async (req , res) => {
         });
         return res.status(200).json({success:true , message:"User logged out successfully...!"})                                                        
     } catch (error) {
-        await objUserDb.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
+        await objUserDb.AllModels.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
         return req.status(500).json({success:false , message:error.message})   
     }
 }
@@ -231,7 +231,7 @@ export const UpdateProfile = async (req , res) => {
     try {
         //Verify user data
         const {isEmailChange , isProfileChange} = req.body
-        const isValidUser = await objUserDb.users.findOne({where:{userId:req.user.userId}})
+        const isValidUser = await objUserDb.AllModels.users.findOne({where:{userId:req.user.userId}})
         if(!isValidUser){
             return res.status(400).json({success:false , message:"Invalid user ...!"})
         }
@@ -240,10 +240,10 @@ export const UpdateProfile = async (req , res) => {
             if(! isCorrectOTP.success){
                 res.status(400).json({success:false , message:isCorrectOTP.message})
             }
-        const updatedEmail = await objUserDb.users.update({userMail:userMail},{where:{userId:req.user.userId}})
+        const updatedEmail = await objUserDb.AllModels.users.update({userMail:userMail},{where:{userId:req.user.userId}})
         }
     } catch (error) {
-        await objUserDb.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
+        await objUserDb.AllModels.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
         return req.status(500).json({success:false , message:error.message})  
     }
 }
@@ -252,14 +252,14 @@ export const sendOTP = async(req , res) => {
         //API Structure: {userMail}
         const {userMail} = req.body
         const otp = await Math.floor(100000 + Math.random() * 900000);
-        const userData = await objUserDb.users.findOne({where:{userId:req.user.userId}})
+        const userData = await objUserDb.AllModels.users.findOne({where:{userId:req.user.userId}})
         if(!userData){
             return res.json({success:false , message:"Invalid user ...!"})
         }
         //clear exisiting OTP
-        await objUserDb.otps.destroy({where:{userId:userData.userId}})
+        await objUserDb.AllModels.otps.destroy({where:{userId:userData.userId}})
         const OTPTime = new Date()
-        const savedOTP = await objUserDb.otps.create({
+        const savedOTP = await objUserDb.AllModels.otps.create({
             userId:userData.userId,
             OneTimePassword:otp,
             GeneratedTime:TimeFormatter(OTPTime) ,
@@ -268,7 +268,7 @@ export const sendOTP = async(req , res) => {
         //TBD: Send OTP to user's new Mail
         return res.status(200).json({success:true , message:`OTP sent to ${userMail}`})
     } catch (error) {
-        await objUserDb.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
+        await objUserDb.AllModels.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
         return req.status(500).json({success:false , message:error.message})  
     }
 }
@@ -276,37 +276,37 @@ export const verifyOTP = async (OTP) => {
     //API Structure: {}
     try {
         const currentTime = new Date()
-        if(! await objUserDb.users.findOne({where:{userId:req.user.userId}})){
+        if(! await objUserDb.AllModels.users.findOne({where:{userId:req.user.userId}})){
             return {success:false , message:"Invalid user ...!"}
         }
-        const OTPData = await objUserDb.otps.findOne({where:{userId:req.user.userId}})
+        const OTPData = await objUserDb.AllModels.otps.findOne({where:{userId:req.user.userId}})
         if(!OTPData){
                 return {success:false , message:"No OTP found, Please trigger OTP...!"}
         }
         //isExpired
         const differenceInMinutes = (currentTime - OTPData.GeneratedTime) / (1000 * 60)
         if(differenceInMinutes > 60 || OTPData.WrongAttemptCount >= 3){
-            await objUserDb.otps.destroy({where:{userId:req.user.userId}})
+            await objUserDb.AllModels.otps.destroy({where:{userId:req.user.userId}})
             return {success:false , message:"OTP expired please generate new OTP"}
         }
         if(OTPData.OneTimePassword != OTP){
             //increment the wrongAttemptCount
             const newCount = OTPData.WrongAttemptCount += 1
-            await objUserDb.otps.update({WrongAttemptCount: newCount} , {where:{userId:OTPData.userId}})
+            await objUserDb.AllModels.otps.update({WrongAttemptCount: newCount} , {where:{userId:OTPData.userId}})
             return {success:false , message:"Incorrect OTP...!"}
         }
         return {success:true}
     } catch (error) {
-        await objUserDb.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
+        await objUserDb.AllModels.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
         return req.status(500).json({success:false , message:error.message}) 
     }
 }
 //DB call Promises
 const verifyPendingUser =  async (reqId) =>{
     return new Promise(async (resolve , reject) => {
-        const isUserAvailableAndNotVerified = await objUserDb.pendingUsers.findOne({where:{[Op.and]:{verificationHash:reqId , isVerified:false}}})
+        const isUserAvailableAndNotVerified = await objUserDb.AllModels.pendingUsers.findOne({where:{[Op.and]:{verificationHash:reqId , isVerified:false}}})
         if(isUserAvailableAndNotVerified){
-            const verifiedUser = await objUserDb.pendingUsers.update({isVerified:true} , {where:{verificationHash:reqId}})
+            const verifiedUser = await objUserDb.AllModels.pendingUsers.update({isVerified:true} , {where:{verificationHash:reqId}})
             resolve(verifiedUser)
         }
         else{

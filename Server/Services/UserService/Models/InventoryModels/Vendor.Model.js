@@ -22,7 +22,7 @@ export default (sequelize , DataTypes) => {
     VendorAPI:{
         type:DataTypes.STRING,
         allowNull:false
-    }
+    },
     
   }, {
     timestamps: true,

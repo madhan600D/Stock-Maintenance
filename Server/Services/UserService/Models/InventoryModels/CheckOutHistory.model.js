@@ -2,8 +2,8 @@
 
 //Customer Orders
 export default (Sequelize , DataTypes) => {
-    const CheckOutModel = Sequelize.define('CheckOuts' , {
-    CheckOutID:{
+    const CheckOutHistoryModel = Sequelize.define('CheckOutHistory' , {
+    CheckOutHistoryID:{
         type:DataTypes.INTEGER,
         primaryKey:true,
         autoIncrement:true,
@@ -39,12 +39,12 @@ export default (Sequelize , DataTypes) => {
         timestamps: true,
         createdAt:'CheckOutTime' ,
         updatedAt:false,
-        tableName: 'CheckOuts',
+        tableName: 'CheckOutHistory',
     } 
     )
 
     CheckOutModel.associate = (models) => {
-        CheckOutModel.belongsTo(models.organizations, {
+        CheckOutModel.belongsTo(models.Category, {
             foreignKey: 'OrganizationID',
             targetKey: 'organizationId', 
         });

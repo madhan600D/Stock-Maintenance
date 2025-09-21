@@ -22,7 +22,7 @@ InventoryServer.use('/api/inventoryservice', signUpRouter);
 try {
   
   InventoryServer.listen(port, () => {
-    objUserDb.connectDB();
+    objUserDb.AllModels.connectDB();
     console.log(`User server is running on port: ${port}`);
   }); 
 } catch (error) {

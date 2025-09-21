@@ -35,9 +35,6 @@ export default (sequelize , DataTypes) => {
             type:DataTypes.BOOLEAN,
             allowNull:false,
         },
-        CurrencyID:{
-            
-        },
         //Is order active or not, Giving the ability to cancel the order
         Active:{
             type:DataTypes.BOOLEAN,

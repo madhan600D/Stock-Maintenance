@@ -1,5 +1,5 @@
 
-import objUserDb from "../../Utils/userDB.js"
+import objUserDb from "../../../Utils/userDB.js"
 import {Op} from 'sequelize'
 export const signUpUserValidation = async (req , res , next) => {
     try {
@@ -9,12 +9,12 @@ export const signUpUserValidation = async (req , res , next) => {
               userNameRegex = /^[a-zA-Z0-9]+$/ , 
               EmailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
-        const IsUserNameAdded = await objUserDb.pendingUsers.findOne({where:{userName:req.body.userName}}) 
-        const IsUserMailAdded = await objUserDb.pendingUsers.findOne({where:{userMail:req.body.userMail}})
+        const IsUserNameAdded = await objUserDb.AllModels.pendingUsers.findOne({where:{userName:req.body.userName}}) 
+        const IsUserMailAdded = await objUserDb.AllModels.pendingUsers.findOne({where:{userMail:req.body.userMail}})
 
-        const IsUserNameTaken = await objUserDb.users.findOne({where:{userName:req.body.userName}})
-        const IsUserMailTaken = await objUserDb.users.findOne({where:{userName:req.body.userMail}})
-        const IsUserAndMailMatch = await objUserDb.pendingUsers.findOne({where:{[Op.and]:{userName:req.body.userName , userMail:req.body.userMail}}})
+        const IsUserNameTaken = await objUserDb.AllModels.users.findOne({where:{userName:req.body.userName}})
+        const IsUserMailTaken = await objUserDb.AllModels.users.findOne({where:{userName:req.body.userMail}})
+        const IsUserAndMailMatch = await objUserDb.AllModels.pendingUsers.findOne({where:{[Op.and]:{userName:req.body.userName , userMail:req.body.userMail}}})
         if(typeof req.body.userName !== 'string' || IsUserNameTaken){
             return res.status(400).json({success:false , message:'UserName Taken ...!'})
         }
@@ -56,7 +56,7 @@ export const AddUserValidation = async (req , res , next) => {
 
         const {userName , userMail} = req.body ;
 
-        const isUserMailVerified = await objUserDb.pendingUsers.findOne({where:{userMail:userMail}})
+        const isUserMailVerified = await objUserDb.AllModels.pendingUsers.findOne({where:{userMail:userMail}})
 
         if(!isUserMailVerified){
             return res.status(400).json({success:false , message:"Please click on verification button before adding the user ... !"})   
@@ -66,7 +66,7 @@ export const AddUserValidation = async (req , res , next) => {
                 return res.status(400).json({success:false , message:`A verification E-Mail is sent to ${userMail}, Please verify before proceeding. If mail not received, click on the Email button again.`})   
             }
         }
-        const IsDataSameInPendingUser = await objUserDb.pendingUsers.findOne({where:{[Op.and]:{userName:userName ,       userMail:userMail}}})
+        const IsDataSameInPendingUser = await objUserDb.AllModels.pendingUsers.findOne({where:{[Op.and]:{userName:userName ,       userMail:userMail}}})
 
         if(!IsDataSameInPendingUser){
             return res.status(400).json({success:false , message:"UserName or MailID doesn't match with the verified UserName ...!"})

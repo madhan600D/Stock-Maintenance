@@ -57,15 +57,15 @@ export default (sequelize , DataTypes) => {
     },
     IsExpired:{
         type:DataTypes.STRING,
-        allowNull:false,
+        allowNull:true,
 
     },
     ExpirationDate:{
         type:DataTypes.DATE,
-        allowNull:false,
+        allowNull:true,
         
     },
-    ProductThreshold:{
+    ReorderThreshold:{
         type:DataTypes.DATE,
         allowNull:true,
     },
@@ -94,11 +94,11 @@ export default (sequelize , DataTypes) => {
             foreignKey: 'VendorID',
             targetKey: 'VendorID', 
         });
-        ProductModel.belongsTo(model.organizations , {
+        ProductModel.belongsTo(models.organizations , {
             foreignKey:'OrganizationID',
             targetKey:'organizationId'
         });
-        ProductModel.belongsTo(model.Currency , {
+        ProductModel.belongsTo(models.Currency , {
             foreignKey:'CurrencyID',
             targetKey:'CurrencyID'
         })
