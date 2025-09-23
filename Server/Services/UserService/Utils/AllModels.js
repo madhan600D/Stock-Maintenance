@@ -25,7 +25,7 @@ import CurrencyModel from "../Models/InventoryModels/Currency.Model.js";
 import OrdersModel from "../Models/InventoryModels/Orders.Model.js";
 import HolidayModel from "../Models/InventoryModels/Holiday.Model.js";
 import ScreensModel from "../Models/InventoryModels/Screens.Model.js";
-
+import OrganizationStateModel from "../Models/InventoryModels/OrganizationState.Model.js";
 
 
 export async function InitializeDataBase(){
@@ -58,6 +58,7 @@ export async function InitializeDataBase(){
       Orders: OrdersModel(InventoryDB, DataTypes),
       Holidays: HolidayModel(InventoryDB, DataTypes),
       Screens: ScreensModel(InventoryDB, DataTypes),
+      OrgState: OrganizationStateModel(InventoryDB , DataTypes)
     }; 
 
     return {Models , userDB , InventoryDB}

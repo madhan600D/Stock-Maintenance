@@ -47,7 +47,7 @@ export const joinOrg = async (req , res) => {
                         model:objUserDb.AllModels.organizations, attributes:['organizationName']}
                     ]},{where:{userName:req.user.userId} , transaction:JoinOrgTransaction}) 
 
-                const NewRole = await objUserDb.AllModels.userRoles.create({userId:req.user.userId , roleId:3 , role:"Staff" , organizationId:joinOrg.organizationId} , {transaction:JoinOrgTransaction})
+                const NewRole = await objUserDb.AllModels.roles.create({userId:req.user.userId , roleId:3 , role:"Staff" , organizationId:joinOrg.organizationId} , {transaction:JoinOrgTransaction})
                 
                 const DataToClient = {organizationName:updatedUser.organizatinName , organizationId:updatedUser.organizationId , }
 
@@ -89,14 +89,14 @@ export const createOrg = async (req , res) => {
                                        adminId:req.user.userId,
                                        organizationName:OrganizationName.toUpperCase()
         } , {transaction:CreateOrgTransaction})
+        await objUserDb.AllModels.roles.create({userId:req.user.userId , 
+                                       roleId:1, role:'Admin' , organizationId:newOrganization.organizationId} , {transaction:CreateOrgTransaction})
 
         await objUserDb.AllModels.users.update(
             { organizationId: newOrganization.organizationId }, 
             { where: { userId: req.user.userId } , transaction:CreateOrgTransaction }        
         );
 
-        //Add to Roles table
-        await objUserDb.AllModels.userRoles.create({userId:req.user.userId , roleId:1 , role:"Admin" , organizationId:newOrganization.organizationId})
         await CreateOrgTransaction.commit()
         //TBD:Call mail service and send mail to Admin with welcome details:Kafka
         return res.status(200).json({success:true , message:`Sucessfully created organization ${newOrganization.organizationName}` , data:newOrganization});

@@ -2,7 +2,7 @@
 
 // OrganizationState Model
 export default (sequelize , DataTypes) => {
-    const OrganizationState = sequelize.define('OrganizationStates', {
+    const OrganizationState = sequelize.define('OrgState', {
         OrganizationID:{
             type:DataTypes.INTEGER,
             allowNull:false,
@@ -33,7 +33,16 @@ export default (sequelize , DataTypes) => {
             type:DataTypes.BOOLEAN,
             allowNull:true
         }
-
-
-    })
+    } , 
+        {tableName:'OrgState',
+        timestamps:false,
+    }
+)
+    OrganizationState.associate = (models) => {
+        OrganizationState.belongsTo(models.organizations , {
+            foreignKey: 'OrganizationID',
+            targetKey: 'organizationId', 
+        })
+    }
+    return OrganizationState
 }

@@ -35,3 +35,26 @@ export const AlterProductValidate = async (req , res , next) => {
         
     }
 }
+
+export const DeleteProductValidate = async (req , res , next) => {
+    try {
+        const {ProductIDs} = req?.body;
+        if(!ProductIDs){
+            return res.status(400).json({success:false , message:"Please select atleast one product to remove ...!"})
+        }
+        const AllProducts = await objInventoryDataBase.AllModels.Products.findAll({
+                        where: {
+                            ProductId: {
+                            [Op.in]: [...ProductIDs]
+                            }
+                        }
+        });
+
+        if(AllProducts.length !== ProductIDs.length){
+            return res.status(400).json({success:false , message:"One or more selected products is not available, Please refresh and try again"})
+        }
+        next()
+    } catch (error) {
+        
+    }
+}

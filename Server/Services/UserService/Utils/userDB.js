@@ -2,7 +2,7 @@ import { InitializeDataBase } from "./AllModels.js";
 
 class UserDatabase {
   constructor() {
-    this.allModels = null;
+    this.AllModels = null;
     this.userDB = null;
   }
 

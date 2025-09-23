@@ -2,6 +2,7 @@ import { Op } from "sequelize";
 import objInventoryDataBase from "../../Utils/InventoryDB.js";
 
 import cloudinary from "../../Lib/Cloudinary.js";
+import objUserDb from "../../Utils/userDB.js";
 
 export const GetProductsForOrganization = async (req , res) => {
     try {
@@ -85,5 +86,19 @@ export const AlterProductForOrganization = async (req , res) => {
         
     } catch (error) {
         
+    }
+}
+
+export const DeleteProducts = async (req , res) => {
+    try {
+        const Transaction = await objUserDb.userDB.transaction()
+        const NewProductList = await objUserDb.allModels.Products.delete({where:{
+            [Op.in] : [req.body.ProductIDs]
+        } , transaction:Transaction});
+
+        await Transaction.commit()
+        return res.status(200).json({success:true , message:"Products removed successfully" , data:NewProductList})
+    } catch (error) {
+        await Transaction.rollback()
     }
 }

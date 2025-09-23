@@ -7,6 +7,7 @@ import {ObjNotificationKafkaProducer} from '../Kafka/Producer/KafkaProducer.js'
 import {Op} from 'sequelize'
 export class PushMail{
     constructor(mailOptions){
+        //{ParentMailOptions:{UserName,UserMail , HTML}}
         this.ParentMailOptions = mailOptions
         this.UserData
         this.NotificationData
@@ -14,7 +15,10 @@ export class PushMail{
     }
 SendMail = async (transaction) => {
     try {
-        // this.UserData = await objNotificationDB.Users.findOne({where:{UserMail:this.ParentMailOptions.UserMail}});
+        this.UserData = await objNotificationDB.Users.findOne({where:{UserMail:this.ParentMailOptions.UserMail}});
+        if(!this.UserData){
+            return {success:false}
+        }
         await this.IsUserAtCoolDown(this.ParentMailOptions.UserName , transaction);
         let KafkaResponse = {}
         if (!this.ErrorObj.success) {
@@ -71,6 +75,7 @@ SendMail = async (transaction) => {
             // KafkaResponse.Data = {Success : true , UserID : this.UserData.UserID , UserName : this.UserData.UserName , UserMail:this.UserData.UserMail}
             // ObjNotificationKafkaProducer.ProduceEvent('VerificationMailSent' , 'user.create_user.response' , )
             await this.AddMailToBucket(this.UserData.UserName , transaction);
+            await transaction.commit();
             return {success:true , message:"Mail added to bucket...!"}
         } else {
             // KafkaResponse = {}
@@ -86,6 +91,7 @@ SendMail = async (transaction) => {
         }
     } catch (error) {
         this.ErrorObj = {success:false , message:"System error in push mail" + error.message};
+        await transaction.rollback()
         console.log("Error at Push mail" , error)
     }
 };
@@ -163,6 +169,7 @@ SendMail = async (transaction) => {
                 await objNotificationDB.NotificationCoolDown.update({IsCoolDown:false} , {where:{userName:UserName} , transaction:transaction})
             }
         } catch (error) {
+            await transaction.rollback()
             this.ErrorObj = {success:false , message:"System error in push mail" + error.message};
             console.log("Error at Push mail" , error)
         }
@@ -174,6 +181,7 @@ SendMail = async (transaction) => {
             await objNotificationDB.NotificationBuckets.update({NotificationsInBucket:NotificationCount.NotificationsInBucket} , {where:{UserID:this.UserData.UserID} , transaction:transaction})
 
         } catch (error) {
+            await transaction.rollback()
             this.ErrorObj = {success:false , message:"System error in push mail" + error.message};
             console.log("Error at Push mail" , error)
         }
