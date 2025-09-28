@@ -1,10 +1,10 @@
 import React from 'react'
 import Styles from './InviteToOrgPage.module.css'
-import ItemAdder from '../Components/ItemAdder/ItemAdder.jsx'
+import ItemAdder from '../../Components/ItemAdder/ItemAdder.jsx'
 
 //Stores
-import useOrg from '../../Stores/OrgStore.js'
-import ShowToast from '../Components/Toast/Toast.js'
+import useOrg from '../../../Stores/OrgStore.js'
+import ShowToast from '../../Components/Toast/Toast.js'
 function InviteToOrgPage() {
   //Stores
   const {GroupInviteToOrg , IsBulkMailLoading} = useOrg()

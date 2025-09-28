@@ -18,7 +18,7 @@ export default (Sequelize , DataTypes) => {
         }
     },
     CheckOutDate:{
-        type:DataTypes.DATE,
+        type:DataTypes.DATEONLY,
         allowNull:false
     },
     NoOfItems:{
@@ -28,7 +28,15 @@ export default (Sequelize , DataTypes) => {
     //A Array of JSON
     ProductsItems:{
         type:DataTypes.INTEGER,
-        allowNull:false
+        allowNull:false,
+        get() {
+            const RawValue = this.getDataValue("ProductItems")
+            return RawValue ? JSON.parse(RawValue) : null;
+        },
+        set(Value){
+            const JsonValue = JSON.stringify(Value) ; 
+            setDataValue("ProductItems" , JsonValue);
+        }
     },
     TotalCost:{
         type:DataTypes.INTEGER,

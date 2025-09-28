@@ -1,25 +1,36 @@
 import { create } from 'zustand';
 import AxiosInstance from '../Lib/AxiosInstance.js';
 const useOrg = create((set , get) => ({
-    IsCreateOrgLoading:false,
+    IsNewOrgLoading:false,
     IsJoiningOrg:false,
     IsBulkMailLoading : false,
     OrganizationData:{},
     AllOrganizations:[],
     CreateOrg : async (OrgData) => {
         set({IsNewOrgLoading:true});
+        let DataFromBackend , ObjError = {success:true , message:''}
         try {
             const IsSuccess = await Validate("CreateOrg" , OrgData);
             if(!IsSuccess.success){
                 return {success:false , message:IsSuccess.message}
             }
             const res = await AxiosInstance.put('/api/userservice/org/create-org' , OrgData);
+
             //NewOrg Data
-            const DataFromBackend = res.data.data;
-            set({OrganizationData:{OrganizationName:DataFromBackend.organizationName , OrganizationID: DataFromBackend.organizationId , OrganizationJoiningCode: DataFromBackend.OrganizationJoiningCode}});
-            return {success:true , message:`Congratulations on creating ${DataFromBackend.organizationName} ...!`}
+            DataFromBackend  = res.data.data;
+
+            //Set Global org state
+            set({OrganizationData:{OrganizationData:{OrganizationName:DataFromBackend.OrganizationName , OrganizationID: DataFromBackend.OrganizationID} , OrganizationJoiningCode: DataFromBackend.OrganizationJoiningCode , RunDate:DataFromBackend.RunDate , CurrentDaySales:DataFromBackend.OrgState.CurrentDaySales , ClosingTime:DataFromBackend.ClosingTime ,Weekends:DataFromBackend.OrgState.Weekends , TotalExpense:DataFromBackend.PNL.TotalExpense , TotalRevenue:DataFromBackend.PNL.TotalRevenue}});
+
+            //Set message to error object
+            ObjError.message = "Organization created successfully"
+            
         } catch (error) {
-            return {success:false , message:DataFromBackend.data?.message || error.response.data.message || "Error while creating new organization ...!"}
+            ObjError = {success:false , message:'Failed while creating a organization'}
+        }
+        finally{
+            set({IsNewOrgLoading:false});
+            return ObjError
         }
     },
     JoinOrg: async (OrgData) => {
@@ -68,23 +79,31 @@ const useOrg = create((set , get) => ({
         }
         finally{
             set({IsBulkMailLoading :false})
-        }
+        } 
     }
 }))
 
 const Validate =  (ValidationType , Data) => {
     try {
         if(ValidationType === "CreateOrg"){
-            const {OrganizationName , BusinessType , Street , City , Country , PinCode} = Data;
-            if([OrganizationName , BusinessType , Street , City , Country , PinCode].some(Value => Value === undefined)){
+            const {OrganizationName , TypeOfBusiness , Address , ClosingTime , Weekends} = Data;
+            if([OrganizationName , TypeOfBusiness , Address.Street , Address.City , Address.Country , Address.Pincode , ClosingTime , Weekends].some(Value => Value === undefined)){
                 return {success:false , message:"Please fill all fields ...!"}
             }
+
+            //ClosingTime Conversion to SQL time dataType
+            Data.ClosingTime = Data.ClosingTime.format("HH:mm:ss");
+
+            if(Weekends.length !== 2){
+                return {success:false , message:"Please select two days as weekend...!"}
+            }
+            
             return {success:true , message:"Validation Done ...!"}
         }
         else if(ValidationType == "JoinOrg"){
             if(Data?.JoinMethod == "referral"){
                 const {OrganizationJoiningCode} = Data ; 
-                if(OrganizationJoiningCode.toString().length > 8){
+                if(OrganizationJoiningCode.toString().length !== 8){
                     return {success:false , message:"Org code should be 6 digits...!"}
                 }
                 return {success:true}

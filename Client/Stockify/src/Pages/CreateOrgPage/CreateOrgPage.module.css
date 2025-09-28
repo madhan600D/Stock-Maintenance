@@ -1,9 +1,27 @@
 .Main-Div{
     display: flex;
+    padding-top: 5rem;
     align-items: center;
     flex-direction: row;
     overflow: hidden;
     justify-content: center;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
+}
+.Weekend-Div{
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: wheat;
+}
+.Summary-Div{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.Weekend-Div :nth-child{
+}
+
+Summary-Div{
+    display: inline-block;
 }

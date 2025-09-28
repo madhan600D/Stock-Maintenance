@@ -11,7 +11,7 @@ import ShowToast from '../Toast/Toast.js'
 import { useEffect } from 'react';
 import TextBoxWithButton from '../TextBoxWithButton/TextBoxWithButton.jsx';
 import ButtonWithToolTip from '../ButtonWithToolTip/ButtonWithToolTip.jsx'
-function ItemAdder({ButtonText , ItemLimit , ButtonCallBack}) {
+function ItemAdder({ButtonText , ItemLimit , Description , ButtonCallBack}) {
     //Variables
     const MailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -80,8 +80,7 @@ function ItemAdder({ButtonText , ItemLimit , ButtonCallBack}) {
     }
   return (
     <div className = {Styles['Main-Div']}>
-        <h2>Invite users to your organization</h2>
-        <label>Enter the emails of the users you wish to add to your organization. The specified user will receive an Code via email, They can join your organization by entering the code.</label>
+        <label>{Description}</label>
         <br />
         <div className = {Styles['ItemDisplay-Div']}>
             {ItemList.map((Item, Index) => {

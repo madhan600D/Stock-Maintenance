@@ -8,8 +8,8 @@ export const CreateUserController = async (Topic , Partition , Message) =>{
         if(Message.Event == 'SendVerificationEmail'){
             const ObjUserCreation = new UserCreation(Message.Data.userMail , Message.Data.userName)
             const IsUserCreated = await ObjUserCreation.CreateUser(Message.Data.userName , Message.Data.userMail , Message.Data.verificationHash , CreateUserTransaction)
-            if(IsUserCreated?.success){
-                await CreateUserTransaction.commit() 
+            if(IsUserCreated?.success){ 
+                await CreateUserTransaction.commit()  
                  return {success:true , message:"User created at Notification service end"}
             }  
             else{

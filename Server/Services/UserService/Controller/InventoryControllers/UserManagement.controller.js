@@ -43,11 +43,11 @@ export const AlterWorker = async (req , res) => {
         const HtmlData = {UserName:UserDetails.userName , UserMail:UserDetails.userMail , Organization:UserDetails.organizations.organizationName}
 
         //Send a mail event to kafka
-        const HTMLData = await PrepareHTML("RoleChange" , HtmlData)
+        const HTMLDataResult = await PrepareHTML("RoleChange" , HtmlData)
 
         //Kafka Message
         KafkaMessage.Event = "SingleMail"
-        KafkaMessage.Data = {UserMail:UserDetails.userMail , UserName:UserDetails.userName ,Data:{HTML:HtmlData}}
+        KafkaMessage.Data = {UserMail:UserDetails.userMail , UserName:UserDetails.userName ,Data:{HTML:HTMLDataResult}}
         await ObjUserKafkaProducer.ProduceEvent("SingleMail" , "user.new_mail.request" , KafkaMessage);
 
         return res.status(200).json({success:true , message:`Role updated: ${UserID}` , data:UpdatedRole})

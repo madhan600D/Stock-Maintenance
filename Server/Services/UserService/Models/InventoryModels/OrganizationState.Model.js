@@ -12,15 +12,15 @@ export default (sequelize , DataTypes) => {
             }
         },
         RunDate:{
-            type:DataTypes.DATE,
+            type:DataTypes.DATEONLY,
             allowNull:false
         },
         CurrentDaySales:{
-            type:DataTypes.DATE,
+            type:DataTypes.INTEGER,
             allowNull:false
         },
         ClosingTime:{
-            type:DataTypes.DATE,
+            type:DataTypes.TIME,
             allowNull:true
         },
         Weekends:{

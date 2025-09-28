@@ -34,7 +34,7 @@ export const GetProductsForOrganization = async (req , res) => {
 export const AddProductForOrganization = async (req , res) => {
     try {
         const Transaction = await objInventoryDataBase.InventoryDB.transaction()
-        const {ProductName , ProductImage , ProductPrice, ProductQuantity, Currency, CategoryName, Unit, Vendor, ExpirationDate, ReorderThreshold} = req.body;
+        const {ProductName , ProductImage , ProductPrice, ActualPrice , ProductQuantity, Currency, CategoryName, Unit, Vendor, ExpirationDate, ReorderThreshold} = req.body;
 
         const IsCategoryExsists = await objInventoryDataBase.allModels.Category.findOne({
                 where:{[Op.and]:[{OrganizationID:req.user.OrgID} , {CategoryName:CategoryName}]}
@@ -50,9 +50,14 @@ export const AddProductForOrganization = async (req , res) => {
         }
         
         //Add the product
-        const NewProduct = await objInventoryDataBase.allModels.Products.create({OrganizationID:req.user.OrgID,     ProductName:ProductName, ProductPrice:ProductPrice, ActualPrice:ProductPrice, CategoryID:!IsCategoryExsists ? NewCategory.CategoryID : IsCategoryExsists.CategoryID, ProductImage:CloudinaryResponse.secure_url, VendorID:Vendor, IsExpired:false, ExpirationDate:ExpirationDate,ReorderThreshold:ReorderThreshold, Unit:Unit, Quantity:ProductQuantity , Currency:Currency} , {Transaction});
+        const NewProduct = await objInventoryDataBase.allModels.Products.create({OrganizationID:req.user.organizationId,ProductName:ProductName, ProductPrice:ProductPrice, ActualPrice:ActualPrice, CategoryID:!IsCategoryExsists ? NewCategory.CategoryID : IsCategoryExsists.CategoryID, ProductImage:CloudinaryResponse.secure_url, VendorID:Vendor, IsExpired:false, ExpirationDate:ExpirationDate,ReorderThreshold:ReorderThreshold, Unit:Unit, Quantity:ProductQuantity , Currency:Currency} , {Transaction});
 
-        return res.status(200).json({success:true , message:"Product and category created successfully ...!" , data:[NewProduct , NewCategory]})
+        //Update PNL using increment
+        const NewPNL = await objInventoryDataBase.AllModels.PNL.increment(
+                            { TotalRevenue: ActualPrice },
+                            { where: { OrganizationID: req.user.organizationId }});
+
+        return res.status(200).json({success:true , message:"Product and category created successfully ...!" , data:{PNL:NewPNL , NewProduct:NewProduct}})
 
     } catch (error) {
         

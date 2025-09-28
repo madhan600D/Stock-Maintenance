@@ -1,0 +1,39 @@
+.stepper {
+  display: flex;
+  align-self: center;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-left: 2rem;
+  margin-right: 2rem;
+  
+  
+}
+
+.step-container {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.step {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #ccc; /* default gray */
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.step.active {
+  background: #2563eb; /* blue (like Tailwind blue-600) */
+}
+
+.bar {
+  flex: 1;
+  height: 4px;
+  background: #ccc;
+}

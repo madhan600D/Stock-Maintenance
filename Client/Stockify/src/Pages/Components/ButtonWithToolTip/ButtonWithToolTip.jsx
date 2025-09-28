@@ -11,15 +11,6 @@ function ButtonWithToolTip({ButtonLogo , ToolTipText , Reference , ButtonCallBac
             <p className={Styles['Back']} style={{color:ColorPalatte[1]}}>{ToolTipText}</p>
     </button>
     </div>
-    
-
-    // <button className= {Styles['add-Button']} onClick={handleAddButtonClick}>
-    //         <MdAddCard className = {Styles['addButton-Icon']} />
-    //         <p className= {Styles['addButton-Label']}>
-    //           ADD PRODUCT
-    //         </p>
-                            
-    //       </button>
   )
 }
 

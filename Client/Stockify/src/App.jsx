@@ -8,7 +8,7 @@ import useUser from './Stores/UserStore';
 //Pages
 import LoginPage from './Pages/LoginPage/LoginPage';
 import CreateOrJoinOrgPage from './Pages/CreateOrJoinOrgPage/CreateOrJoinOrgPage.jsx';
-import InviteToOrgPage from './Pages/InviteToOrgPage/InviteToOrgPage.jsx';
+import InviteToOrgPage from './Pages/SubPages/InviteToOrgPage/InviteToOrgPage.jsx';
 import HomePage from './Pages/HomePage/HomePage.jsx';
 import { ToastContainer } from 'react-toastify';
 import ShowToast from './Pages/Components/Toast/Toast.js';

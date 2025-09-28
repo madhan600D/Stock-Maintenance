@@ -1,4 +1,4 @@
-import { PushMail } from "../NodeMailer/PushNotification.class";
+import { PushMail } from "../NodeMailer/PushNotification.class.js";
 import { objNotificationDB } from "../Utils/NotificationDB.js";
 
 export const SendMail = async (Topic , Partition , Message) => {

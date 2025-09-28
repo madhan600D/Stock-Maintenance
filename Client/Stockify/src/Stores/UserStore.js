@@ -18,47 +18,68 @@ const useUser = create((set , get) => ({
 
 
     SignUp: async (UserCredentials) => {
+        let ObjError = {success:true , message:''}
+        let DataFromBackend
         try {
             //API Structure:{userName , userMail , password}
             set({IsSignUpLoading:true});
             const Validation = await Validate('SignUp' , UserCredentials)
             if(!Validation.success){
-                return {success:false , message:Validation.message}
-        }
-        const res = await AxiosInstance.put('/api/userservice/signup' , UserCredentials)
-        const DataFromBackend = res.data;
-        if(DataFromBackend.success){
-            return {success:true , message:DataFromBackend.message}
-        }
-        } catch (error) {
-            console.log(error)
-            return {success:false , message:error.response.data.message}
-        }
-        finally{
-            set({IsSignUpLoading:false});
-        }
+                ObjError = {success:false , message:Validation.message}
+                return ObjError 
+            }
+            const res = await AxiosInstance.put('/api/userservice/signup' , UserCredentials)
+            DataFromBackend = res.data;
+
+            if(DataFromBackend.success){
+                ObjError = {success:true , message:DataFromBackend.message}
+            }
+
+            } catch (error) {
+                ObjError = {success:false , message:"Error signing up...!"}
+            }
+            finally{
+                set({IsSignUpLoading:false});
+                return ObjError;
+            }
     },
     AddUser: async (UserCredentials) => {
         set({IsAddUserLoading:true})
+        let DataFromBackend , ObjError = {success:true , message:''};
         try {
             //API Structure:{userName , userMail , password}
             const Validation = await Validate('SignUp' , UserCredentials);
             if(!Validation){
-                return {success:false , message:Validation.message}
+                ObjError = {success:false , message:Validation.message}
+                return ObjError
             }
+
             const res = await AxiosInstance.put('/api/userservice/add-user' , UserCredentials)
-            const DataFromBackend = res.data;
+            DataFromBackend = res.data;
+
             //Set UserData
-            set({UserData:{UserName:UserCredentials.userName , UserMail:UserCredentials.userMail , Password:UserCredentials.password}})
+            set({
+                IsAuthenticated: true,
+                UserData: {
+                    UserName: DataFromBackend.data.UserName,
+                    UserMail: DataFromBackend.data.UserMail,
+                    UserID: DataFromBackend.data.UserID
+                },
+                OrganizationData: {
+                    OrganizationID: 1,
+                    OrganizationName: "New"
+                }
+            });
             set({IsAuthenticated:true})
-            return {success:true , message:DataFromBackend.message};
+            ObjError = {success:true , message:"Sign up successfull"}
 
         } catch (error) {
             console.log(error)
-            return{success:false , message:error.response.data ?error.response.data.message : error.message };
+            ObjError = {success:false , message:"Signup failed...! at Error block"}
         }
         finally{
             set({IsAddUserLoading:false})
+            return ObjError
         }
     },
     ValidateUser:async () => {
@@ -70,7 +91,7 @@ const useUser = create((set , get) => ({
             const DataFromBackend = res.data;
             if(DataFromBackend.data){
                 console.log(DataFromBackend.data)
-                set({UserData:DataFromBackend.data});
+
                 set({
                 IsAuthenticated: true,
                 UserData: {

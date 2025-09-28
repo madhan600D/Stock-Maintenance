@@ -34,7 +34,7 @@ export class KafkaProducer{
     }
     LogEvent = async (topic , event) => {
         try {
-            const ProducedEvent = await this.DataBase.producedEvents.create({
+            const ProducedEvent = await this.DataBase.AllModels.ProducedEvents.create({
                 Topic:topic,
                 Event:JSON.stringify(event.Data),
                 IsResponseReceived:false

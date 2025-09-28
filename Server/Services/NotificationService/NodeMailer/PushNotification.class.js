@@ -15,7 +15,7 @@ export class PushMail{
     }
 SendMail = async (transaction) => {
     try {
-        this.UserData = await objNotificationDB.Users.findOne({where:{UserMail:this.ParentMailOptions.UserMail}});
+        this.UserData = await objNotificationDB.Users.findOne({where:{UserMail:this.ParentMailOptions.to}});
         if(!this.UserData){
             return {success:false}
         }
@@ -75,7 +75,6 @@ SendMail = async (transaction) => {
             // KafkaResponse.Data = {Success : true , UserID : this.UserData.UserID , UserName : this.UserData.UserName , UserMail:this.UserData.UserMail}
             // ObjNotificationKafkaProducer.ProduceEvent('VerificationMailSent' , 'user.create_user.response' , )
             await this.AddMailToBucket(this.UserData.UserName , transaction);
-            await transaction.commit();
             return {success:true , message:"Mail added to bucket...!"}
         } else {
             // KafkaResponse = {}
@@ -227,7 +226,7 @@ export class EmailVerification extends PushMail{
            const IsMailSent = await this.SendMail(transaction)
            if(IsMailSent?.success){
             return {success:true}
-           }
+           } 
            else{
             return {success:false}
            }

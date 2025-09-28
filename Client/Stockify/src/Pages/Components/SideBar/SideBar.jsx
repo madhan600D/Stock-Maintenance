@@ -19,6 +19,7 @@ import { MdOutlineInventory } from "react-icons/md";
 import { FaUsers } from "react-icons/fa";
 import EnventoryLogo from '../../../assets/Logo/EnventoryLogo.png'
 import { BsLayoutTextSidebarReverse } from "react-icons/bs";
+import { FaCartArrowDown } from "react-icons/fa6";
 
 //Stores
 import useOrg from '../../../Stores/OrgStore.js';
@@ -59,6 +60,7 @@ function SideBar() {
             MenuText={menu.MenuText}
             Callback={menu.Callback}
             ArrayOfSubMenus={menu.ArrayOfSubMenus || []}
+            URL={menu.URL || ''}
           />
         }))
       }
@@ -97,22 +99,32 @@ function SideBar() {
   //Dynamic SideBar
   const HomePage = [{
     MenuLogo: MdOutlineInventory,
-    MenuText: "Inventory"
+    MenuText: "Dashboard",
+    Callback:HandleSubPageChange,
+    URL:'/dashboard'
   },
   {
     MenuLogo: GoOrganization,
     MenuText: "Organization",
     ArrayOfSubMenus: [
-      { MenuText: "Invite to org", Callback: HandleSubPageChange , URL:'/invite-to-org' },
-      { MenuText: "Edit Organization" }
+      { MenuText: "Invite", Callback: HandleSubPageChange , URL:'/invite-to-org' },
+      { MenuText: "Edit Org" }
     ]
   },
   {
     MenuLogo: AiOutlineStock,
-    MenuText: "Stock",
+    MenuText: "Products",
     ArrayOfSubMenus: [
-      { MenuText: "ForeCast Stocks" },
-      { MenuText: "Stock Settings" }
+      { MenuText: "Manage Product" },
+      { MenuText: "Add Product" }
+    ]
+  },
+  {
+    MenuLogo: FaCartArrowDown,
+    MenuText: "Orders",
+    ArrayOfSubMenus: [
+      { MenuText: "Order Management" },
+      { MenuText: "Vendors" },
     ]
   },
   {
@@ -121,7 +133,6 @@ function SideBar() {
     ArrayOfSubMenus: [
       { MenuText: "User Management" },
       { MenuText: "Group Buzz" },
-      { MenuText: "Chat" }
     ]
   },
   {
@@ -221,7 +232,9 @@ function Menu({MenuLogo , MenuText , ArrayOfSubMenus , Callback , URL}){
 
   return (
     <div className = {Styles['AllMenu-Div']}>
-      <div className = {Styles['Menu-Div']} onClick={() => HandleDropDown()}>
+      <div className = {Styles['Menu-Div']} onClick={() => {
+              HandleDropDown()
+        }}>
           
           <MenuLogo className = {Styles['Logo-Svg']}/>
           <label>

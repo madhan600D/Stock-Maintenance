@@ -19,7 +19,7 @@ const DeclareKafkaConsumers = async () => {
   const ObjKafkaConsumerGroupMail = await new KafkaConsumer(kafka , objNotificationDB , "user.group_mail" , "Group_Mail");
   KafkaConsumers.set(ObjKafkaConsumerGroupMail , OrganizationEvents)
 
-  const ObjKafkaConsumerNewMail = await new KafkaConsumer(kafka , objNotificationDB , "user.new_mail" , "New_Mail");
+  const ObjKafkaConsumerNewMail = await new KafkaConsumer(kafka , objNotificationDB , "user.new_mail.request" , "New_Mail");
   KafkaConsumers.set(ObjKafkaConsumerNewMail , SendMail)
     //#endregion
 }

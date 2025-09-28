@@ -20,7 +20,7 @@ export default (sequelize , DataTypes) => {
             allowNull:true
         },
         Year:{
-            type:DataTypes.DATE,
+            type:DataTypes.INTEGER,
             allowNull:false
         }
     } , {

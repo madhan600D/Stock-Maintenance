@@ -9,6 +9,9 @@ function PageHolder() {
   const {CurrentPage} = useApp();
   return (
     <div className={Styles['Main-Div']}>
+        <div className={Styles['TopButtons-Div']}>
+          
+        </div>
         <div className='Page-Div'>
           {CurrentPage === '' ? "Welcome to home page" : <CurrentPage />}
         </div>

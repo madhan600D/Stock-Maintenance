@@ -2,9 +2,10 @@ import { create } from 'zustand';
 import AxiosInstance from '../Lib/AxiosInstance.js';
 
 //SubPages
-import InviteToOrgPage from '../Pages/InviteToOrgPage/InviteToOrgPage.jsx';
+import InviteToOrgPage from '../Pages/SubPages/InviteToOrgPage/InviteToOrgPage.jsx';
+import DashboardPage from '../Pages/SubPages/DashboardPage/DashboardPage.jsx';
 
-const URLToPage = {'/invite-to-org':InviteToOrgPage}
+const URLToPage = {'/invite-to-org':InviteToOrgPage , '/dashboard': DashboardPage}
 
 const useApp = create((set , get) => ({
     CurrentPage:'',

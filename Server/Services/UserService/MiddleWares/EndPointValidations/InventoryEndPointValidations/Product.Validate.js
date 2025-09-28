@@ -2,9 +2,9 @@
 import objInventoryDataBase from "../../../Utils/InventoryDB.js"
 export const AddProductValidate = async (req , res , next) => {
     try {
-        const {ProductName , ProductImage , ProductPrice, ProductQuantity, Currency, CategoryName, Unit, Vendor, ExpirationDate, ReorderThreshold} = req?.body;
+        const {ProductName , ProductImage , ProductPrice, ProductQuantity, Currency, CategoryName, Unit, Vendor, ExpirationDate, ReorderThreshold , ActualPrice} = req?.body;
 
-        if([ProductName , ProductImage , ProductPrice, ProductQuantity, Currency, CategoryName, Unit, Vendor, ExpirationDate, ReorderThreshold].some(Element => Element === undefined)){
+        if([ProductName , ProductImage , ProductPrice, ProductQuantity, Currency, CategoryName, Unit, Vendor, ExpirationDate, ReorderThreshold ,ActualPrice].some(Element => Element === undefined)){
             return res.status(400).json({success:false , message:"Please fill all the required product fields...!"})
         }
 

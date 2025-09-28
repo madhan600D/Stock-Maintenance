@@ -71,7 +71,7 @@ export class UserCreation{
                     UserName: UserData.UserName, 
                     UserMail: UserData.UserMail,
                     isActive: false
-                } , transaction);
+                });
             if(!NewUser){
                 this.ErrorObj = { success: false, message: "Error while adding user to userstable"}
             }

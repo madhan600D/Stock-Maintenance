@@ -2,9 +2,9 @@ import { Op } from "sequelize"
 import objUserDb from "../../../Utils/userDB.js"
 export const CreateOrgValidate = async (req , res , next) => {
     try {
-        const {OrganizationName , BusinessType , Street , City , Country , PinCode} = req?.body
+        const {OrganizationName , TypeOfBusiness , Address , ClosingTime , Weekends} = req?.body 
 
-        if([OrganizationName , BusinessType , Street , City , Country , PinCode].some(element => element === undefined)){
+        if([OrganizationName , TypeOfBusiness , Address.Street , Address.City , Address.Country , Address.Pincode , ClosingTime , Weekends].some(element => element === undefined)){
             return res.status(400).json({success:false , message:"Please fill all the fields...!"})
         }
         const isOrgExist = await objUserDb.AllModels.organizations.findOne({where:{organizationName:OrganizationName.toUpperCase()}})

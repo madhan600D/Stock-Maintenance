@@ -1,18 +1,17 @@
 import { Op } from "sequelize"
-
+import dayjs from 'dayjs'
 //DataBase
 import objUserDb from "../../Utils/userDB.js"
+import objInventoryDataBase from '../../Utils/InventoryDB.js'
 
 //Kafka
 import {ObjUserKafkaProducer} from '../../Kafka/Producer/kafkaProducer.js'
-import { raw } from "express"
-
 export const joinOrg = async (req , res) => {
     //TBD: When adding user to a ORG a mail is sent to Admin and a task will be added in his task list
     //API Structure:{JoinId , userName , userId} request
     //API Structure:{JoinMethod , userName , userId , OrganizationJoiningCode} referral
     try {
-        const JoinOrgTransaction = objUserDb.AllModels.userDB.transaction()
+        const JoinOrgTransaction = await objUserDb.userDB.transaction()
         const {JoinMethod} = req.body
         let errorMessage
         let ValidUser = await objUserDb.AllModels.users.findOne({where:{[Op.and]:{userId:req.user.userId , organizationId:1}}})
@@ -47,9 +46,9 @@ export const joinOrg = async (req , res) => {
                         model:objUserDb.AllModels.organizations, attributes:['organizationName']}
                     ]},{where:{userName:req.user.userId} , transaction:JoinOrgTransaction}) 
 
-                const NewRole = await objUserDb.AllModels.roles.create({userId:req.user.userId , roleId:3 , role:"Staff" , organizationId:joinOrg.organizationId} , {transaction:JoinOrgTransaction})
+                const NewRole = await objUserDb.AllModels.roles.create({userId:req.user.userId , roleId:3 , role:"Staff" , organizationId:joinedOrg.organizationId} , {transaction:JoinOrgTransaction})
                 
-                const DataToClient = {organizationName:updatedUser.organizatinName , organizationId:updatedUser.organizationId , }
+                const DataToClient = {organizationName:updatedUser.organizatinName , organizationId:updatedUser.organizationId}
 
                 await JoinOrgTransaction.commit()
                 return res.status(200).json({success:true , message:  `Sucessfully joined ${updatedUser.organization.organizationName}` , data:DataToClient})
@@ -64,11 +63,12 @@ export const createOrg = async (req , res) => {
     //At front end all organization related details should be displayed after created
     //Ability to send Invite to join this Application to others VIA Email :: How? A verification code is sent via mail
     //Entering the code will add the user to the org
+
+    let CreateOrgTransaction = await objUserDb.userDB.transaction();
     try {
-        //API Structure: {organizationName , typeOfBusiness , street , city , country , pincode , userId}
-        const CreateOrgTransaction = objUserDb.AllModels.userDB.transaction();
+        //API Structure: {organizationName , typeOfBusiness , street , city , country , pincode , userId , ClosingTime , Weekends}    
         let errorMessage , OrganizationCode
-        const {OrganizationName , BusinessType , Street , City , Country , PinCode} = req?.body
+        const {OrganizationName , TypeOfBusiness , Address , ClosingTime , Weekends} = req?.body
         //8 Digit unique ID --> Generate untill no Id is Found in DB
         OrganizationCode = Math.floor(10000000 + Math.random() * 90000000);
         let isIDExist = await objUserDb.AllModels.organizations.findOne({where:{OrganizationJoiningCode:OrganizationCode}})
@@ -77,29 +77,50 @@ export const createOrg = async (req , res) => {
                 isIDExist = await objUserDb.AllModels.organizations.findOne({where:{OrganizationJoiningCode:OrganizationCode}})
         }
         //Add in Org Table and Admin Table
-        const newOrganization = await objUserDb.AllModels.organizations.create({organizationName:OrganizationName.toUpperCase() , 
-                                        typeofBusiness:BusinessType,
-                                        street:Street,
-                                        city:City,
-                                        country:Country,
-                                        pincode:PinCode,
+        const newOrganization = await objUserDb.AllModels.organizations.create({
+                                        organizationName:OrganizationName.toUpperCase() , 
+                                        typeofBusiness:TypeOfBusiness,
+                                        street: Address.Street,
+                                        city:Address.City,
+                                        country:Address.Country,
+                                        pincode:Number(Address.Pincode) ,
                                         OrganizationJoiningCode:OrganizationCode
         } , {transaction:CreateOrgTransaction})
+        
+        //Admin table entry
         await objUserDb.AllModels.admins.create({organizationId:newOrganization.organizationId , 
                                        adminId:req.user.userId,
                                        organizationName:OrganizationName.toUpperCase()
         } , {transaction:CreateOrgTransaction})
+
+        //Roles table entry
         await objUserDb.AllModels.roles.create({userId:req.user.userId , 
                                        roleId:1, role:'Admin' , organizationId:newOrganization.organizationId} , {transaction:CreateOrgTransaction})
-
+        //State table entry
         await objUserDb.AllModels.users.update(
             { organizationId: newOrganization.organizationId }, 
             { where: { userId: req.user.userId } , transaction:CreateOrgTransaction }        
         );
 
+        //Data entry in OrgState Table
+        const OrgState = await objInventoryDataBase.AllModels.OrgState.create({
+            OrganizationID:newOrganization.organizationId , RunDate: dayjs().format("YYYY-MM-DD") , CurrentDaySales:0 , ClosingTime:ClosingTime , Weekends:Weekends.toString() , AutoDayShiftFlag: 1
+        } , {transaction:CreateOrgTransaction})
+
+        //Data entry to PNL Table
+
+        const PNL = await objInventoryDataBase.AllModels.PNL.create({
+            OrganizationID:newOrganization.organizationId , TotalExpense:0 , TotalRevenue:0
+        } , {transaction:CreateOrgTransaction})
+
+        
+
+        const DataToClient = {NewOrg:{OrganizationID:newOrganization.organizationId , OrganizationName:newOrganization.organizatinName , OrganizationJoiningCode:newOrganization.OrganizationJoiningCode, TypeOfBusiness:TypeOfBusiness} , OrgState:{RunDate:OrgState.RunDate , CurrentDaySales:OrgState.CurrentDaySales , ClosingTime:OrgState.ClosingTime , Weekends:OrgState.Weekends , AutoDayShiftFlag:OrgState.AutoDayShiftFlag} , PNL:{TotalExpense:PNL.TotalExpense , TotalRevenue:PNL.TotalRevenue}}
+
         await CreateOrgTransaction.commit()
+
         //TBD:Call mail service and send mail to Admin with welcome details:Kafka
-        return res.status(200).json({success:true , message:`Sucessfully created organization ${newOrganization.organizationName}` , data:newOrganization});
+        return res.status(200).json({success:true , message:`Sucessfully created organization ${newOrganization.organizationName}` , data:DataToClient});
         
     } catch (error) {
         await objUserDb.AllModels.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})

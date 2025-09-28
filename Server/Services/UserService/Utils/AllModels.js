@@ -26,6 +26,7 @@ import OrdersModel from "../Models/InventoryModels/Orders.Model.js";
 import HolidayModel from "../Models/InventoryModels/Holiday.Model.js";
 import ScreensModel from "../Models/InventoryModels/Screens.Model.js";
 import OrganizationStateModel from "../Models/InventoryModels/OrganizationState.Model.js";
+import PNLModel from "../Models/InventoryModels/PNL.Model.js";
 
 
 export async function InitializeDataBase(){
@@ -48,7 +49,7 @@ export async function InitializeDataBase(){
       ProducedEvents: producedEventsModel(userDB, DataTypes),
       LoadingTexts: LoadingTextsModel(userDB, DataTypes),
       RoleDetails: RoleDetailsModel(userDB, DataTypes),
-
+      userErrorLog: userErrorLogModel(userDB , DataTypes),
       // Inventory System
       Category: CategoryModel(InventoryDB, DataTypes),
       Products: ProductModel(InventoryDB, DataTypes),
@@ -58,7 +59,8 @@ export async function InitializeDataBase(){
       Orders: OrdersModel(InventoryDB, DataTypes),
       Holidays: HolidayModel(InventoryDB, DataTypes),
       Screens: ScreensModel(InventoryDB, DataTypes),
-      OrgState: OrganizationStateModel(InventoryDB , DataTypes)
+      OrgState: OrganizationStateModel(InventoryDB , DataTypes),
+      PNL:PNLModel(InventoryDB , DataTypes)
     }; 
 
     return {Models , userDB , InventoryDB}

@@ -31,12 +31,13 @@ export default (sequelize , DataTypes) => {
             key:'CurrencyID'
         }
     },
+    //Price the vendor charged
     ActualPrice:{
         type:DataTypes.INTEGER,
         allowNull:false
     },
     CategoryID:{
-        type:DataTypes.STRING, 
+        type:DataTypes.INTEGER, 
         allowNull:false,
         reference:{
             model:'Category',
@@ -56,17 +57,17 @@ export default (sequelize , DataTypes) => {
         }
     },
     IsExpired:{
-        type:DataTypes.STRING,
+        type:DataTypes.BOOLEAN,
         allowNull:true,
 
     },
     ExpirationDate:{
-        type:DataTypes.DATE,
+        type:DataTypes.DATEONLY,
         allowNull:true,
         
     },
     ReorderThreshold:{
-        type:DataTypes.DATE,
+        type:DataTypes.INTEGER,
         allowNull:true,
     },
     Unit:{

@@ -77,18 +77,22 @@ export const addUser = async (req , res) => {
                     password:passwordHash,
                     profilePic:''
                 })
-            const JwtToken = GenerateJWT(newUser.userId); 
+            const JwtToken = await GenerateJWT(newUser.userId); 
 
             //Add session Data
             const currentTime = new Date()
             await objUserDb.AllModels.sessions.create({userId:newUser.userId , loggedInAt:Date(TimeFormatter(currentTime)) , LoggedOutAt:'' , isActive:true})
+
+            const DataToClient = {UserName: newUser.userName,
+                    UserMail: newUser.userMail,
+                    UserID: newUser.userId}
             return res.cookie("jwt",
                 JwtToken , {
                     maxAge: 60 * 60 * 1000,
                     httpOnly:true,
                     secure:process.env.NODE_ENV !== "development",})
                 .status(200)
-                .json({success:true , message:'User created successfully'});     
+                .json({success:true , message:'User created successfully' , data:DataToClient});     
 
     } catch (error) {
         await objUserDb.AllModels.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
