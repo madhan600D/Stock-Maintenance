@@ -3,9 +3,12 @@ import Styles from './LabelWithLogo.module.css'
 
 //Components
 import { GiPlainSquare } from "react-icons/gi";
-function LabelWithLogo({Header , Value , Logo , BGColor}) {
+function LabelWithLogo({Header , Value , Logo , BGColor , Dimension}) {
   return (
-    <div className = {Styles['Main-Div']}>
+    <div className = {Styles['Main-Div']} style={{
+    height: Dimension !== undefined ? `${Dimension[0]}px` : "",
+    width: Dimension !== undefined ? `${Dimension[1]}px` : ""
+    }}>
         <div style={{backgroundColor:BGColor}} className={Styles['Logo-Div']}>
             <Logo className = {Styles['Logo']} />
         </div>

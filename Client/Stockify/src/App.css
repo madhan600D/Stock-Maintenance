@@ -14,8 +14,8 @@
 
 /* Firefox */
 * {
-  scrollbar-width: thin;
-  scrollbar-color: #888 transparent;
+  scrollbar-width:thin;
+  scrollbar-color: #ffffffbb transparent;
 }
 
 /* WebKit */
@@ -30,6 +30,7 @@
 
 *::-webkit-scrollbar-thumb {
   background: #888;
+  display: none;
   border-radius: 10px;
 }
 

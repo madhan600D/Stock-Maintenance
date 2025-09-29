@@ -107,7 +107,7 @@ const useUser = create((set , get) => ({
                 return {success:true , message:DataFromBackend.message}
             }
             else{
-                set({IsAuthenticated:true});
+                set({IsAuthenticated:false});
                 set({UserData:{}});
                 set({OrganizationData:{}})
                 return {success:false , message:DataFromBackend.message}
