@@ -5,7 +5,7 @@ export default (sequelize , DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey:true,
-      autoIncrenent:true
+      autoIncrement:true
     },
     OrganizationID:{
         type:DataTypes.INTEGER,

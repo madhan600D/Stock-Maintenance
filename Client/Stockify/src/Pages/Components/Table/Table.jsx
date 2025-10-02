@@ -11,7 +11,7 @@ import { TbCategory } from "react-icons/tb";
 import { FaEdit } from "react-icons/fa";
 import { FaSort } from "react-icons/fa6";
 import { FiRefreshCcw } from "react-icons/fi";
-import { styled } from '@mui/material/styles';
+import { MdOutlineClosedCaptionDisabled } from "react-icons/md";
 
 function Table({TableName , TableArg , ColumnPalette , RowPalette , UpdateButton , RefreshFunction}) {
     //Prop Column:[{Column , IsEditable}]
@@ -29,7 +29,7 @@ function Table({TableName , TableArg , ColumnPalette , RowPalette , UpdateButton
         try {
             let SortedTable = [...Table.Rows] 
             //Find the column's index
-            const ColIndex = Table.Columns.findIndex(Value => Value.Column === ColToSort);
+            const ColIndex = Table.Columns.findIndex(Value => Value.ColumnName === ColToSort);
             //Check for Number
 
             //BubbleSort
@@ -75,26 +75,35 @@ function Table({TableName , TableArg , ColumnPalette , RowPalette , UpdateButton
             <TbCategory />
             <label>{TableName}</label>
         </div>
-        <div style={{backgroundColor:ColumnPalette[0] , color:ColumnPalette[1]}} className = {Styles['Header-Div']}>
+        {/* Column Mapping */}
+        <div style={{backgroundColor:ColumnPalette[0] , color:ColumnPalette[1] , gridTemplateColumns:`repeat(${TableState.Columns.length}, 0.3fr)`}} className = {Styles['Header-Div']}>
             {TableState.Columns.map((Column , Idx) => {
                 return (
                     <div className = {Styles['Column-Div']} >
                         <div className={Styles['Sort-Div']}>
                             <Tooltip placement='right' title="Sort" arrow>
-                            <IconButton onClick={() => {Dispatch({type:TableActions.SORT_TABLE , payload:Column.Column})}}>
+                            <IconButton onClick={() => {Dispatch({type:TableActions.SORT_TABLE , payload:Column.ColumnName})}}>
                                 <FaSort color='bisque'/>
                                 </IconButton>
                             </Tooltip>
                         </div>
                         
-                        <label>{Column.Column.length < 10 ? Column.Column : `${Column.Column.slice(0)}`}</label>
+                        <label>{Column.ColumnName.length < 10 ? Column.ColumnName : `${Column.ColumnName.slice(0)}`}</label>
                     </div>
                 )
             })}
         </div>
+        {/* Row mapping */}
         <div className={Styles['Body-Div']}>
+            {TableState.Rows.length <= 0 && (
+                <LabelWithLogo 
+                    Logo={MdOutlineClosedCaptionDisabled}
+                    Value={"No data!"}
+                    BGColor={'red'}
+                />
+            )}
             {TableState.Rows.map((Row, RowIndex) => (
-                <div key={RowIndex} className={Styles['Row-Div']} style={{boxShadow:RowIndex % 2 == 0 ? '0 0 6px #39393997' : 'none' , backgroundColor:RowIndex % 2 == 0 ? RowPalette[0] : RowPalette[1] , color:RowPalette[2]}}>
+                <div key={RowIndex} className={Styles['Row-Div']} style={{boxShadow:RowIndex % 2 == 0 ? '0 0 6px #39393997' : 'none' , backgroundColor:RowIndex % 2 == 0 ? RowPalette[0] : RowPalette[1] , color:RowPalette[2] , gridTemplateColumns:`repeat(${TableState.Columns.length}, 0.5fr)`}}>
                     {Row.map((CellData, CellIndex) => (
                         <div className = {Styles['Cell-Div']}>
                             <label className = {Styles['Wrap-Label']} key={CellIndex}>{CellData}</label>

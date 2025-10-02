@@ -116,7 +116,8 @@ function SideBar() {
     MenuText: "Products",
     ArrayOfSubMenus: [
       { MenuText: "Manage Product" },
-      { MenuText: "Add Product" }
+      { MenuText: "Add Product" },
+      { MenuText: "Category" , Callback:HandleSubPageChange , URL:'/category' }
     ]
   },
   {

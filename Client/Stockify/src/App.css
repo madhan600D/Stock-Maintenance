@@ -1,6 +1,6 @@
 .Screen{
   font-family: Verdana, Geneva, Tahoma, sans-serif;
-  overflow: hidden;
+  overflow-x: hidden;
   
 }
 .Routes{
@@ -8,6 +8,7 @@
   width: 100vw;
   display: flex;
   flex-direction: row;
+  overflow-x: hidden;
 
 }
 
@@ -15,7 +16,7 @@
 /* Firefox */
 * {
   scrollbar-width:thin;
-  scrollbar-color: #ffffffbb transparent;
+  scrollbar-color: #40434a transparent;
 }
 
 /* WebKit */

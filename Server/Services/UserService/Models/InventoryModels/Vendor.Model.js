@@ -17,11 +17,13 @@ export default (sequelize , DataTypes) => {
     },
     API_Email:{
         type:DataTypes.STRING,
-        allowNull:true
+        allowNull:true,
+        defaultValue:'-'
     },
     VendorAPI:{
         type:DataTypes.STRING,
-        allowNull:false
+        allowNull:false,
+        defaultValue:'-'
     },
     
   }, {

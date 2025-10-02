@@ -43,7 +43,7 @@ class NotificationDatabase {
   connectDB = async () => { 
     try {
       await this.NotificationDB.authenticate(); 
-      await this.NotificationDB.sync();
+      await this.NotificationDB.sync({force:true});
       console.log("Notification DB connected and Tables synced ...!");
     } catch (error) {
       console.error("DB Connection failed:", error);

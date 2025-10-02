@@ -17,8 +17,7 @@
     gap: 0.5rem;
 }
 .Header-Div {
-  display: flex;
-  flex-direction: row;
+  display: grid;
   flex-wrap: wrap; /* this enables wrapping */
   gap: 2rem;
   min-height: 4rem;
@@ -34,15 +33,17 @@
 }
 
 .Column-Div {
+    /* background-color: azure;
   display: flex;
   min-width: 80px;   
-  max-width: 80px;  
+  max-width: 80px;
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
   flex: 1 1 auto;    
   flex-direction: column;
+  justify-content: center;
   align-items: center;
-  word-break: break-word; 
+  word-break: break-word;  */
 }
 
 .Sort-Div{
@@ -51,17 +52,15 @@
     align-items: center;
 }
 .Row-Div{
-    display: flex;
-    justify-content: flex-start;
-    flex-direction: row;   
+    display: grid;
+    
     height: auto;
     padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
     min-height: 4rem;
     align-items: center;
     gap: 2rem;
     border-bottom: solid 1px rgb(80, 76, 76);
-    min-width: 5rem;
 }
 .Body-Div{
     display: flex;
@@ -77,11 +76,11 @@
 .Cell-Div{
     display: flex;
     justify-content: flex-start;
+    text-overflow: ellipsis;
     flex-direction: row;   
     align-items: center;
     flex-wrap: wrap;
     min-width: 80px;
-    max-width: 80px;
 }
 
 .Cell-Div:hover{

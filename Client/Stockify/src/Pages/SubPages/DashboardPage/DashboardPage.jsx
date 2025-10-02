@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Styles from './DashboardPage.module.css'
 
 //Components
@@ -12,8 +12,19 @@ import { BsBoxes } from "react-icons/bs";
 import { FaHandsHelping } from "react-icons/fa";
 import { BsCurrencyDollar } from "react-icons/bs";
 
+import UseProduct from '../../../Stores/ProductStore.js';
+
 
 function DashboardPage() {
+  //Destructure Store hooks
+  const {GetProducts} = UseProduct();
+
+  useEffect (() => {
+    async function FillDashBoard(){ 
+      const FillSuccess = await GetProducts(0)
+    }
+    FillDashBoard()
+  } , [])
   return (
     <div className = {Styles['Main-Div']}>
         <div className = {Styles['OrgData-Div']}>
@@ -50,14 +61,14 @@ function DashboardPage() {
         </div>
           <Table
               TableArg={{Columns:[
-                { Column: "Id", IsEditable: false },
-                { Column: "Name", IsEditable: true },
-                { Column: "Age", IsEditable: true },
-                { Column: "Gender", IsEditable: false },
-                { Column: "Email", IsEditable: true },
-                { Column: "Department", IsEditable: false },
-                { Column: "Joining Date", IsEditable: false },
-                { Column: "Salary", IsEditable: true }], 
+                { ColumnName: "Id", IsEditable: false },
+                { ColumnName: "Name", IsEditable: true },
+                { ColumnName: "Age", IsEditable: true },
+                { ColumnName: "Gender", IsEditable: false },
+                { ColumnName: "Email", IsEditable: true },
+                { ColumnName: "Department", IsEditable: false },
+                { ColumnName: "Joining Date", IsEditable: false },
+                { ColumnName: "Salary", IsEditable: true }], 
                 Rows:[
                   [1, "Madhan", 23, "Male", "madhan@example.com", "Engineering", "2022-03-15", "₹60,000"],
                   [2, "Kumar", 27, "Female", "veni@example.com", "Marketing", "2021-11-10", "₹50,000"],
@@ -67,7 +78,7 @@ function DashboardPage() {
           
   RowPalette={["#858585c2" , "#444444ff" , "bisque"]}
   ColumnPalette={["#375158c2" , "#ffffffc2"]}
-  TableName={"EMPLOYEE DATA WITH SALARY"}
+  TableName={"CURRENT PRODUCTS"}
 />
 
 

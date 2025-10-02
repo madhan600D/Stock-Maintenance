@@ -27,12 +27,8 @@ export const signUpUser = async (req , res) => {
         }
         else{
             KafkaMessage.Event = 'SendVerificationEmail'
-            //Hash the password
-            const passwordSalt = await bcrypt.genSalt(10)
-            const passwordHash = await bcrypt.hash(req.body.password , passwordSalt)
             newPendingUser = await objUserDb.AllModels.pendingUsers.create({
                 userName:req.body.userName.toLowerCase(), 
-                password:passwordHash,
                 userMail:req.body.userMail, 
                 isVerified:false
             })

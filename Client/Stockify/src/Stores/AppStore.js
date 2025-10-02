@@ -4,8 +4,9 @@ import AxiosInstance from '../Lib/AxiosInstance.js';
 //SubPages
 import InviteToOrgPage from '../Pages/SubPages/InviteToOrgPage/InviteToOrgPage.jsx';
 import DashboardPage from '../Pages/SubPages/DashboardPage/DashboardPage.jsx';
+import AddCategoryPage from '../Pages/SubPages/AddCategoryPage/AddCategoryPage.jsx';
 
-const URLToPage = {'/invite-to-org':InviteToOrgPage , '/dashboard': DashboardPage}
+const URLToPage = {'/invite-to-org':InviteToOrgPage , '/dashboard': DashboardPage , '/category':AddCategoryPage}
 
 const useApp = create((set , get) => ({
     CurrentPage:'',

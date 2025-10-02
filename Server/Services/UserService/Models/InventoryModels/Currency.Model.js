@@ -3,7 +3,7 @@ export default (sequelize , DataTypes) => {
         CurrencyID:{
             type:DataTypes.INTEGER,
             allowNull:false,
-            primaryKey:true,
+            primaryKey:true, 
             autoIncrement:true
         },
         CurrencyName:{
@@ -11,7 +11,7 @@ export default (sequelize , DataTypes) => {
             allowNull:false,
         },
         CurrencySymbol:{
-            type:DataTypes.INTEGER,
+            type:DataTypes.STRING,
             allowNull:false,
         },
         

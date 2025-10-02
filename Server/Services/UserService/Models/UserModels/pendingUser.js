@@ -15,10 +15,6 @@ export default (sequelize , DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     isVerified: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
@@ -31,7 +27,8 @@ export default (sequelize , DataTypes) => {
   }, {
     // timestamps: true, 
     tableName: 'pendingUsers',
-    createdAt: 'CreatedTime'
+    createdAt: 'CreatedTime',
+    updatedAt:false
   });
   return pendingUserModel
 }

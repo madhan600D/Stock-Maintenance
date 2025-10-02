@@ -4,11 +4,7 @@ import {Op} from 'sequelize'
 export const signUpUserValidation = async (req , res , next) => {
     try {
         //API Structure: {UserName , UserMail , Password}
-        //regex states : one upper case , one number  , one special character
-        const Passwordregex = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/ ,  
-              userNameRegex = /^[a-zA-Z0-9]+$/ , 
-              EmailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-
+        const userNameRegex = /^[a-zA-Z0-9]+$/ , EmailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
         const IsUserNameAdded = await objUserDb.AllModels.pendingUsers.findOne({where:{userName:req.body.userName}}) 
         const IsUserMailAdded = await objUserDb.AllModels.pendingUsers.findOne({where:{userMail:req.body.userMail}})
 
@@ -32,12 +28,7 @@ export const signUpUserValidation = async (req , res , next) => {
                return res.status(400).json({success:false , message:"Provided User Name doesn't match with Email ...!"}) 
             }
         }
-        if((req.body.password.length < 6 && req.body.password.length > 20) || ! Passwordregex.test(req.body.password)){
-            return res.status(400).json({success:false , message:'Enter a strong password(One upper case , One Number & One special charcter)'})
-        }
-        if(req.body.password !== req.body.confirmPassword){
-            return res.status(400).json({success:false , message:'Password and confirm password doesnt match'})
-        }
+
         next() 
     } catch (error) {
         console.log("Error at NewUser Middleware" + error.toString())
@@ -48,6 +39,16 @@ export const signUpUserValidation = async (req , res , next) => {
 
 export const AddUserValidation = async (req , res , next) => {
     try {
+        //regex states : one upper case , one number  , one special character
+        const Passwordregex = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/  
+              
+
+        if((req.body.password.length < 6 && req.body.password.length > 20) || ! Passwordregex.test(req.body.password)){
+            return res.status(400).json({success:false , message:'Enter a strong password(One upper case , One Number & One special charcter)'})
+        }
+        if(req.body.password !== req.body.confirmPassword){
+            return res.status(400).json({success:false , message:'Password and confirm password doesnt match'})
+        }
         //Is UserName and UserMail same at PendingUsers Table
         if(req.body.password !== req.body.confirmPassword){ 
             return res.status(400).json({success:false , message:'Password and confirm password doesnt match'})

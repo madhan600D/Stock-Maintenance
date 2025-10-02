@@ -187,8 +187,8 @@ const useUser = create((set , get) => ({
 
 const Validate = async (ValidationType , Data) => {
     if(ValidationType === "SignUp"){
-        const {userName , userMail , password} = Data;
-        if(! userName || !userMail || !password){
+        const {userName , userMail} = Data;
+        if(! userName || !userMail){
             return {success:false , message:"Please fill all the fields ...!"}
         }
         return {success:true , message:"Validation successfull ...!"}
