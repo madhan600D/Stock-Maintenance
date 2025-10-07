@@ -115,9 +115,8 @@ function SideBar() {
     MenuLogo: AiOutlineStock,
     MenuText: "Products",
     ArrayOfSubMenus: [
-      { MenuText: "Manage Product" },
-      { MenuText: "Add Product" },
-      { MenuText: "Category" , Callback:HandleSubPageChange , URL:'/category' }
+      { MenuText: "Manage Product" ,Callback:HandleSubPageChange , URL:'/products' },
+      { MenuText: "Manage Category" , Callback:HandleSubPageChange , URL:'/category' }
     ]
   },
   {
@@ -138,12 +137,9 @@ function SideBar() {
   },
   {
     MenuLogo: TbReportAnalytics,
-    MenuText: "Reports",
-    ArrayOfSubMenus: [
-      { MenuText: "CurrentDay Report" },
-      { MenuText: "PNL Report" },
-      { MenuText: "History Data" }
-    ]
+    MenuText: "Vendors",
+    Callback:HandleSubPageChange,
+    URL:'/vendors'
   },
   {
     MenuLogo: FaTasks,

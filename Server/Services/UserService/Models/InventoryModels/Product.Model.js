@@ -5,7 +5,7 @@ export default (sequelize , DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey:true,
-      autoIncrenent:true
+      autoIncrement:true
     },
     OrganizationID:{
         type:DataTypes.INTEGER,
@@ -14,7 +14,7 @@ export default (sequelize , DataTypes) => {
             model:'organizations',
             key:'organizationId'
         }
-    },
+    }, 
     ProductName: {
       type: DataTypes.STRING,
       allowNull: false,

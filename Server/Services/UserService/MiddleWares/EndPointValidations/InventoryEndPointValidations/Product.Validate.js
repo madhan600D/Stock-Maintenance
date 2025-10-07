@@ -1,26 +1,41 @@
 
 import AccessControl from "../../../Class/AccessControl.class.js";
 import objInventoryDataBase from "../../../Utils/InventoryDB.js"
-export const AddProductValidate = async (req , res , next) => {
-    try {
-        const {ProductName , ProductImage , ProductPrice, ProductQuantity, Currency, CategoryName, Unit, Vendor, ExpirationDate, ReorderThreshold , ActualPrice} = req?.body;
 
-        if([ProductName , ProductImage , ProductPrice, ProductQuantity, Currency, CategoryName, Unit, Vendor, ExpirationDate, ReorderThreshold ,ActualPrice].some(Element => Element === undefined)){
+import { Op } from "sequelize";
+export const AddProductValidate = async (req , res , next) => {
+    try { 
+        const {ProductName , ProductImage , ProductPrice, Quantity, CurrencyName, CategoryName, Unit, VendorName, ExpirationDate, ReorderThreshold , ActualPrice} = req?.body;
+
+        if([ProductName , ProductImage , ProductPrice, Quantity, CurrencyName, CategoryName, Unit, VendorName, ExpirationDate, ReorderThreshold ,ActualPrice].some(Element => Element === undefined)){
             return res.status(400).json({success:false , message:"Please fill all the required product fields...!"})
         }
 
-        //If 
-        const IsProductsExists = await objInventoryDataBase.allModels.Products.findOne({
-            where:{[Op.and]:[{OrganizationID:req.validate.OrgID} , {ProductName:ProductName}]}
+        const IsProductsExists = await objInventoryDataBase.AllModels.Products.findOne({
+            where:{[Op.and]:[{OrganizationID:req.user.organizationId} , {ProductName:ProductName}]}
         })
 
-        if(IsProductsExists){
+        if(IsProductsExists){ 
             return res.status(400).json({success:false , message:"Product already exists ...!"})
+        }
+
+        //Date validation
+        const CurrentDate = new Date();
+        if(ExpirationDate <= CurrentDate.toLocaleDateString()){
+            return res.status(400).json({success:false , message:"Product expiration date cannot be less than current date"})
+        }
+        //Access Validations
+        const ObjAccessControl = new AccessControl()
+        const HasAccess = await ObjAccessControl.VerifyAccessControl(req.user.userId , "ADD" , "Inventory")
+
+        if(!HasAccess){
+            return res.status(400).json({success:false , message:"You're not authorized to do this action."})
         }
 
         next();
     } catch (error) {
-        
+        console.log("Error at add product validation")
+        return res.status(500).json({success:false , message:"Server side error at prodict validation "})
     }
 }
 

@@ -35,16 +35,23 @@ export const GetProductsForOrganization = async (req , res) => {
 export const AddProductForOrganization = async (req , res) => {
     try {
         const Transaction = await objInventoryDataBase.InventoryDB.transaction()
-        const {ProductName , ProductImage , ProductPrice, ActualPrice , ProductQuantity, Currency, CategoryName, Unit, Vendor, ExpirationDate, ReorderThreshold} = req.body;
+        const {ProductName , ProductImage , ProductPrice, ActualPrice , Quantity, CurrencyName, CategoryName, Unit, VendorName, ExpirationDate, ReorderThreshold} = req.body;
 
-        const IsCategoryExsists = await objInventoryDataBase.allModels.Category.findOne({
-                where:{[Op.and]:[{OrganizationID:req.user.OrgID} , {CategoryName:CategoryName}]}
-            });
+
+
+        const Currency = await objInventoryDataBase.AllModels.Currency.findOne({where:{CurrencyName:CurrencyName} , attributes:['CurrencyID'] , raw:true});
+
+        const Vendor = await objInventoryDataBase.AllModels.Vendors.findOne({where:{VendorName:VendorName} , attributes:['VendorID'] , raw:true});
+
+
+        const IsCategoryExsists = await objInventoryDataBase.AllModels.Category.findOne({
+                where:{[Op.and]:[{OrganizationID:req.user.organizationId} , {CategoryName:CategoryName}]}
+        });
 
         //Add new category to DB
         let NewCategory
         //TBD:Handle category image upload
-        !IsCategoryExsists ? NewCategory  = await objInventoryDataBase.allModels.Category.create({OrganizationID:req.user.OrgID, CategoryName:CategoryName, CategoryDescription:'' , CategoryImage:''}) : ''
+        !IsCategoryExsists ? NewCategory  = await objInventoryDataBase.AllModels.Category.create({OrganizationID:req.user.OrgID, CategoryName:CategoryName, CategoryDescription:'' , CategoryImage:''}) : ''
         
         if(ProductImage){
             var CloudinaryResponse = await cloudinary.uploader.upload(ProductImage);
@@ -55,16 +62,20 @@ export const AddProductForOrganization = async (req , res) => {
         }
         
         //Add the product
-        const NewProduct = await objInventoryDataBase.allModels.Products.create({OrganizationID:req.user.organizationId,ProductName:ProductName, ProductPrice:ProductPrice, ActualPrice:ActualPrice, CategoryID:!IsCategoryExsists ? NewCategory.CategoryID : IsCategoryExsists.CategoryID, ProductImage:CloudinaryResponse.secure_url, VendorID:Vendor, IsExpired:false, ExpirationDate:ExpirationDate,ReorderThreshold:ReorderThreshold, Unit:Unit, Quantity:ProductQuantity , Currency:Currency} , {Transaction});
+        const NewProduct = await objInventoryDataBase.AllModels.Products.create({OrganizationID:req.user.organizationId,ProductName:ProductName, ProductPrice:ProductPrice, ActualPrice:ActualPrice, CategoryID:!IsCategoryExsists ? NewCategory.CategoryID : IsCategoryExsists.CategoryID, ProductImage:CloudinaryResponse.secure_url, VendorID:Vendor.VendorID, IsExpired:false, ExpirationDate:ExpirationDate,ReorderThreshold:ReorderThreshold, Unit:Unit, Quantity:Quantity , CurrencyID:Currency.CurrencyID} , {returning: ['ProductID', 'ProductName', 'Quantity' , 'ProductPrice'] , 
+        Transaction});
 
-        const ProductExpense = ActualPrice * ProductQuantity
+        const ProductExpense = ActualPrice * Quantity;  
 
-        //Update PNL using increment
-        const NewPNL = await objInventoryDataBase.AllModels.PNL.increment(
-                            { TotalRevenue: ProductExpense },
-                            { where: { OrganizationID: req.user.organizationId }});
-
-        return res.status(200).json({success:true , message:"Product and category created successfully ...!" , data:{PNL:NewPNL , NewProduct:NewProduct}})
+        // Update PNL
+        const [PNLUpdate] = await objInventoryDataBase.AllModels.PNL.increment(
+                                { TotalExpense: ProductExpense },
+                                { where: { OrganizationID: req.user.organizationId }, returning: true });
+        
+        //Prepare Client Data
+        const RawClientData = {ProductData: {ProductID:NewProduct.ProductID , ProductName:ProductName , ProductPrice:NewProduct.ProductPrice}, PNLData: PNLUpdate[0][0]};
+ 
+        return res.status(200).json({success:true , message:"Product and category created successfully ...!" , data:RawClientData})
 
     } catch (error) {
         console.log("Error while adding products");
@@ -147,5 +158,14 @@ export const DeleteProducts = async (req , res) => {
         return res.status(200).json({success:true , message:"Products removed successfully" , data:NewProductList})
     } catch (error) {
         await Transaction.rollback()
+    }
+}
+
+export const GetCurrency = async (req , res) => {
+    try {
+        const Currency = await objInventoryDataBase.AllModels.Currency.findAll({raw:true , attributes:['CurrencyID' , 'CurrencyName']})
+        return res.status(200).json({success:true , message:"Products removed successfully" , data:Currency})
+    } catch (error) {
+        console.log("Failed to get currency")
     }
 }

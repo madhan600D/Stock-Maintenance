@@ -24,6 +24,7 @@ import TextBoxWithButton from '../Components/TextBoxWithButton/TextBoxWithButton
 //Stores
 import useUser from '../../Stores/UserStore.js';
 import ShowToast from '../Components/Toast/Toast.js';
+import UseProduct from '../../Stores/ProductStore.js';
 
 const LoginPage = () => {
 
@@ -58,6 +59,7 @@ const LoginPage = () => {
       FormData.closeSession = true
     }
   }
+  
   const HandleLoginClick = async (Param) => {
     const IsLogin = await Login(FormData);
     ShowToast(IsLogin.success , IsLogin.message);
@@ -68,6 +70,7 @@ const LoginPage = () => {
       }
       else{
         //TBD:Navigate to home page
+        
         navigate('/home');
       }
     } 

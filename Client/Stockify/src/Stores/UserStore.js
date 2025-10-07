@@ -1,5 +1,8 @@
 import { create } from 'zustand';
 import AxiosInstance from '../Lib/AxiosInstance.js';
+
+//Methods
+
 const useUser = create((set , get) => ({
     IsAuthenticated:false,
     
@@ -141,6 +144,7 @@ const useUser = create((set , get) => ({
                     OrganizationName: DataFromBackend.data.OrganizationName
                 }
             });
+            
             return {success:true , message:DataFromBackend.message , data:DataFromBackend};
         } catch (error) {
             console.log(error)

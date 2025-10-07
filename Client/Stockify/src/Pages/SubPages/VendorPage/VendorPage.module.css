@@ -1,0 +1,54 @@
+#div{
+    overflow-y: hidden;
+}
+.Main-Div{
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    position: relative;
+    min-height: 40rem;
+    height: 100%;
+}
+.Start-Div{
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    margin-bottom: 4rem;
+}
+.Vendor-Label{
+    font-size: x-large;
+    color: rgb(255, 255, 255);
+    letter-spacing: 0.05rem;
+
+}
+
+.Vendor-Label::first-letter {
+  color: rgb(44, 113, 118);  
+  font-weight: bold;
+}
+
+.Top-Div{
+    display: flex;
+    gap: 2rem;
+    width: 100%;
+    margin-bottom: 2rem;
+    justify-content: space-evenly;
+}
+
+.Table-Div{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.Side-Div{
+    display: flex;
+    z-index: 2;
+    padding: -1rem;
+    overflow: hidden;
+    height: fit-content;
+    position: absolute;
+    right: 0;
+    transition: all 0.3s ease;
+    width: 60%;
+}

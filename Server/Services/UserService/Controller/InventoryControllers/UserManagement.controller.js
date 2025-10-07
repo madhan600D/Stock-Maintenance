@@ -17,7 +17,7 @@ export const GetUsers = async (req , res) => {
 
 export const GetVendors = async (req , res) => {
     try {
-        const Vendors = await objUserDb.AllModels.Vendors.findAll();
+        const Vendors = await objUserDb.AllModels.Vendors.findAll({raw:true});
         return res.status(200).json({success:true , data:Vendors})
     } catch (error) {
         

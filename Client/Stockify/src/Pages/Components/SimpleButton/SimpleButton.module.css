@@ -1,0 +1,30 @@
+.lbl{
+    margin: 0;
+    font-size:small;
+    display: inline-block;
+    font-weight: 500;
+
+}
+.Btn{
+    display: flex;
+    justify-content: center;
+    z-index: 3;
+    align-items: center;
+    margin: 0.4rem;
+    height: fit-content;
+    border-radius: 30px;
+    transition: all 0.5s ease;
+
+}
+
+.Btn:hover{
+
+    box-shadow: 0 0 10px rgb(38, 38, 38);
+    transform: scale(1.02);
+    
+}
+
+.Btn:active{
+    transform: scale(0.95);
+}
+
