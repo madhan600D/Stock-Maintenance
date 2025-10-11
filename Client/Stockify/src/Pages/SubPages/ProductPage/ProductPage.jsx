@@ -1,5 +1,6 @@
-import React, { useRef, useState , useReducer} from 'react'
+import React, { useRef, useState , useReducer, useEffect} from 'react'
 import Styles from './ProductPage.module.css'
+import { StateToTable } from '../../../Utils/QueryToObject.js'
 
 //Components
 import LabelWithLogo from '../../Components/LabelWithLogo/LabelWithLogo.jsx'
@@ -21,6 +22,10 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { FaBoxOpen } from "react-icons/fa6";
 import { BiSolidFileImage } from "react-icons/bi";
 import { IoIosClose } from 'react-icons/io'
+import { IoWarningOutline } from "react-icons/io5";
+import { CiViewTable } from "react-icons/ci";
+import { FaCubesStacked } from "react-icons/fa6";
+import { ImStack } from "react-icons/im";
 
 //Stores
 import UseProduct from '../../../Stores/ProductStore.js';
@@ -28,14 +33,29 @@ import dayjs from 'dayjs'
 import ShowToast from '../../Components/Toast/Toast.js'
 import Tooltip from '@mui/material/Tooltip'
 import { ToastContainer } from 'react-toastify'
+import Card from '@mui/material/Card'
+import ProductCard from '../../Components/Card/ProductCard.jsx'
+import PageSelector from '../../Components/PageSelector/PageSelector.jsx'
+import Table from '../../Components/Table/Table.jsx'
 
 function ProductPage() {
         //States
         const [ShowDiv , SetShowDiv] = useState(false);
-        const {Category , Vendors  , Currency,AddProduct}  = UseProduct();
+        const [TableData , SetTableData] = useState();
+        //Login --> Stack , Signup --> Table
+        const [CurrentView , SetCurrentView] = useState("Login");
+        const {Category , Vendors  , Products , Currency,AddProduct}  = UseProduct();
         const ProductNameRef = useRef();
         const ProductImageRef = useRef();
+
+        //Effects
+        useEffect(() => {
+          const table =  StateToTable(UseProduct.getState().Products, {} , ['ProductID' , 'ProductName' , 'Quantity']); 
+          SetTableData(table)
+        } , [])
+
         const InitialState = {ProductName:"" , ProductPrice:0 , Currency:'' ,ActualPrice:0  , CategoryName:'' , ProductImage:"" , VendorName:'' , ExpirationDate:'' , ReorderThreshold:0 , Unit:"" ,Quantity:0}
+
         //Functions
         const HandleAddProduct = async() => {
           try {
@@ -113,94 +133,95 @@ function ProductPage() {
       
         const [ProductState , Dispatch] = useReducer(ProductReducer , InitialState);
             //Themes
-            const CategorySelect = createTheme({
-              components: {
-                MuiSelect: {
-                  styleOverrides: {
-                    root: {
-                      color: "white", // text color inside select
-                      height:'40px',
-                    },
-                    icon: {
-                      color: "#5A7DC4", // dropdown arrow color
-                    },
+        const CategorySelect = createTheme({
+          components: {
+            MuiSelect: {
+              styleOverrides: {
+                root: {
+                  color: "white", // text color inside select
+                  height:'40px',
+                },
+                icon: {
+                  color: "#5A7DC4", // dropdown arrow color
+                },
+              },
+            },
+            MuiOutlinedInput: {
+              styleOverrides: {
+                root: {
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#ffffffff", // default border
+        
+        
+                  },
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#ffffffff", // hover border
+                  },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#5A7DC4", // focused border
                   },
                 },
-                MuiOutlinedInput: {
-                  styleOverrides: {
-                    root: {
-                      "& .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#ffffffff", // default border
-            
-            
-                      },
-                      "&:hover .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#ffffffff", // hover border
-                      },
-                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#5A7DC4", // focused border
-                      },
-                    },
-                    input: {
-                      color: "white", 
-                      display:'flex',
-                      alignItems:'center',
-                    },
+                input: {
+                  color: "white", 
+                  display:'flex',
+                  alignItems:'center',
+                },
+              },
+            },
+            MuiInputLabel: {
+            styleOverrides: {
+              root: {
+                textAlign:'center',
+                transform:'translate(20%,35%) scale(1)',
+                color: "white",
+                "&.Mui-focused": {
+                  transform:'translate(25%,-40%) scale(0.8)',
+                  color: "#5A7DC4", // label turns blue when focused
+                },
+                "&.MuiFormLabel-root.Mui-disabled": {
+                  color: "gray", // optional: label color when disabled
+                },
+              },
+            }
+        }}});
+
+        const TimePickerTheme = createTheme({
+          components: {
+            MuiOutlinedInput: {
+              styleOverrides: {
+                root: {
+                  backgroundColor:'grey',
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "white",
+                    
+                  },
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "white", // hover border
+                  },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#1976d2", // blue border on focus
                   },
                 },
-                MuiInputLabel: {
-                styleOverrides: {
-                  root: {
-                    textAlign:'center',
-                    transform:'translate(20%,35%) scale(1)',
-                    color: "white",
-                    "&.Mui-focused": {
-                      transform:'translate(25%,-40%) scale(0.8)',
-                      color: "#5A7DC4", // label turns blue when focused
-                    },
-                    "&.MuiFormLabel-root.Mui-disabled": {
-                      color: "gray", // optional: label color when disabled
-                    },
-                  },
-                }
-            }}});
-            const TimePickerTheme = createTheme({
-              components: {
-                MuiOutlinedInput: {
-                  styleOverrides: {
-                    root: {
-                      backgroundColor:'grey',
-                      "& .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "white",
-                        
-                      },
-                      "&:hover .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "white", // hover border
-                      },
-                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#1976d2", // blue border on focus
-                      },
-                    },
-                    input: {
-                      color: "white", // default text color (empty state)
-                      "&.Mui-focused": {
-                        color: "#1976d2", // focused text color
-                      },
-                    },
-                  },
-                },
-                MuiInputLabel: {
-                  styleOverrides: {
-                    root: {
-                      color: "white", // default label
-                      "&.Mui-focused": {
-                        color: "#1976d2", // focused label
-                      },
-                    },
+                input: {
+                  color: "white", // default text color (empty state)
+                  "&.Mui-focused": {
+                    color: "#1976d2", // focused text color
                   },
                 },
               },
-            });
+            },
+            MuiInputLabel: {
+              styleOverrides: {
+                root: {
+                  color: "white", // default label
+                  "&.Mui-focused": {
+                    color: "#1976d2", // focused label
+                  },
+                },
+              },
+            },
+          },
+        });
         const CreateProductLayout = {
           "Basic Product Info": [
             {
@@ -253,7 +274,7 @@ function ProductPage() {
                 ],
                 
                 GridSpan: 2,
-              } , "Image Upload":{
+              } , "Product Image":{
                 ArrayOfElements:[<div style={{display:'flex' , flexDirection:'column' , gap:'2rem'}}>
                       <Tooltip title = 'Upload Image'>
                           <BiSolidFileImage type='file' onClick={() => {ProductImageRef.current.click()}} className= {Styles['ImageUpload-Button']}/>
@@ -381,14 +402,85 @@ function ProductPage() {
             <div className= {Styles['Top-Div']}>
                 <LabelWithLogo 
                     Logo={FaBoxOpen}
-                    Header={"Warning"}
-                    Value={30}
+                    Header={"Total Products"}
+                    Value={Products[0].length || "NA"}
                     BGColor={'#282f31ff'}
-                    Dimension={[500 , 100]}
+                    Dimension={[350 , 100]}
                 />
-                <DialButton 
-                    DialButtonColor={'rgba(0, 83, 139, 0.93)'}
+                <LabelWithLogo 
+                    Logo={IoWarningOutline}
+                    Header={"Low Stock Products"}
+                    Value={Products.length || 0}
+                    BGColor={'#ff6c6cff'}
+                    Dimension={[350 , 100]}
                 />
+                <LabelWithLogo 
+                    Logo={IoWarningOutline}
+                    Header={"High Selling Product"}
+                    Value={Products[0][0].ProductName || 0}
+                    BGColor={'#a5ff7bff'}
+                    Dimension={[350 , 100]}
+                />
+                <LabelWithLogo 
+                    Logo={IoWarningOutline}
+                    Header={"Low Stock Products"}
+                    Value={Products.length || 0}
+                    BGColor={'#282f31ff'}
+                    Dimension={[350 , 100]}
+                />
+
+            </div>
+            <div className = {Styles['Display-Div']}>
+              <div className = {Styles['DisplayTop-Div']}>
+                <div className = {Styles['TopLeft-Div']}>
+                  <label>INVENTORY</label>
+                  <ImStack />
+                </div>
+                <PageSelector 
+                  PageHeader={[<FaCubesStacked /> , <CiViewTable />]}
+                  CurrentPage={CurrentView}
+                  SetCurrentPage={SetCurrentView}
+                  Dimension={['10rem' , 'auto']}
+                />
+              </div>
+              {/* Login --> Stack , Signup --> Table */}
+              
+              <div className = {Styles['View-Div']}>
+                {CurrentView === "Login" ? (
+                    // Stack View
+                    Products && Products[0] && Products[0].map((Product) => (
+                      <ProductCard
+                        key={Product.ProductID}
+                        ProductID={Product.ProductID}
+                        ProductName={Product.ProductName}
+                        ProductImage={Product.ProductImage}
+                        ProductPrice={Product.ProductPrice}
+                        ActualPrice={Product.ActualPrice}
+                        Quantity={Product.Quantity}
+                        Unit={Product.Unit}
+                        VendorName={Vendors[0]?.find(v => v.VendorID === Product.VendorID)?.VendorName}
+                        ReorderThreshold={Product.ReorderThreshold}
+                        Dimensions={['15rem', 'max-content']}
+                      />
+                    ))
+                  ) : (
+                    // Table View
+                    <div className = {Styles['Table-Div']}>
+                      <Table 
+                        TableName={'ALL PRODUCTS'}
+                        TableArg={TableData}
+                        ColumnPalette={["#1c1d1fff" , "white"]}
+                        RowPalette={["#161A20" , "#1E232B" , "white"]}
+                      />
+                    </div>
+                    
+                  )}
+
+                    
+              </div>
+              
+              
+
             </div>
             <div className = {Styles['Side-Div']} style={{transform: ShowDiv ? "translateX(20%)" : "translateX(120%)"}}>
                 <FormComponent 

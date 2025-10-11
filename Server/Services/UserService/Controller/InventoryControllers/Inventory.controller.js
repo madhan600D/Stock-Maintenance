@@ -1,4 +1,4 @@
-import { Op, Transaction } from "sequelize";
+import { Op, Transaction, where } from "sequelize";
 import objInventoryDataBase from "../../Utils/InventoryDB.js";
 
 import cloudinary from "../../Lib/Cloudinary.js";
@@ -133,16 +133,51 @@ export const AddCategoryForOrganization = async (req , res) => {
 
 export const AlterProductForOrganization = async (req , res) => {
     try {
-        const {Key , Value , ProductID} = req?.body;
+        var Transaction = await objInventoryDataBase.InventoryDB.transaction();
+        let ClientData = {};
+        let {UpdateKeyValue , ProductID} = req?.body;
 
+        UpdateKeyValue = new Map(Object.entries(UpdateKeyValue))
+        //Get Product Data
+        const ProductData = await objInventoryDataBase.AllModels.Products.findOne({where:{ProductID:ProductID}})
+        //Update product with validation
+        for(let [Key , Value] of UpdateKeyValue){
+            if(Key === "ProductImage"){
+                var CloudinaryResponse = await cloudinary.uploader.upload(Value);
+                UpdateKeyValue.set("ProductImage" , CloudinaryResponse.secure_url)
+            }
+            if(Key === "ProductPrice"){
+                if(ProductData.ActualPrice > Value){
+                    res.status(400).json({success:false , message:"New price cannot be less than actual price"})
+                }
+            }
+            if(Key === "Quantity"){
+                // const CurrentExpense = await objInventoryDataBase.AllModels.PNL.findOne({where:{OrganizationID:req.user.organizationId}});
+                let AddingExpense = ProductData.ProductPrice * Value
+                var [PNLUpdate] = await objInventoryDataBase.AllModels.PNL.increment(
+                                { TotalExpense: AddingExpense },
+                                { where: { OrganizationID: req.user.organizationId }, returning: true  , Transaction:Transaction});
+                ClientData.NewPNL = PNLUpdate[0][0]
+            }
+        }
+        
+        
         //Dynamically updating the product based on UserValue
-        const UpdatedProduct = await objInventoryDataBase.allModels.Products.update({[Key] : Value} , {where:{ProductID:ProductID}});
+        UpdateKeyValue = Object.fromEntries(UpdateKeyValue)
+        await objInventoryDataBase.AllModels.Products.update(UpdateKeyValue, {where:{ProductID:ProductID} , Transaction:Transaction , raw:true});
 
-        return res.status(200).json({success:true , message:`Updated ${UpdatedProduct.ProductName}'s ${Key} successfully ...!` , data:UpdatedProduct});
+        const UpdatedProduct = await objInventoryDataBase.AllModels.Products.findOne({where:{ProductID:ProductID} , raw:true});
+        //Set ClientData
+        ClientData.NewProduct = UpdatedProduct
+        
+        await Transaction.commit() 
+        return res.status(200).json({success:true , message:`Updated ${UpdatedProduct.ProductName} successfully ...!` , data:ClientData});
         
 
         
     } catch (error) {
+        console.log("Server side error while updating" , error);
+        await Transaction.rollback()
         
     }
 }

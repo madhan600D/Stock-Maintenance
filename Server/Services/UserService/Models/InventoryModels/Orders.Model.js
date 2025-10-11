@@ -30,6 +30,13 @@ export default (sequelize , DataTypes) => {
         OrderJSON:{
             type:DataTypes.STRING,
             allowNull:false,
+            get(){
+                const rawValue = this.getDataValue("OrderJSON");
+                return rawValue ? JSON.parse(rawValue) : null;
+            },
+            set(value) {
+                this.setDataValue("OrderJSON", JSON.stringify(value));
+            },
         },
         OrderCost:{
             type:DataTypes.BOOLEAN,

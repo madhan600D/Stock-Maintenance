@@ -4,6 +4,7 @@ import express from 'express'
 import { cookieValidation } from '../MiddleWares/cookieValidation.js';
 import { AddCategoryValidation, AddProductValidate , AlterProductValidate , DeleteProductValidate } from '../MiddleWares/EndPointValidations/InventoryEndPointValidations/Product.Validate.js';
 import { AddVendorValidate } from '../MiddleWares/EndPointValidations/InventoryEndPointValidations/Vendor.Validate.js';
+import { AddCheckOutValidate } from '../MiddleWares/EndPointValidations/InventoryEndPointValidations/CheckOut.validate.js';
 
 //Controllers
 import { GetProductsForOrganization, AddProductForOrganization , GetCategoryForOrganization, AlterProductForOrganization, DeleteProducts, AddCategoryForOrganization, GetCurrency} from '../Controller/InventoryControllers/Inventory.controller.js';
@@ -20,7 +21,7 @@ InventoryRouter.use(cookieValidation);
 InventoryRouter.get('/get_products' ,  GetProductsForOrganization);
 InventoryRouter.put('/add_product' ,  AddProductValidate , AddProductForOrganization);
 InventoryRouter.patch('/alter_product' ,  AlterProductValidate ,AlterProductForOrganization);
-InventoryRouter.delete('/delete_products' ,cookieValidation ,DeleteProductValidate , DeleteProducts)
+InventoryRouter.delete('/delete_products'  ,DeleteProductValidate , DeleteProducts)
 
 //Category Routers
 InventoryRouter.put('/add_category' , AddCategoryValidation , AddCategoryForOrganization);
@@ -30,8 +31,11 @@ InventoryRouter.get('/get_categories' , GetCategoryForOrganization);
 InventoryRouter.get('/get_vendor' , GetVendors);
 InventoryRouter.put('/add_vendor' , AddVendorValidate , AddVendor);
 
-//Currency Router
+//Currency Routers
 InventoryRouter.get('/get_currency' , GetCurrency);
+
+//CheckOut Routers
+InventoryRouter.put('/add_checkout' , AddCheckOutValidate , )
 
 //User Routers
 InventoryRouter.get('/get_workforce' ,  GetUsers);

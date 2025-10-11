@@ -1,0 +1,58 @@
+><html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <style>
+                .Main-Div{
+                    background-color: #c3c8ce;
+                    padding: 1rem;
+                    border-radius: 20px;
+                }
+        </style>
+    </head>
+    <body>
+        <div class="Main-Div" style="display: flex;flex-direction: column;">
+
+        <h2 style="font-family: Arial, Helvetica, sans-serif;display: flex; align-items: center; justify-content: center;">PRODUCT ORDER</h2>
+        <div class="Greetings-Div" style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size: 14px;">
+            <label>Hi {VendorName},</label>
+            <br />
+            <br />
+            <label>The below table contains the order details of today's order {RunDate}. Please deliver the order within the estimated time.</label>
+            <br />
+            <label style="font-weight: bolder;">This is a Auto generated mail, Please don't reply.</label>
+            <br />
+            <br />
+
+        </div>
+        
+        <table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size: 14px;">
+        <thead>
+            <tr style="background-color: #161A20;color: white;">
+            <th>Product ID</th>
+            <th>Product Name</th>
+            <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dynamic Rows Will Come Here -->
+            {OrderData}
+        </tbody>
+        </table>
+        <br />
+        <br />
+        <div class="Regards-Div" style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size: 14px;">
+            <label>The order will be closed by the system once admin marks the order as delivered. A remainder mail will be sent if order is not delivered at estimated time of delivery.</label>
+            <br />
+            <br />
+            <label style="font-weight: bolder;">Thanks & Regards,</label>
+            <br />
+            <label>{OrganizationName}</label>
+            <br />
+            <label>E-Inventory</label>
+
+    </div>
+    </div>
+    
+    </body>
+</html>

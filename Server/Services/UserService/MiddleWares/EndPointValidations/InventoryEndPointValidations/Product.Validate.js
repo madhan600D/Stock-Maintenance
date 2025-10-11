@@ -40,15 +40,22 @@ export const AddProductValidate = async (req , res , next) => {
 }
 
 export const AlterProductValidate = async (req , res , next) => {
-    try {
-        const {Key , Value , ProductID} = req?.body;
-
-        if([Key , Value , ProductID].some(Element === undefined)){
+    try { 
+        const {UpdateKeyValue, ProductID} = req?.body;   
+ 
+        if([UpdateKeyValue, ProductID].some(Element => Element == undefined)){ 
             return res.status(400).json({success:false , message:"Please fill/select required data ...!"})
+        }
+        //Verify user permission
+        const ObjAccessControl = new AccessControl()
+        const HasAccess = await ObjAccessControl.VerifyAccessControl(req.user.userId , "Alter" , "Inventory")
+
+        if(!HasAccess){
+            return res.status(400).json({success:false , message:"You're not authorized to do this action."})
         }
         next()
     } catch (error) {
-        
+        return res.status(500).json({success:false , message:"Server side error while Altering product."})
     }
 }
 

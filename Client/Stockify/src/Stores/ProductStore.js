@@ -94,6 +94,26 @@ import AxiosInstance from '../Lib/AxiosInstance.js';
             console.log(error.message)
             return {success:false , message:"Error at Product PUT ...!"}
         }
+    },
+    AlterProduct:async(Data) => {
+        try {
+            const Validation = Validate("AlterProduct" , Data);
+            if(!Validation.success){
+                return {success:Validation.success , message: Validation.message}
+            }
+            Data.UpdateKeyValue = Object.fromEntries(Data.UpdateKeyValue)
+            var res = await AxiosInstance.patch('/api/userservice/inv/alter_product' , Data);
+            const DataFromBackEnd = res.data.data;
+
+            //Set Global States
+            Products[0].map(Prod => (Prod.ProductID === DataFromBackEnd.NewProduct.ProductID ? DataFromBackEnd.NewProduct : Prod))
+            PNL = {...State , TotalExpense:DataFromBackEnd.NewPNL.TotalExpense} 
+
+            return {success:true , message:"Updated product successfully"}
+        } catch (error) {
+            console.log(error.message)
+            return {success:false , message:res.data.message ?? "Error while altering product"}
+        }
     }
     ,
     AddVendor:async(Input) => {
@@ -163,6 +183,21 @@ const Validate =  (ValidationType , Data) => {
         //Expiration date conversion
         if(Data.ExpirationDate == ''){
             Data.ExpirationDate = '9999-12-31'
+        }
+        return {success:true , message:"Validation successfull ...!"}
+    }
+    else if(ValidationType === "AlterProduct"){
+        let {UpdateKeyValue , ProductID} = Data;
+        if([UpdateKeyValue , ProductID].some(Element => undefined)){
+            return {success:false , message:"Please fill all the fields ...!"}
+        }
+
+        //Validate Update Datas
+        if(UpdateKeyValue.has("ProductName")){
+            let Value = UpdateKeyValue.get("ProductName")
+            if(Value.length < 1 || Value.length > 15){
+                return {success:false , message:"Invalid product name updation ...!"}
+            }
         }
         return {success:true , message:"Validation successfull ...!"}
     }

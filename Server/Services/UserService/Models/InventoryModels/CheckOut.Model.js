@@ -27,8 +27,15 @@ export default (Sequelize , DataTypes) => {
     },
     //A Array of JSON
     ProductsItems:{
-        type:DataTypes.INTEGER,
-        allowNull:false
+        type:DataTypes.STRING,
+        allowNull:false,
+            get() {
+                const rawValue = this.getDataValue("ProductOfItems");
+                return rawValue ? JSON.parse(rawValue) : null;
+            },
+            set(value) {
+                this.setDataValue("ProductOfItems", JSON.stringify(value));
+            },
     },
     TotalCost:{
         type:DataTypes.INTEGER,

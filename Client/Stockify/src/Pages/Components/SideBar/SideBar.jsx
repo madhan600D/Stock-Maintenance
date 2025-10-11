@@ -122,10 +122,6 @@ function SideBar() {
   {
     MenuLogo: FaCartArrowDown,
     MenuText: "Orders",
-    ArrayOfSubMenus: [
-      { MenuText: "Order Management" },
-      { MenuText: "Vendors" },
-    ]
   },
   {
     MenuLogo: FaUsers,
@@ -143,7 +139,7 @@ function SideBar() {
   },
   {
     MenuLogo: FaTasks,
-    MenuText: "Tasks"
+    MenuText: "Check out"
   },
   {
     MenuLogo: CgProfile,

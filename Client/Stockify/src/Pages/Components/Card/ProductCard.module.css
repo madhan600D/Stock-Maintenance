@@ -1,0 +1,276 @@
+.productCard-Div{
+    transition: all 0.6s ease ;
+    background: transparent;
+    display: flex;
+    flex :0 0 1;
+    width: max-content;
+    min-width: 250px;
+    border-radius: 12px;
+    align-items: center;
+    flex-direction: column;
+    padding: 0;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.434);
+    justify-content:flex-end;
+    transition: all 0.4s ease;
+    overflow: hidden;
+    
+}
+.ProductCardDescription-Div{
+    margin-top: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items:start;
+    padding: 5px;
+    background-color: #303844;
+    width: 100%;
+    height: 40%;
+    overflow-wrap: hidden;
+    border-bottom-right-radius: 5%;
+    border-bottom-left-radius: 5%;
+    box-shadow: 1px 1px 20px  #1e1e1e19;
+    font: 200;
+    
+}
+.Product-Image{
+    border-top-left-radius: 5%;
+    border-top-right-radius: 5%;
+    width: 100%;
+    height: max-content;
+    transition: all 0.3s ease;
+    max-height: 10rem;
+    min-height: 10rem;
+    object-fit:cover;
+    object-position: center;
+
+    display: block;   
+}
+.ProductDesc-Div{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-height: 5rem;
+    min-height: 5rem;
+    align-items: center;
+    justify-content: center;
+}
+.ProductName-Label {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.3rem;
+  font-size: 1.2rem;
+  text-shadow: 5px 5px 3px rgba(0, 0, 0, 0.526);
+  color: #d9e2ef;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.ProductPrice-Label {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 1.6rem;
+  color: #7b8283;
+  text-shadow: 0 0 8px rgba(59, 62, 62, 0.299);
+  margin: 0;
+}
+.ProductSubDesc-Div{
+    display: flex;
+    flex-direction: column;
+    font-size: xx-small;
+    margin-top: 1.5rem;
+    justify-content: center;
+    padding: 0.5rem;
+}
+.Desc-Label{
+    margin: 0;
+}
+.Action-Button{
+    position: absolute;
+    justify-self: flex-end;
+}
+.ProductCardButtons-Div{
+    display: flex;
+    flex-direction: row;
+    margin-left: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    justify-content:flex-end;
+    align-items:end;
+    gap: 10px;
+    width: 90%;
+}
+
+.ImageEdit-Div{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position:relative;
+    width: 100%;
+}
+
+.ImageUpload-Button{
+    opacity: 0;
+    position: absolute;
+    padding: 0.5rem;
+    height: 3rem;
+    background-color: transparent;
+    width: 3rem;
+    border-radius: 20px;
+    cursor: pointer;
+    
+}
+
+.ImageEdit-Div:hover .Product-Image{
+    opacity: 5%;
+}
+
+.ImageEdit-Div:hover .ImageUpload-Button{
+    opacity: 100%;
+}
+.productCardEdit-Div{
+    transition: all 0.6s ease ;
+    background: rgba(0, 38, 66, 0.552);
+    display: flex;
+    border-radius: 5%;
+    align-items: center;
+    flex-direction: column;
+    min-width: 250px;
+    padding: 15px;
+    justify-content:flex-end;
+    transition: all 0.4s ease;
+    overflow: hidden;
+    
+}
+
+::-webkit-scrollbar{
+    
+}
+.productData-Input{
+    background-color: beige;
+    margin-bottom: 3px;
+    width: calc(75% + 5px);
+    background-color: transparent;
+    border: .7px;
+    border-radius: 5px;
+    border-color: #2d3748a1;
+    border-style: solid;
+    padding: 5px;
+    overflow:scroll;
+    transition: all 0.2s ease;
+}
+.productCardEditInput-Div{
+    
+    animation: editContentDivRotate 0.6s ease forwards;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+.ProductCardButtonsEdit-Div{
+    transition: all 0.6s ease ;
+    display: flex;
+    flex-direction: row;
+    margin-left: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    justify-content: start;
+    align-items:center;
+    gap: 10px;
+    animation: editContentDivRotate 0.8s ease forwards;
+}   
+
+.productData-Input:focus{
+    transform: scale(1.04,1.04);
+    border-style: dotted;
+    border: 0;
+    border-color: #1a2a46a1;
+    
+}
+
+
+
+.update-Button{
+    background-color:rgba(39, 229, 140, 0.778);
+    height: inherit;
+    width: inherit;
+    padding: 5px;
+    border-radius: 10px;
+    transition: all 0.3S ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.update-Button:hover{
+    box-shadow: 0px 0px 10px rgba(116, 240, 116, 0.774);
+}
+.update-Button:active{
+    box-shadow: 0px 0px 10px rgba(136, 234, 136, 0.774);   
+}
+.cancel-Button{
+    background-color:rgba(229, 74, 39, 0.778);
+    height: inherit;
+    width: inherit;
+    padding: 5px;
+    border-radius: 10px;
+    transition: all 0.3S ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+.cancel-Button:hover{
+    box-shadow: 0px 0px 20px rgba(255, 42, 0, 0.748);
+}
+.productCard-Div:hover {
+    transform: scale(1.015);
+    cursor: pointer;
+}
+
+.productCard-Div:hover .Action-Button {
+    transform: scale(1.05);
+}
+
+.productCardEdit-Div:hover{
+    transform: scale(1.05,1.05);
+    cursor: pointer;
+}
+.ProductCardName-Label{
+    font-size:medium;
+    font-weight: bolder;
+    margin-left: 8px;
+    
+}
+.ProductCardPrice-Label{
+    font-size: medium;
+    margin-left: 8px;
+}
+
+@keyframes editDivRotate {
+    0% {
+      opacity: 0;
+      transform: rotate3d(0,0,0, 0);
+      
+    }
+    100% {
+      opacity: 1;
+      transform: scale(0.8,0.8);
+      transform: rotate3d(0,1,0, 180deg);
+    }
+  }
+  @keyframes editContentDivRotate {
+    0% {
+      transform: rotate3d(0,0,0, 0);
+      
+    }
+    100% {
+      transform: rotate3d(0,1,0, 180deg);
+    }
+  }
+  @keyframes productCardRotate {
+    0% {
+        opacity: 100%;
+        transform: rotate3d(0,0,0, 0);
+    }
+    100%{
+        opacity: 0;
+        transform: rotate3d(0,1,0, 360deg);
+    }
+  }

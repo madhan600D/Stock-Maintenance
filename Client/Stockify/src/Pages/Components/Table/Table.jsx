@@ -1,4 +1,4 @@
-import React, { useState , useReducer } from 'react'
+import React, { useState , useReducer , useEffect } from 'react'
 import Styles from './Table.module.css'
 //Components
 import LabelWithLogo from '../LabelWithLogo/LabelWithLogo'
@@ -26,6 +26,9 @@ function Table({TableName , TableArg , ColumnPalette , RowPalette , UpdateButton
     let TableData;
     const [Loading , SetLoading] = useState(false);
     const [Query , SetQuery] = useState();
+    const ColumnPixel = []
+
+    
     //Reducer Functions
     function SortTable(ColToSort , Table){
 
@@ -104,6 +107,10 @@ function Table({TableName , TableArg , ColumnPalette , RowPalette , UpdateButton
     } 
 
     const [TableState , Dispatch] = useReducer(Reducer , TableArg);
+    //Effect
+    useEffect(() => {
+        TableState.Columns.map((Col , Idx) => {ColumnPixel.push(Col.Col?.length * 20)}) 
+    }, [TableState]);
     //Theme
     const FilterBox = createTheme({
         components: {
@@ -195,7 +202,8 @@ function Table({TableName , TableArg , ColumnPalette , RowPalette , UpdateButton
         <div style={{backgroundColor:ColumnPalette[0] , color:ColumnPalette[1] , gridTemplateColumns:`repeat(${TableState.Columns.length}, 0.3fr)`}} className = {Styles['Header-Div']}>
             {TableState.Columns.map((Column , Idx) => {
                 return (
-                    <div className = {Styles['Column-Div']} >
+                    <div className = {Styles['Column-Div']} style={{width:`${Column.ColumnName?.length * 20}px`}}>
+                        
                         <div className={Styles['Sort-Div']}>
                             <Tooltip placement='right' title="Sort" arrow>
                             <IconButton onClick={() => {Dispatch({type:TableActions.SORT_TABLE , payload:Column.ColumnName})}}>
@@ -221,7 +229,7 @@ function Table({TableName , TableArg , ColumnPalette , RowPalette , UpdateButton
             {TableState.Rows.map((Row, RowIndex) => (
                 <div key={RowIndex} className={Styles['Row-Div']} style={{boxShadow:RowIndex % 2 == 0 ? '0 0 6px #39393997' : 'none' , backgroundColor:RowIndex % 2 == 0 ? RowPalette[0] : RowPalette[1] , color:RowPalette[2] , gridTemplateColumns:`repeat(${TableState.Columns.length}, 0.5fr)`}}>
                     {Row.map((CellData, CellIndex) => (
-                        <div className = {Styles['Cell-Div']}>
+                        <div className = {Styles['Cell-Div']} style={{width:ColumnPixel[CellIndex]}}>
                             <label className = {Styles['Wrap-Label']} key={CellIndex}>{CellData}</label>
                         </div>
                         
