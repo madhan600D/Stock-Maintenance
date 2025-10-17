@@ -1,0 +1,25 @@
+.Main-Div{
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    position: relative;
+    overflow-y: hidden;
+    min-height: 40rem;
+    height: 100%;
+}
+
+.Top-Div{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 1.5rem;
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.Styled-Label{
+    font-weight:500;
+    margin: 0;
+    color: #959ba4;
+    font-family: poppins;
+}

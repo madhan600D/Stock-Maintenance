@@ -4,7 +4,7 @@ import Styles from './TextBoxWithLogo.module.css'
 //Components
 import FallBackSpinner from '../Suspense Components/FallBackSpinner/FallBackSpinner';
 import TypingSuspense from '../Suspense Components/TypingSuspense/TypingSuspense';
-function TextBoxWithLogo({Logo , IsMandatory , FloatingText , Type , TBCallBack , DataProp, Reference , IsLoading ,ColorPallete}) {
+function TextBoxWithLogo({Logo , IsMandatory , FloatingText , Type , TBCallBack , DataProp, Reference , IsLoading ,ColorPallete , }) {
     //Hooks
     const [TextBoxData , SetTextBoxData] = useState(DataProp || '');
     const [DataTypeRegex , SetDataTypeRegex] = useState();
@@ -12,9 +12,6 @@ function TextBoxWithLogo({Logo , IsMandatory , FloatingText , Type , TBCallBack 
     
     //To Call the text box change Callback
     useEffect(() => {
-        // if(Reference.current.value == ""){
-        //     SetTextBoxData("")
-        // }
         TBCallBack(TextBoxData)
     } , [TextBoxData])
     //To set the initial DataType for Datatype
@@ -57,7 +54,7 @@ function TextBoxWithLogo({Logo , IsMandatory , FloatingText , Type , TBCallBack 
         </div>
         <div className = {Styles['TexBoxAndLogo-Div']}>
 
-            <input value={DataProp || TextBoxData} ref={Reference} onChange={HandleInput} pattern = {DataTypeRegex}  className= {Styles['TextBox-Input']} onFocus={() => SetIsTextBoxFocused(true)} onBlur={() => SetIsTextBoxFocused(false)} onKeyDown={HandleEnterKey}/>
+            <input value={Reference?.current?.value || DataProp} ref={Reference} onChange={HandleInput} pattern = {DataTypeRegex}  className= {Styles['TextBox-Input']} onFocus={() => SetIsTextBoxFocused(true)} onBlur={() => SetIsTextBoxFocused(false)} onKeyDown={HandleEnterKey}/>
 
             <p className= {Styles['TextBox-Label']} style={{color:IsTextBoxFocused ? ColorPallete[1] : "#2d2d28ff" , 
                 transform:TextBoxData?.length > 0 || DataProp?.length > 0 ? "translate(0,-2rem)" : "",

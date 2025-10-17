@@ -4,7 +4,7 @@ export default (Sequelize , DataTypes) => {
     OrganizationID:{
         type:DataTypes.INTEGER,
         allowNull:false,
-        reference:{
+        references:{
             model:'organizations',
             key:'organizationId'
         }

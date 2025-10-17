@@ -15,6 +15,7 @@ function SearchBox({Data  = [], OnSelection , MaxItems , OnChange  ,
         //States
         const [Query , SetQuery] = useState('');
         const [IsFocused , SetIsFocused] = useState(InitialFocus);
+        const [Select ,SetSelect] = useState();
         const [ShowItemBar , SetShowItemBar] = useState();
         const [CurrentQueryItems , SetCurrentQueryItems] = useState([]);
         const [MaxHeight , SetMaxHeight] = useState('0px');
@@ -49,26 +50,30 @@ function SearchBox({Data  = [], OnSelection , MaxItems , OnChange  ,
         useEffect(() => {
             const Height = CalculateHeight();
             SetMaxHeight(Height);
-}, [CurrentQueryItems]);
+            }, [CurrentQueryItems]);
 
         //Functions
         const UpdateQuery = async () => {
             SetQuery(InputBoxRef.current.value);
         }
 
-        const HandleSelection = async () => {
+        const HandleSelection = async (Value) => {
             //Close the Items bar
             SetShowItemBar(false);
+            //Empty query
             SetQuery('')
-            SelectionCallBack();
+            InputBoxRef.current.value = Value
+            SetSelect(Value);
+            console.log("Reference:",InputBoxRef.current.value)
+            SelectionCallBack(Value);
 
         }
 
         const CalculateHeight = () => {
             const itemHeight = 50;
             const maxVisibleItems = MaxItems || 5;
-            if(CurrentQueryItems.length > 0){
-                return Math.min(CurrentQueryItems.length, maxVisibleItems) * itemHeight;
+            if(CurrentQueryItems?.length > 0){
+                return Math.min(CurrentQueryItems?.length, maxVisibleItems) * itemHeight;
             }
             else{
                 return 0
@@ -105,9 +110,9 @@ function SearchBox({Data  = [], OnSelection , MaxItems , OnChange  ,
             />
         </div>
   <div className={Styles['Query-Div']} style={{ maxHeight: `${ShowItemBar ? MaxHeight : 0}px`, }}>
-      {CurrentQueryItems.slice(0, MaxItems).map((Value, Index) => (
+      {CurrentQueryItems?.slice(0, MaxItems).map((Value, Index) => (
         <>
-            <div className={Styles['Bar-Div']} key={Index} onClick={HandleSelection}>
+            <div className={Styles['Bar-Div']} key={Index} onClick={() => HandleSelection(Value)}>
           <label className={Styles['Bar-Label']}>{Value}</label>
         </div>
         </>

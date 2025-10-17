@@ -6,16 +6,34 @@
     flex-direction: column;
     overflow-x: hidden;
     position: relative;
+    overflow-y: hidden;
     min-height: 40rem;
     height: 100%;
 }
 
 .Top-Div{
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.8rem;
     flex-direction: row;
-    justify-content: center;
+    align-items: flex-start;
+    gap: 1.5rem;
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.Styled-Label{
+    font-weight:500;
+    margin: 0;
+    color: #959ba4;
+    font-family: poppins;
+}
+
+.Simple-Button{
+    position: absolute;
+    right: 0;
+}
+.Styled-Label::first-letter{
+    color: #9f9f9f;
+    font-weight: bolder;
 }
 .Start-Div{
     display: flex;
@@ -80,7 +98,7 @@
     justify-content: flex-start;
     overflow-x: scroll;
     width: 100%;
-    gap:4rem;
+    gap:2rem;
 }
 
 .Side-Div{

@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import AxiosInstance from '../Lib/AxiosInstance.js';
 
 //SubPages
 import InviteToOrgPage from '../Pages/SubPages/InviteToOrgPage/InviteToOrgPage.jsx';
@@ -7,8 +6,11 @@ import DashboardPage from '../Pages/SubPages/DashboardPage/DashboardPage.jsx';
 import AddCategoryPage from '../Pages/SubPages/AddCategoryPage/AddCategoryPage.jsx';
 import VendorPage from '../Pages/SubPages/VendorPage/VendorPage.jsx';
 import ProductPage from '../Pages/SubPages/ProductPage/ProductPage.jsx';
+import CheckoutPage from '../Pages/SubPages/CheckoutPage/CheckoutPage.jsx';
+import ProfilePage from '../Pages/SubPages/ProfilePage/ProfilePage.jsx';
+import OrganizationPage from '../Pages/SubPages/OrganizationPage/OrganizationPage.jsx';
 
-const URLToPage = {'/invite-to-org':InviteToOrgPage , '/dashboard': DashboardPage , '/category':AddCategoryPage , '/vendors':VendorPage , '/products' : ProductPage}
+const URLToPage = {'/invite-to-org':InviteToOrgPage , '/dashboard': DashboardPage , '/category':AddCategoryPage , '/vendors':VendorPage , '/products' : ProductPage , '/checkouts':CheckoutPage , '/profile':ProfilePage , '/orgpage':OrganizationPage}
 
 const useApp = create((set , get) => ({
     CurrentPage:'',

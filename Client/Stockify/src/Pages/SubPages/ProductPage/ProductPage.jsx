@@ -21,7 +21,11 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 //Logos
 import { FaBoxOpen } from "react-icons/fa6";
 import { BiSolidFileImage } from "react-icons/bi";
+import { MdOutlineInventory } from "react-icons/md";
+import { AiOutlineDollar } from "react-icons/ai";
 import { IoIosClose } from 'react-icons/io'
+import { FaTrophy } from "react-icons/fa6";
+import { FaCartArrowDown } from "react-icons/fa6";
 import { IoWarningOutline } from "react-icons/io5";
 import { CiViewTable } from "react-icons/ci";
 import { FaCubesStacked } from "react-icons/fa6";
@@ -42,9 +46,12 @@ function ProductPage() {
         //States
         const [ShowDiv , SetShowDiv] = useState(false);
         const [TableData , SetTableData] = useState();
+        const [MostSelling , SetMostSelling] = useState();
+        const [OutOfStock , SetOutOfStock] = useState(0);
+        const FormRef = useRef();
         //Login --> Stack , Signup --> Table
         const [CurrentView , SetCurrentView] = useState("Login");
-        const {Category , Vendors  , Products , Currency,AddProduct}  = UseProduct();
+        const {Category , Vendors  , Products , Currency , AddProduct , HighSellingProducts}  = UseProduct();
         const ProductNameRef = useRef();
         const ProductImageRef = useRef();
 
@@ -52,8 +59,30 @@ function ProductPage() {
         useEffect(() => {
           const table =  StateToTable(UseProduct.getState().Products, {} , ['ProductID' , 'ProductName' , 'Quantity']); 
           SetTableData(table)
+          const MostSeller = StateToTable(UseProduct.getState().HighSellingProducts , {} , ['ProductID' , 'ProductName' , 'Quantity' , 'Price'])
+          SetMostSelling(MostSeller)
+          
         } , [])
-
+        //Events
+        useEffect(() => {
+            const HandleClick = (Event) => {
+                if(FormRef.current && !FormRef.current.contains(Event.target)){
+                    FormRef.current.value = ""
+                    SetShowDiv(false);
+                }
+            }
+            document.addEventListener("mousedown" , HandleClick);
+            return () => document.removeEventListener("mousedown", HandleClick);
+        } , [])
+        useEffect(() => {
+            let LowStockCount = 0
+            for(let P of Products[0]){
+              if(P.Quantity < P.ReorderThreshold){
+                LowStockCount += 1
+              }
+            }
+            SetOutOfStock(LowStockCount)
+        } , [Products])
         const InitialState = {ProductName:"" , ProductPrice:0 , Currency:'' ,ActualPrice:0  , CategoryName:'' , ProductImage:"" , VendorName:'' , ExpirationDate:'' , ReorderThreshold:0 , Unit:"" ,Quantity:0}
 
         //Functions
@@ -390,50 +419,71 @@ function ProductPage() {
         };
   return (
     <div className = {Styles['Main-Div']}>
-        <div className = {Styles['Start-Div']}>
-            <label className = {Styles['Product-Label']}>Products</label>
-                <SimpleButton 
-                    ButtonText={"ADD PRODUCT"}
-                    BGColor={"#0f9ec6ff"}
-                    Dimensions={[10, 3]}
-                    Callback={() => {SetShowDiv(Prev => !Prev)}}
-                />
-        </div>
-            <div className= {Styles['Top-Div']}>
+       <div className = {Styles['Top-Div']}>
+                   {/* About this page details */}
+                   <div style={{display:'flex' , alignItems:'center' , justifyContent:'center' , fontSize:'1.6rem' , gap:'0.6rem' , backgroundColor:'#1E232B' , padding:'0.6rem' , borderRadius:'10px'}}>
+                       <FaCartArrowDown />
+                       <label className={Styles['Styled-Label']}>Products</label>
+                   </div>
+                   <div className = {Styles['Simple-Button']}>
+                      <SimpleButton
+                       
+                        ButtonText={"ADD PRODUCT"}
+                        BGColor={"#0f9ec6ff"}
+                        Dimensions={[10, 3]}
+                        Callback={() => {SetShowDiv(true)}}
+                      />
+                   </div>          
+          </div>
+           <div className = {Styles['PageDesc-Div']} style={{marginBottom:'2rem'}}>
+                      <label style={{fontSize:'0.8rem' , fontFamily:'poppins'}}>View and maintain your org inventory in this page. Add new product by clicking:</label>
+                      <label style={{fontSize:'0.8rem' , fontFamily:'poppins' , backgroundColor:'#027aa6ff' , padding:'0.3rem' , borderRadius:'10px' , marginRight:'0.2rem' , marginLeft:'0.2rem'}}>
+                              Add Product 
+                      </label>
+                      <label style={{fontSize:'0.8rem' , fontFamily:'poppins'}}>
+                          Edit product details in the below:  
+                      </label>
+                      <label style={{fontSize:'0.8rem' , fontFamily:'poppins' , backgroundColor:'#2e7032ff' , padding:'0.3rem' , borderRadius:'10px' , marginRight:'0.2rem' , marginLeft:'0.2rem'}}>stack view edit</label>
+                      <label style={{fontSize:'0.8rem' , fontFamily:'poppins'}}>button.</label>
+                          
+                  </div>
+            <div className= {Styles['Top-Div']} style={{backgroundColor:'#13171d84' , padding:'1.5rem',borderRadius:'20px' ,display:'flex' , flexDirection:'column'}}>
+              <div>
+                  <div style={{display:'flex' , alignItems:'center' , justifyContent:'center' , fontSize:'1rem' , gap:'0.6rem' , backgroundColor:'#1E232B' , padding:'0.6rem' , borderRadius:'10px'}}>
+                       <MdOutlineInventory />
+                       <label style={{fontSize:'small'}} className={Styles['Styled-Label']}>Dashboard</label>
+                   </div>
+              </div>
+              <div style={{display:'flex' , flexDirection:'row' ,gap:'0.6rem' , alignItems:'center' , justifyContent:'center'}}>
                 <LabelWithLogo 
                     Logo={FaBoxOpen}
                     Header={"Total Products"}
                     Value={Products[0].length || "NA"}
                     BGColor={'#282f31ff'}
-                    Dimension={[350 , 100]}
+                    Dimension={[250 , 100]}
                 />
                 <LabelWithLogo 
                     Logo={IoWarningOutline}
                     Header={"Low Stock Products"}
-                    Value={Products.length || 0}
+                    Value={OutOfStock}
                     BGColor={'#ff6c6cff'}
-                    Dimension={[350 , 100]}
+                    Dimension={[250 , 100]}
                 />
                 <LabelWithLogo 
-                    Logo={IoWarningOutline}
-                    Header={"High Selling Product"}
-                    Value={Products[0][0].ProductName || 0}
+                    Logo={FaTrophy}
+                    Header={"Top Seller"}
+                    Value={HighSellingProducts[0][0].ProductName}
                     BGColor={'#a5ff7bff'}
-                    Dimension={[350 , 100]}
+                    Dimension={[250 , 100]}
                 />
-                <LabelWithLogo 
-                    Logo={IoWarningOutline}
-                    Header={"Low Stock Products"}
-                    Value={Products.length || 0}
-                    BGColor={'#282f31ff'}
-                    Dimension={[350 , 100]}
-                />
+              </div>
+                
 
             </div>
             <div className = {Styles['Display-Div']}>
               <div className = {Styles['DisplayTop-Div']}>
                 <div className = {Styles['TopLeft-Div']}>
-                  <label>INVENTORY</label>
+                  <label className={Styles['Styled-Label']}>Inventory</label>
                   <ImStack />
                 </div>
                 <PageSelector 
@@ -465,12 +515,13 @@ function ProductPage() {
                     ))
                   ) : (
                     // Table View
-                    <div className = {Styles['Table-Div']}>
+                    <div className = {Styles['Table-Div']} style={{width:'100%'}}>
                       <Table 
                         TableName={'ALL PRODUCTS'}
                         TableArg={TableData}
                         ColumnPalette={["#1c1d1fff" , "white"]}
                         RowPalette={["#161A20" , "#1E232B" , "white"]}
+                        Dimensions={["100%" , ""]}
                       />
                     </div>
                     
@@ -484,6 +535,7 @@ function ProductPage() {
             </div>
             <div className = {Styles['Side-Div']} style={{transform: ShowDiv ? "translateX(20%)" : "translateX(120%)"}}>
                 <FormComponent 
+                    Reference={FormRef}
                     Structure={CreateProductLayout}
                     ReducerState={ProductState}
                     LoadingState={false}
@@ -491,6 +543,24 @@ function ProductPage() {
                 />
             </div>
             <ToastContainer />
+            <div className= {Styles['Top-Div']} style={{backgroundColor:'#13171d84' , padding:'1.5rem',borderRadius:'20px' ,display:'flex' , flexDirection:'column' , marginTop:'2rem'}}>
+                <div>
+                    <div style={{display:'flex' , alignItems:'center' , justifyContent:'center' , fontSize:'1rem' , gap:'0.6rem' , backgroundColor:'#1E232B' , padding:'0.6rem' , borderRadius:'10px'}}>
+                        <AiOutlineDollar />
+                        <label style={{fontSize:'small'}} className={Styles['Styled-Label']}>Inventory Flow</label>
+                    </div>
+                </div>
+                <div style={{display:'flex' , gap:'1rem'}}>
+                  {MostSelling && (
+                    <Table 
+                    TableName={"Most Selling Products"}
+                    TableArg={MostSelling}
+                    Dimensions={["100%" , ""]}
+                  />
+                  )}
+                  
+                </div>
+              </div>
     </div>
   )
 }

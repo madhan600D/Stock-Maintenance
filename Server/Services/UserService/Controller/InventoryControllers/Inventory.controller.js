@@ -82,7 +82,6 @@ export const AddProductForOrganization = async (req , res) => {
         await Transaction.rollback();
     }
 }
-
 export const GetCategoryForOrganization = async (req , res) => {
     try {
 

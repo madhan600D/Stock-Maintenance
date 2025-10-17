@@ -8,9 +8,9 @@ import { AddCheckOutValidate } from '../MiddleWares/EndPointValidations/Inventor
 
 //Controllers
 import { GetProductsForOrganization, AddProductForOrganization , GetCategoryForOrganization, AlterProductForOrganization, DeleteProducts, AddCategoryForOrganization, GetCurrency} from '../Controller/InventoryControllers/Inventory.controller.js';
-
 import { AlterWorker, GetUsers , GetVendors } from '../Controller/InventoryControllers/UserManagement.controller.js';
 import { AddVendor } from '../Controller/InventoryControllers/Vendor.controller.js';
+import { AddCheckOut , GetCurrentDayCheckout} from '../Controller/InventoryControllers/Checkout.controller.js';
 
 const InventoryRouter = express.Router();
 
@@ -35,7 +35,8 @@ InventoryRouter.put('/add_vendor' , AddVendorValidate , AddVendor);
 InventoryRouter.get('/get_currency' , GetCurrency);
 
 //CheckOut Routers
-InventoryRouter.put('/add_checkout' , AddCheckOutValidate , )
+InventoryRouter.put('/add_checkout' , AddCheckOutValidate , AddCheckOut);
+InventoryRouter.get('/get_today_checkout' , GetCurrentDayCheckout);
 
 //User Routers
 InventoryRouter.get('/get_workforce' ,  GetUsers);

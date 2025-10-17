@@ -10,7 +10,7 @@ export default (sequelize , DataTypes) => {
     OrganizationID:{
         type:DataTypes.INTEGER,
         allowNull:false,
-        reference:{
+        references:{
             model:'organizations',
             key:'organizationId'
         }
@@ -26,7 +26,7 @@ export default (sequelize , DataTypes) => {
     CurrencyID:{
         type:DataTypes.INTEGER,
         allowNull:false,
-        reference:{
+        references:{
             model:'Currency',
             key:'CurrencyID'
         }
@@ -39,7 +39,7 @@ export default (sequelize , DataTypes) => {
     CategoryID:{
         type:DataTypes.INTEGER, 
         allowNull:false,
-        reference:{
+        references:{
             model:'Category',
             key:'CategoryID'
         }
@@ -51,7 +51,7 @@ export default (sequelize , DataTypes) => {
     VendorID:{
         type:DataTypes.INTEGER,
         allowNull:false,
-        reference:{
+        references:{
             model:'Vendors',
             key:'VendorID'
         }

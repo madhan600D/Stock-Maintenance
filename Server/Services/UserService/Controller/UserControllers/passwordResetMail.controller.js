@@ -45,7 +45,7 @@ export const changerUserPassword = async (req , res) => {
         const OTPData = await objUserDb.AllModels.otps.findOne({
         include: [{
             model: objUserDb.AllModels.users,
-            where: { userName: userName.toLowerCase() },  // or req.body.userName
+            where: { userName: userName.toLowerCase() },  
             attributes: [] // if you don't need user fields
         }]
         });

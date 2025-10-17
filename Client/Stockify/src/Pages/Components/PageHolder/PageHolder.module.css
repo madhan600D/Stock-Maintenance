@@ -1,9 +1,10 @@
 .Main-Div{
     display: flex;
-    height: 100%;
+    height: max-content;
+    overflow-y: hidden;
     overflow-x: hidden;
     flex-direction: column;
     margin:1rem ;
-    padding-bottom:5rem ;
-    height:max-content;
+    padding-bottom:20rem ;
+
 }

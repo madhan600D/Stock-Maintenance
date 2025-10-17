@@ -10,6 +10,7 @@ import { GoOrganization } from "react-icons/go";
 import { LuListTodo } from "react-icons/lu";
 import { IoIosArrowDown } from "react-icons/io";
 import { BiCaretRight } from "react-icons/bi";
+import { IoMdPaper } from "react-icons/io";
 
 import { IoSettings , IoPowerSharp} from "react-icons/io5";
 import { FaWindowClose } from "react-icons/fa";
@@ -106,17 +107,15 @@ function SideBar() {
   {
     MenuLogo: GoOrganization,
     MenuText: "Organization",
-    ArrayOfSubMenus: [
-      { MenuText: "Invite", Callback: HandleSubPageChange , URL:'/invite-to-org' },
-      { MenuText: "Edit Org" }
-    ]
+    Callback:HandleSubPageChange,
+    URL:'/orgpage'
   },
   {
     MenuLogo: AiOutlineStock,
     MenuText: "Products",
     ArrayOfSubMenus: [
-      { MenuText: "Manage Product" ,Callback:HandleSubPageChange , URL:'/products' },
-      { MenuText: "Manage Category" , Callback:HandleSubPageChange , URL:'/category' }
+      { MenuText: "Products" ,Callback:HandleSubPageChange , URL:'/products' },
+      { MenuText: "Category" , Callback:HandleSubPageChange , URL:'/category' }
     ]
   },
   {
@@ -138,16 +137,16 @@ function SideBar() {
     URL:'/vendors'
   },
   {
-    MenuLogo: FaTasks,
-    MenuText: "Check out"
+    MenuLogo: IoMdPaper,
+    MenuText: "Check out",
+    Callback:HandleSubPageChange,
+    URL:'/checkouts'
   },
   {
     MenuLogo: CgProfile,
     MenuText: "Profile",
-    ArrayOfSubMenus: [
-      { MenuText: "Edit Profile" },
-      { MenuText: "Update Profile" }
-    ]
+    Callback:HandleSubPageChange,
+    URL:'/profile'
   },
   {
     MenuLogo: IoSettings,

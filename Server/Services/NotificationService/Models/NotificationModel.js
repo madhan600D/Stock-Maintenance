@@ -19,7 +19,7 @@ export default (Sequelize , DataTypes) => {
             ReceiverID:{
                 type:DataTypes.INTEGER,
                 allowNull:true,
-                reference:{
+                references:{
                     model:'Users',
                     key:'UserID'
                 }

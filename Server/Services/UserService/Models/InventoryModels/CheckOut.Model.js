@@ -12,7 +12,7 @@ export default (Sequelize , DataTypes) => {
     OrganizationID:{
         type:DataTypes.INTEGER,
         allowNull:false,
-        reference:{
+        references:{
             model:'organizations',
             key:'organizationId'
         }
@@ -24,17 +24,22 @@ export default (Sequelize , DataTypes) => {
     NoOfItems:{
         type:DataTypes.INTEGER,
         allowNull:false,
-    },
-    //A Array of JSON
-    ProductsItems:{
+    }, 
+    //A Array of JSON 
+    ProductItems:{
         type:DataTypes.STRING,
         allowNull:false,
             get() {
-                const rawValue = this.getDataValue("ProductOfItems");
+                const rawValue = this.getDataValue("ProductItems");
                 return rawValue ? JSON.parse(rawValue) : null;
             },
             set(value) {
-                this.setDataValue("ProductOfItems", JSON.stringify(value));
+                try {
+                    this.setDataValue("ProductItems", JSON.stringify(value));    
+                } catch (error) {
+                    console.log(error)
+                }
+                
             },
     },
     TotalCost:{

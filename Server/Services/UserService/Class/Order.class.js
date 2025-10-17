@@ -4,7 +4,7 @@ import objInventoryDataBase from "../Utils/InventoryDB.js";
 import { readFile } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { ObjUserKafkaProducer } from "../Kafka/Producer/kafkaProducer";
+import { ObjUserKafkaProducer } from "../Kafka/Producer/kafkaProducer.js";
 class Orders{
     constructor(){
         try {
@@ -46,7 +46,7 @@ class Orders{
         }
     }
     async PrepareOrderMailHTML(){
-        try {
+        try { 
             //Import HTML Data
             let OrderHTML = ImportUserEmailHTML("OrderMailTemplate");
             let OrderRows = ""
@@ -59,7 +59,7 @@ class Orders{
                 OrderRows += '\n'
             }
             console.log(OrderRows)
-            OrderHTML.replace('OrderData' , OrderRows);
+            OrderHTML.replace('{OrderData}' , OrderRows);
             return OrderHTML;
 
         } catch (error) {

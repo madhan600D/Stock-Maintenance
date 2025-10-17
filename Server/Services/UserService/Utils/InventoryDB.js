@@ -20,7 +20,7 @@ class InventoryDatabase {
   }
 
   connectDB = async () => {
-    try {
+    try { 
       await this.InventoryDB.authenticate();
       await this.InventoryDB.sync();
       console.log("Inventory DB connected and Tables synced ...!");

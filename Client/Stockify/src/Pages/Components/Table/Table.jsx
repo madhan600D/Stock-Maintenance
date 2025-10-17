@@ -14,9 +14,10 @@ import { FaEdit } from "react-icons/fa";
 import { FaSort } from "react-icons/fa6";
 import { FiRefreshCcw } from "react-icons/fi";
 import { MdOutlineClosedCaptionDisabled } from "react-icons/md";
-import { FaFilter } from "react-icons/fa";
+import { MdOutlineManageSearch } from "react-icons/md";
 
-function Table({TableName , TableArg , ColumnPalette , RowPalette , UpdateButton , RefreshFunction}) {
+
+function Table({TableName , TableArg , ColumnPalette , RowPalette , UpdateButton , RefreshFunction , Dimensions = ["max-content" , "max-content"] , DisplayOptions = true}) {
     //Prop Column:[{Column , IsEditable}]
     //Prop Data:[["data"]]
     //ColumnPalette:{BGColor , TextColor}
@@ -164,11 +165,12 @@ function Table({TableName , TableArg , ColumnPalette , RowPalette , UpdateButton
 
 
   return (
-    <div className = {Styles['Main-Div']}>
+    <div className = {Styles['Main-Div']} style={{width:Dimensions[0] , height:Dimensions[1]}}>
         <div className = {Styles['TableInfo-Div']}>
             <TbCategory />
             <label>{TableName}</label>
-            <div className = {Styles['Bottom-Div']}>
+            {DisplayOptions && (
+                <div className = {Styles['Bottom-Div']}>
                 <div style={{display:'inline-block' , height:'100%' , marginLeft:'0.5rem' }}>
                     <ThemeProvider theme={FilterBox}>
                     <TextField
@@ -180,9 +182,9 @@ function Table({TableName , TableArg , ColumnPalette , RowPalette , UpdateButton
                     />
                     </ThemeProvider>
                 </div>
-            <Tooltip title="Filter" arrow>
+            <Tooltip title="Search" arrow>
                 <IconButton onClick={() => Dispatch({ type: TableActions.FILTER_TABLE, payload: Query })}>
-                    <FaFilter color="bisque" />
+                    <MdOutlineManageSearch color="bisque" />
                 </IconButton>
             </Tooltip>
             <Tooltip title="Edit" arrow>
@@ -197,45 +199,39 @@ function Table({TableName , TableArg , ColumnPalette , RowPalette , UpdateButton
                 </IconButton>
             </Tooltip>
         </div>
+            )}
+            
         </div>
         {/* Column Mapping */}
-        <div style={{backgroundColor:ColumnPalette[0] , color:ColumnPalette[1] , gridTemplateColumns:`repeat(${TableState.Columns.length}, 0.3fr)`}} className = {Styles['Header-Div']}>
-            {TableState.Columns.map((Column , Idx) => {
-                return (
-                    <div className = {Styles['Column-Div']} style={{width:`${Column.ColumnName?.length * 20}px`}}>
-                        
-                        <div className={Styles['Sort-Div']}>
-                            <Tooltip placement='right' title="Sort" arrow>
-                            <IconButton onClick={() => {Dispatch({type:TableActions.SORT_TABLE , payload:Column.ColumnName})}}>
-                                <FaSort color='bisque'/>
-                                </IconButton>
-                            </Tooltip>
-                        </div>
-                        
-                        <label>{Column.ColumnName.length < 10 ? Column.ColumnName : `${Column.ColumnName.slice(0)}`}</label>
-                    </div>
-                )
-            })}
-        </div>
-        {/* Row mapping */}
-        <div className={Styles['Body-Div']}>
-            {TableState.Rows.length <= 0 && (
-                <LabelWithLogo 
-                    Logo={MdOutlineClosedCaptionDisabled}
-                    Value={"No data!"}
-                    BGColor={'red'}
-                />
-            )}
-            {TableState.Rows.map((Row, RowIndex) => (
-                <div key={RowIndex} className={Styles['Row-Div']} style={{boxShadow:RowIndex % 2 == 0 ? '0 0 6px #39393997' : 'none' , backgroundColor:RowIndex % 2 == 0 ? RowPalette[0] : RowPalette[1] , color:RowPalette[2] , gridTemplateColumns:`repeat(${TableState.Columns.length}, 0.5fr)`}}>
-                    {Row.map((CellData, CellIndex) => (
-                        <div className = {Styles['Cell-Div']} style={{width:ColumnPixel[CellIndex]}}>
-                            <label className = {Styles['Wrap-Label']} key={CellIndex}>{CellData}</label>
-                        </div>
-                        
+        <div className = {Styles['Table-Div']}>
+            <table
+                cellPadding="6"
+                cellSpacing="0"
+                style={{ borderCollapse: "collapse", width: "100%", fontFamily: "Arial, sans-serif", fontSize: "14px"}}
+                className= {Styles['Table']}
+                >
+                <thead className= {Styles['Table-Head']}>
+                    <tr style={{color: "rgba(127, 133, 139, 0.73)" , fontWeight:'bolder' }} >
+                    {TableState && TableState.Columns.map((Column , Idx) => (
+                        <>
+                        <th onClick={() => {Dispatch({type:TableActions.SORT_TABLE , payload:Column.ColumnName})}}>{Column.ColumnName}</th>
+                        </>
                     ))}
-                </div>
-            ))}
+                    </tr>
+                </thead>
+                <tbody className= {Styles['Table-Body']}>
+                    {TableState.Rows && TableState.Rows.map(
+                        (Row , Index) => (
+                            <tr>
+                                {Row && Row.map((CellData , CellIndex) => (
+                                    <td key={CellIndex}>{CellData}</td>
+                                ))}
+                            </tr>
+                        )
+                    )}
+                    
+                </tbody>
+                </table>
         </div>
 
         

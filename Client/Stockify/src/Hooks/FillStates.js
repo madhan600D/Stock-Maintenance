@@ -1,7 +1,9 @@
+import useOrg from "../Stores/OrgStore.js";
 import UseProduct from "../Stores/ProductStore.js";
 
 export const useFillInventoryStates = () => {
-  const { GetProducts, GetCategory, GetVendors, GetCurrency } = UseProduct();
+  const { GetProducts, GetCategory, GetVendors, GetCurrency , GetCurrentDayCheckout } = UseProduct();
+  const {FillOrgData} = useOrg();
 
   const FillInventoryStates = async () => {
     try {
@@ -9,7 +11,9 @@ export const useFillInventoryStates = () => {
         GetProducts(),
         GetCategory(),
         GetVendors(),
-        GetCurrency()
+        GetCurrency(),
+        FillOrgData(),
+        GetCurrentDayCheckout()
       ]);
     } catch (error) {
       console.log("Failed to load", error.message);

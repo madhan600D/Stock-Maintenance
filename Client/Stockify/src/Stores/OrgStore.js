@@ -33,6 +33,20 @@ const useOrg = create((set , get) => ({
             return ObjError
         }
     },
+    FillOrgData:async () => {
+        try {
+            const res = await AxiosInstance.get('/api/userservice/org/fill-organization-data');
+
+            const DataFromBackend = res.data.data;
+
+            //Set Global State
+            set({OrganizationData:[[DataFromBackend]]})
+
+            return {success:true}
+        } catch (error) {
+            console.log(error)
+        }
+    },
     JoinOrg: async (OrgData) => {
         set({IsJoiningOrg:true})
         try {

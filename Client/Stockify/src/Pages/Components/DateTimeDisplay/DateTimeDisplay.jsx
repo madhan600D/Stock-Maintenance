@@ -16,7 +16,6 @@ function DateTimeDisplay() {
 
   return (
     <div className = {Styles["Main-Div"]}>
-        {console.log(currentDate)}
       <label className = {Styles['Time-P']}>{currentDate.toString()}</label>
     </div>
   );

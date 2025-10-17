@@ -8,7 +8,7 @@ export default (sequelize , DataTypes) => {
             allowNull:false,
             reference:{
                 model:'organizations',
-                key:'organizationId'
+                key:'organizationId' 
             }
         },
         RunDate:{

@@ -3,12 +3,19 @@ export const StateToTable =  (Query , ParamObject , Attributes = []) =>{
         //Assign columns
         const keys = Object.keys(Query[0][0]) 
         //({ColumnName:k , IsEditable:false})
-        const ColumnsFromQuery = keys
-            .filter((Col) => Attributes.length === 0 || Attributes.includes(Col))
-            .map((Col) => ({
-                ColumnName: Col,
-                IsEditable: false,
-  }));
+        // const ColumnsFromQuery = keys
+        //     .filter((Col) => Attributes.length === 0 || Attributes.includes(Col))
+        //     .map((Col) => ({
+        //         ColumnName: Col,
+        //         IsEditable: false,
+        //     }));
+        const ColumnsFromQuery = Attributes.map((Attr) => {
+            const match = keys.find(k => k === Attr);
+            return {
+                ColumnName: match ? match : "Column",
+                IsEditable: false
+            };
+        });
         ParamObject.Columns = ColumnsFromQuery
         
         //Assign Rows
@@ -20,6 +27,7 @@ export const StateToTable =  (Query , ParamObject , Attributes = []) =>{
             })
             
         ParamObject.Rows = RowFromQuery
+        console.log("State:" , ParamObject)
         return ParamObject
     } catch (error) {
         console.log(error)

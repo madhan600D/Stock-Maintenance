@@ -5,7 +5,7 @@ export default (Sequelize , DataTypes) => {
             NotificationID:{
                 type:DataTypes.INTEGER,
                 allowNull:false,
-                reference:{
+                references:{
                     model:'Notifications',
                     key:'NotificationID'
                 },
@@ -17,7 +17,7 @@ export default (Sequelize , DataTypes) => {
             ReceiverID:{
                 type:DataTypes.INTEGER,
                 allowNull:false,
-                reference:{
+                references:{
                     model:'Users',
                     key:'UserID'
                 }

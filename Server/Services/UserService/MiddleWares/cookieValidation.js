@@ -9,7 +9,12 @@ export const cookieValidation = async (req , res , next) => {
 
             const Verification =  jwt.verify(Token , process.env.JWT_Key)
             if(!Verification){
-                return await res.status(400).json({success:false , message: "Unauthorized access"})
+                res.clearCookie("jwt", {
+                httpOnly: true,
+                secure: true,
+                sameSite: "Strict"
+                });
+                return res.status(200).json({success:true , message:"JWT expired.Please log in again...!"})     
             }
             const user = await objUserDb.AllModels.users.findOne({where:{userId:Verification.userId}})
 

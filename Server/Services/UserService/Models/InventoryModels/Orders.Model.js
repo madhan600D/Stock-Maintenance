@@ -9,7 +9,7 @@ export default (sequelize , DataTypes) => {
         OrganizationID:{
             type:DataTypes.INTEGER,
             allowNull:false,
-            reference:{
+            references:{
                 model:'organizations',
                 key:'organizationId'
             }
@@ -17,7 +17,7 @@ export default (sequelize , DataTypes) => {
         VendorID:{
             type:DataTypes.INTEGER,
             allowNull:false,
-            reference:{
+            references:{
                 model:'Vendors',
                 key:'VendorID'
             }

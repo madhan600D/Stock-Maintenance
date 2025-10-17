@@ -29,7 +29,7 @@ export default (Sequelize , DataTypes) => {
                 type:DataTypes.STRING,
                 allowNull:false
             },
-            //This will contain the reference of cloudinary URL
+            //This will contain the references of cloudinary URL
             profilePic:{
                 type:DataTypes.STRING
             }

@@ -144,8 +144,34 @@ export const groupInviteToOrg = async (req , res ) => {
     }
 }
 
-export const leaveOrg = async (req ,res) => {
+export const getOrganizationData =async (req , res) => {
+    try {
+        let OrganizationDataForClient = {}
 
+        const OrgDataFromDB = await objInventoryDataBase.AllModels.OrgState.findOne({
+            include:[
+                {
+                    model:objInventoryDataBase.AllModels.organizations,
+                    where:{organizationId:req.user.organizationId},
+                }
+            ],
+            where:{OrganizationID:req.user.organizationId},
+        })
+
+        const PNLData = await objInventoryDataBase.AllModels.PNL.findOne({where:{OrganizationID:req.user.organizationId}})
+
+        OrganizationDataForClient = {OrganizationName:OrgDataFromDB.organization.organizationName
+        , OrganizationID:req.user.organizationId , OrganizationJoiningCode:OrgDataFromDB.organization.OrganizationJoiningCode , RunDate:OrgDataFromDB.RunDate ,CurrentDaySales:OrgDataFromDB.CurrentDaySales , ClosingTime:OrgDataFromDB.ClosingTime , Weekends:OrgDataFromDB.Weekends , TotalExpense:PNLData.TotalExpense , TotalRevenue:PNLData.TotalRevenue}
+
+        return res.status(200).json({success:true , data:OrganizationDataForClient});
+
+    } catch (error) {
+        console.log(error);
+    } 
+}
+
+export const leaveOrg = async (req ,res) => {
+ 
 }
 export const getOrganizations = async (req , res) => {
     try {

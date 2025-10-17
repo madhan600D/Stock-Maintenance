@@ -13,7 +13,7 @@ import { GrFormPrevious } from "react-icons/gr";
 //MUI components
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
-function FormComponent({Structure, ReducerState , LoadingState , LoadingComponent , SubmitCallback , BGColor = '#282a2e'}) {
+function FormComponent({Structure, ReducerState  , Reference , LoadingState , LoadingComponent , SubmitCallback , BGColor = '#282a2e'}) {
   //PropStructure: Form:{Section1:[SubSection1:{Heading , ElementArray, GridSpan}, SubSection2 , SubmitCallBack()]}
 
   //States
@@ -38,7 +38,7 @@ function FormComponent({Structure, ReducerState , LoadingState , LoadingComponen
 
   if(!LoadingState){
     return (
-    <div className = {Styles['Main-Div']} style={{backgroundColor:BGColor}}>
+    <div ref={Reference} className = {Styles['Main-Div']} style={{backgroundColor:BGColor}}>
       {/* The Node at top of the form */}
       <div className = {Styles['Nodes-Div']}>
         <div>

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import AxiosInstance from '../Lib/AxiosInstance.js';
+import useOrg from '../Stores/OrgStore.js'
 
  const UseProduct = create((set , get) => ({
     IsAuthenticated:false,
@@ -10,6 +11,7 @@ import AxiosInstance from '../Lib/AxiosInstance.js';
     Products:[],
     Vendors:[],
     Currency:[],
+    HighSellingProducts:[],
     PNL:{TotalRevenue:0 , TotalExpense:0},
     GetProducts : async(CatID = 0) => {
         try {
@@ -58,6 +60,34 @@ import AxiosInstance from '../Lib/AxiosInstance.js';
             return {success:false , message:"Error at Vendor get ...!"}
         }
     },
+    AddCheckout:async (Data) => {
+        try {
+            //Remove first dummy product
+            Data.ProductItems = Data.ProductItems.filter(P => P.ProductName !== "");
+            
+            const Products = UseProduct.getState().Products;
+
+            //Assign Checkout date as rundate
+            console.log(useOrg.getState().OrganizationData , useOrg.getState().OrganizationData)
+            Data.CheckoutDate = useOrg.getState().OrganizationData.RunDate
+            //Assign Product IDs
+            for (let Product of Data.ProductItems){
+                let GlobalProductIndex =  Products[0].findIndex(Prod => Product.ProductName == Prod.ProductName);
+                Product.ProductID = Products[0][GlobalProductIndex].ProductID
+            }
+
+            const Validation = Validate("AddCheckout", Data);
+            if(!Validation.success){
+                return {success:false , message:Validation.message || "Checkout validation failed."}
+            }
+            const res = await AxiosInstance.put('api/userservice/inv/add_checkout' , Data);
+            const DataFromBackEnd = res.data.data;
+        } catch (error) {
+            console.log(error);
+            return {success:false , message:error?.response.data.message || "Error processing this checkout"}
+        }
+        
+    },
     GetCurrency:async() => {
         try {
             const res = await AxiosInstance.get('/api/userservice/inv/get_currency');
@@ -68,7 +98,24 @@ import AxiosInstance from '../Lib/AxiosInstance.js';
                 return{success:true}
             }
         } catch (error) {
+            return{success:true , message:error?.response?.data?.message ?? "Error while loading currency"};
             console.log(error.message)
+        }
+    },
+    GetCurrentDayCheckout:async() => {
+        try {
+            const res = await AxiosInstance.get('/api/userservice/inv/get_today_checkout');
+            const DataFromBackEnd = res.data.data;
+
+            //Set Global states
+            if(DataFromBackEnd){
+                set({HighSellingProducts:[DataFromBackEnd.MostSellingProducts]});
+            }
+            
+            return {success:true};
+        } catch (error) {
+            console.log(error)
+            return {success:false , message:error?.response.data.message || "Error loading checkouts"}
         }
     },
     AddProduct:async(Data) => {
@@ -112,7 +159,7 @@ import AxiosInstance from '../Lib/AxiosInstance.js';
             return {success:true , message:"Updated product successfully"}
         } catch (error) {
             console.log(error.message)
-            return {success:false , message:res.data.message ?? "Error while altering product"}
+            return {success:false , message:error.res.data.message ?? "Error while altering product"}
         }
     }
     ,
@@ -200,6 +247,13 @@ const Validate =  (ValidationType , Data) => {
             }
         }
         return {success:true , message:"Validation successfull ...!"}
+    }
+    else if(ValidationType == "AddCheckout"){
+        const {TotalItems , ProductItems , TotalCost} = Data;
+        if(TotalItems < 1){
+            return {success:false , message:"Select atleast one item to checkout"};
+        }
+        return {success:true};
     }
 }
 export default UseProduct;

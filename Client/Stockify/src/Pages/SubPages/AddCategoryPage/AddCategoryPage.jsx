@@ -17,28 +17,41 @@ import TextBoxWithLogo from '../../Components/TextBoxWithLogo/TextBoxWithLogo.js
 import { ThemeProvider } from '@emotion/react'
 import TextField from '@mui/material/TextField'
 import { createTheme } from '@mui/material/styles'
+import SimpleButton from '../../Components/SimpleButton/SimpleButton.jsx'
 import ShowToast from '../../Components/Toast/Toast.js'
 //Logos
 import { TbCategory2 } from "react-icons/tb";
 import { GoSidebarExpand } from "react-icons/go";
+import { FaLayerGroup } from "react-icons/fa6";
 import { ToastContainer } from 'react-toastify'
+import { MdFormatListBulleted } from "react-icons/md";
 function AddCategoryPage() {
     //State
     const [TableData , SetTableData] = useState({});
+    const FormRef = useRef();
     const [ShowAddCategory , SetShowAddCategory] = useState(false);
     //Destructure
     const {GetCategory , Category ,AddCategory} = UseProduct();
     //Effects
     useEffect(() => {
-        async function CallGetCategory() {
-            const IsSuccess = await GetCategory();
-            if(IsSuccess){
-                const table = await StateToTable(UseProduct.getState().Category, {}); 
-                SetTableData(table);
-            }
+        function CallGetCategory() {
+            const table = StateToTable(Category, {} , ['CategoryID' , 'CategoryName' , 'CategoryDescription']); 
+            SetTableData(table);
+            
         }   
         CallGetCategory()
     } , [])
+    //Events
+      useEffect(() => {
+          const HandleClick = (Event) => {
+              if(FormRef.current && !FormRef.current.contains(Event.target)){
+                  FormRef.current.value = ""
+                  SetShowAddCategory(false);
+              }
+          }
+          document.addEventListener("mousedown" , HandleClick);
+          return () => document.removeEventListener("mousedown", HandleClick);
+      } , [])
     //Theme
     const DescBox = createTheme({
       components: {
@@ -85,11 +98,6 @@ function AddCategoryPage() {
         },
       },
     });
-
-    //function
-    const HandleShowAddForm = () => {
-        SetShowAddCategory(Prev => !Prev)
-    }
     const HandleAddCategory = async () => {
         try {
             const IsSuccess = await AddCategory(CatState)
@@ -166,35 +174,55 @@ function AddCategoryPage() {
     
   return (
     <div className = {Styles['Main-Div']}>
-        <h3>Categories</h3>
         <div className = {Styles['Top-Div']}>
-                {TableData?.Columns && (
-            <Table 
-            TableName={"CURRENT CATEGORIES"}
-            TableArg={TableData}
-            RowPalette={["#282a2e" , "#333740ff" , "#ffffffff"]}
-            ColumnPalette={["#282a2e" , "#ffffffc2"]}
-        />
-
-        )}
-            <div>
-              {console.log("CatSatte",CatState)}
-            <Tooltip title="Add Category" arrow className={Styles['Toggle-Button']}>
-            <IconButton onClick={() => HandleShowAddForm()}>
-                <GoSidebarExpand color='bisque'/>
-            </IconButton>
-        </Tooltip>
-        </div>
-            <div className = {Styles['Test-Div']} style={{transform: ShowAddCategory ? "translateX(20%)" : "translateX(120%)"}}>
+            {/* About this page details */}
+            <div style={{display:'flex' , alignItems:'center' , justifyContent:'center' , fontSize:'1.6rem' , gap:'0.6rem' , backgroundColor:'#1E232B' , padding:'0.6rem' , borderRadius:'10px'}}>
+                <FaLayerGroup />
+                <label className={Styles['Styled-Label']}>Category</label>
+            </div>
+            <div className = {Styles['Simple-Button']}>
+              <SimpleButton
+                ButtonText={"ADD Category"}
+                BGColor={"#0f9ec6ff"}
+                Dimensions={[10, 3]}
+                Callback={() => {SetShowAddCategory(true)}}
+              />
+            </div>          
+          </div>
+          <div className = {Styles['PageDesc-Div']} style={{marginBottom:'2rem'}}>
+                <label style={{fontSize:'0.8rem' , fontFamily:'poppins'}}>Add and maintain your org inventory groups(Category) in this page. Add new category by clicking:</label>
+                <label style={{fontSize:'0.8rem' , fontFamily:'poppins' , backgroundColor:'#027aa6ff' , padding:'0.3rem' , borderRadius:'10px' , marginRight:'0.2rem' , marginLeft:'0.2rem'}}>
+                        Add Category
+                </label>
+            </div>
+        <div className = {Styles['Top-Div']} style={{width:'100%'}}>
+            {/* About this page details */}
+            <div style={{display:'flex' ,flexDirection:'column' , alignItems:'center' , justifyContent:'center' , fontSize:'1.6rem' , gap:'0.6rem' , backgroundColor:'#1E232B' , padding:'0.6rem' , borderRadius:'10px' , width:'100%'}}>
+                <MdFormatListBulleted />
+                <label style={{fontSize:'1rem'}} className={Styles['Styled-Label']}>Category List</label>
+            <div style={{display:'flex' , gap:'1rem' , width:'100%'}}>
+                {TableData && TableData?.Columns &&(
+                  <Table 
+                  TableName={"Categories"}
+                  TableArg={TableData}
+                  Dimensions={["100%" , ""]}
+                />
+                )}
+              </div>
+            </div>
+          </div>
+          
+            <div className = {Styles['Side-Div']} style={{transform: ShowAddCategory ? "translateX(20%)" : "translateX(120%)"}}>
+              
             <FormComponent 
               Structure={CreateCategoryLayout}
               ReducerCall={CatReducer}
               ReducerState={CatState}
+              Reference={FormRef}
               LoadingState={false}
               ActionTypes={CatActions}
               SubmitCallback={() => {HandleAddCategory()}}
             />
-        </div>
         </div>
         
         
