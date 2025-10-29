@@ -17,7 +17,7 @@ import { MdOutlineClosedCaptionDisabled } from "react-icons/md";
 import { MdOutlineManageSearch } from "react-icons/md";
 
 
-function Table({TableName , TableArg , ColumnPalette , RowPalette , UpdateButton , RefreshFunction , Dimensions = ["max-content" , "max-content"] , DisplayOptions = true}) {
+function Table({TableName , TableArg , ColumnPalette , RowPalette , UpdateButton , EditColumnsMap , RefreshFunction , Dimensions = ["max-content" , "max-content"] , DisplayOptions = true}) {
     //Prop Column:[{Column , IsEditable}]
     //Prop Data:[["data"]]
     //ColumnPalette:{BGColor , TextColor}
@@ -26,9 +26,9 @@ function Table({TableName , TableArg , ColumnPalette , RowPalette , UpdateButton
     //RefreshData:{Function()}
     let TableData;
     const [Loading , SetLoading] = useState(false);
+    const [Mode , SetMode] = useState("View")
     const [Query , SetQuery] = useState();
     const ColumnPixel = []
-
     
     //Reducer Functions
     function SortTable(ColToSort , Table){
@@ -101,6 +101,9 @@ function Table({TableName , TableArg , ColumnPalette , RowPalette , UpdateButton
                 return FilterTable(Action.payload , State)
             case TableActions.REFRESH_TABLE:
                 return TableArg
+            case TableActions.EDIT_TABLE:
+                SetMode("Edit")
+                return State;
             default:
                 return State;
         }
@@ -188,7 +191,7 @@ function Table({TableName , TableArg , ColumnPalette , RowPalette , UpdateButton
                 </IconButton>
             </Tooltip>
             <Tooltip title="Edit" arrow>
-                <IconButton>
+                <IconButton onClick={() => {Dispatch({type:TableActions.EDIT_TABLE})}}>
                     <FaEdit color='bisque'/>
                 </IconButton>
             </Tooltip>
@@ -210,6 +213,7 @@ function Table({TableName , TableArg , ColumnPalette , RowPalette , UpdateButton
                 style={{ borderCollapse: "collapse", width: "100%", fontFamily: "Arial, sans-serif", fontSize: "14px"}}
                 className= {Styles['Table']}
                 >
+                {Mode == "View" ? (
                 <thead className= {Styles['Table-Head']}>
                     <tr style={{color: "rgba(127, 133, 139, 0.73)" , fontWeight:'bolder' }} >
                     {TableState && TableState.Columns.map((Column , Idx) => (
@@ -218,9 +222,18 @@ function Table({TableName , TableArg , ColumnPalette , RowPalette , UpdateButton
                         </>
                     ))}
                     </tr>
-                </thead>
+                </thead>) : (
+                    EditColumnsMap && [...EditColumnsMap.entries()].map((Key , Value) => (
+                        <>
+                            <th>{Key}</th>
+                        </>
+                    ))
+                )}
+                
                 <tbody className= {Styles['Table-Body']}>
-                    {TableState.Rows && TableState.Rows.map(
+
+                    {Mode == "View" ? TableState.Rows && TableState.Rows.map(
+                        // View Mode
                         (Row , Index) => (
                             <tr>
                                 {Row && Row.map((CellData , CellIndex) => (
@@ -228,6 +241,14 @@ function Table({TableName , TableArg , ColumnPalette , RowPalette , UpdateButton
                                 ))}
                             </tr>
                         )
+                    ) : (
+                        // Edit Mode
+                        [...EditColumnsMap.entries()].map((Key , Value) => {
+                            <tr>
+                                <td>{Value}</td>
+                            </tr>
+                            
+                        })
                     )}
                     
                 </tbody>

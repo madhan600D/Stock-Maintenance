@@ -1,5 +1,5 @@
 import React , {useState , useReducer , useRef , useEffect} from 'react'
-import Styles from './CheckoutPage.module.css'
+import Styles from './OrderPage.module.css'
 
 //Stores
 import useProduct from '../../../Stores/ProductStore.js';
@@ -13,36 +13,38 @@ import Tooltip from '@mui/material/Tooltip';
 import ShowToast from '../../Components/Toast/Toast.js'
 
 //Icons
-import { IoMdPaper } from "react-icons/io";
+import { FaShoppingCart } from "react-icons/fa";
 import { VscClearAll } from "react-icons/vsc";
 import { IoIosAdd } from "react-icons/io";
 import { MdDeleteOutline } from "react-icons/md";
+import { LiaCartArrowDownSolid } from "react-icons/lia";
+import { FaCartPlus } from "react-icons/fa";
 import { IoCartOutline } from "react-icons/io5";
 import { TiTick } from "react-icons/ti";
 import { ToastContainer } from 'react-toastify';
 
-function CheckoutPage() {
+function OrderPage() {
     //States
-    const [Check , SetCheck] = useState({ProductID:"" , ProductName:"" , Quantity:0 , Price:0});
+    const [Order , SetOrder] = useState({ProductID:"" , ProductName:"" , Quantity:0 , Price:0});
     const [TotalCost , SetTotalCost] = useState(0);
-    const [ShowAddCheck , SetShowAddCheck] = useState(false);
+    const [ShowAddOrder , SetShowAddOrder] = useState(false);
     const FormRef = useRef()
-    const {Products , AddCheckout} = useProduct()
-    const CheckActions = Object.freeze({
-        ADD_CHECK:"ADD_CHECK",
-        REMOVE_CHECK:"REMOVE_CHECK",
-        CLEAR_CHECK:"CLEAR_CHECK"
+    const {Products , AddOrder} = useProduct()
+    const OrderActions = Object.freeze({
+        ADD_ORDER:"ADD_ORDER",
+        REMOVE_ORDER:"REMOVE_ORDER",
+        CLEAR_ORDER:"CLEAR_ORDER"
     })
-    const CheckReducer = (State , Action) => {
+    const OrderReducer = (State , Action) => {
         switch(Action.Type){
-            case CheckActions.ADD_CHECK:
+            case OrderActions.ADD_ORDER:
                 //Get Product Data from global state
                 const GlobalProductIndex = Products[0].findIndex(Product => Product.ProductName == Action.Payload.ProductName);
                 
                 
                 //Duplicate validation: Add quantity on top of previous
                 let ProductIndex = -1;
-                for (let Index = 0; Index < State.length; Index += 1) {
+                for (let Index = 0; Index < State?.length; Index += 1) {
                         if (State[Index].ProductName === Action.Payload.ProductName) {
                             ProductIndex = Index;
                             break;
@@ -51,9 +53,10 @@ function CheckoutPage() {
                 if(ProductIndex !== -1){
                     //The Product already exsists so add the new count to it
                     let CurrentState = [...State];
+
                     //Compute quantity and recompute price
-                    const NewAddedProductPrice = Products[0][GlobalProductIndex].ProductPrice * Action.Payload.Quantity
-                    const NewPriceValue = (CurrentState[ProductIndex].Quantity + Action.Payload.Quantity) * Products[0][GlobalProductIndex].ProductPrice
+                    const NewAddedProductPrice = Products[0][GlobalProductIndex].ActualPrice * Action.Payload.Quantity
+                    const NewPriceValue = (CurrentState[ProductIndex].Quantity + Action.Payload.Quantity) * Products[0][GlobalProductIndex].ActualPrice
                     CurrentState[ProductIndex] = {...CurrentState[ProductIndex] , Quantity: CurrentState[ProductIndex].Quantity + Action.Payload.Quantity , Price:NewPriceValue}
                     SetTotalCost(CostState => CostState + NewAddedProductPrice)
                     return CurrentState
@@ -63,41 +66,42 @@ function CheckoutPage() {
                     return State;
                 }
                 //Compute Price
-                const NewPrice = Action.Payload.Quantity * Products[0][GlobalProductIndex].ProductPrice;
+                const NewPrice = Action.Payload.Quantity * Products[0][GlobalProductIndex].ActualPrice;
                 SetTotalCost(CostState => CostState + NewPrice);
                 return [...State , {...Action.Payload , Price:NewPrice}]
-            case CheckActions.REMOVE_CHECK:
+            case OrderActions.REMOVE_ORDER:
                 let DeducePrice = State[State.findIndex(OldCheck => OldCheck.ProductName == Action.Payload)].Price
                 SetTotalCost(CostState => CostState - DeducePrice);
                 return State.filter(Prod => Prod.ProductName !== Action.Payload);
-            case CheckActions.CLEAR_CHECK:
+            case OrderActions.CLEAR_ORDER:
                 SetTotalCost(0);
-                return  CheckInitialState;
+                return OrderInitialState;
         }
 
     }
-    const CheckInitialState = [{ProductID:'' , ProductName:'' , Quantity:'' , Price:''}];
+    const OrderInitialState = [{ProductID:'' , ProductName:'' , Quantity:'' , Price:''}];
     //Functions
-    async function ProceedToCheckout(Data) {
+    async function ProceedToPlaceOrder(Data) {
         if(Data?.ProductItems?.length < 1){
             ShowToast(false , "Please add one or more products to proceed.")
         }
-        const IsSuccess = await AddCheckout(Data);
+        const IsSuccess = await AddOrder({TotalItems:OrderState?.length - 1 , ProductItems:OrderState , TotalCost:TotalCost});
         ShowToast(IsSuccess.success , IsSuccess.message);
+        Dispatch({type:OrderActions.CLEAR_ORDER});
     }
     //Events
     useEffect(() => {
         const HandleClick = (Event) => {
             if(FormRef.current && !FormRef.current.contains(Event.target)){
                 FormRef.current.value = ""
-                SetShowAddCheck(false);
+                SetShowAddOrder(false);
             }
         }
         document.addEventListener("mousedown" , HandleClick);
         return () => document.removeEventListener("mousedown", HandleClick);
     } , [])
-    const [CheckoutState , Dispatch] = useReducer(CheckReducer , CheckInitialState);
-    const AddCheckLayout = {"AddNewCheck" : [
+    const [OrderState , Dispatch] = useReducer(OrderReducer , OrderInitialState);
+    const AddOrderLayout = {"Add New Order" : [
         {
             "":{
                 ArrayOfElements:[
@@ -110,7 +114,7 @@ function CheckoutPage() {
                         <label style={{fontSize:'0.8rem' , fontFamily:'poppins' , backgroundColor:'#0d55c3ff' , padding:'0.3rem' , borderRadius:'10px' , marginRight:'0.2rem' , marginLeft:'0.2rem'}}>
                                 CONFIRM 
                         </label>
-                        <label style={{fontSize:'0.8rem' , fontFamily:'poppins'}}>to add a check. </label>
+                        <label style={{fontSize:'0.8rem' , fontFamily:'poppins'}}>to add a ORDER. </label>
                         <label style={{fontSize:'0.8rem' , fontFamily:'poppins'}}> Click anywhere to</label>
                         <label style={{fontSize:'0.8rem' , fontFamily:'poppins' , backgroundColor:'#c3380dff' , padding:'0.3rem' , borderRadius:'10px' , marginRight:'0.2rem' , marginLeft:'0.2rem'}}>CLOSE</label>
                         <label style={{fontSize:'0.8rem' , fontFamily:'poppins'}}>the form.</label>
@@ -120,19 +124,19 @@ function CheckoutPage() {
                     <SearchBox 
                         Data={Products[0].map(Product => Product.ProductName)}
                         Logo={IoCartOutline}
-                        SelectionCallBack={(Value) => SetCheck(Prev => ({...Prev , ProductName:Value}))}
+                        SelectionCallBack={(Value) => SetOrder(Prev => ({...Prev , ProductName:Value}))}
                         PlaceHolder='Products'
                         DataType={"STRING"}
                         FilterType={"SubString"}
                         MaxItems={10}
-                        ColorPallete={["#ef9f3ecc" , "rgba(129, 129, 129, 0.8)"]}
+                        ColorPallete={["#ff3b14cc" , "rgba(129, 129, 129, 0.8)"]}
                     /> , 
                     <NumberInput 
                         label='Quantity'
-                        value={Check.Quantity}
+                        value={Order.Quantity}
                         min={1}
                         step={1}
-                        onChange={(Value) => SetCheck(Prev => ({...Prev , Quantity:Value}))}
+                        onChange={(Value) => SetOrder(Prev => ({...Prev , Quantity:Value}))}
                     />
                 ] ,
                 GridSpan:1
@@ -141,15 +145,15 @@ function CheckoutPage() {
     ]}
   return (
     <div className = {Styles['Main-Div']}>
-        <div className={Styles['Form-Div']}  style={{transform: ShowAddCheck ? "translate(25%, 10%)" : "translate(25%, -110%)"}}>
+        <div className={Styles['Form-Div']}  style={{transform: ShowAddOrder ? "translate(25%, 10%)" : "translate(25%, -110%)"}}>
             <FormComponent
                 Reference={FormRef}
-                Structure={AddCheckLayout}
-                ReducerState={CheckoutState}
+                Structure={AddOrderLayout}
+                ReducerState={OrderState}
                 LoadingState={false}
                 SubmitCallback={() => {
-                    Dispatch({Type:CheckActions.ADD_CHECK , Payload:Check})
-                    SetShowAddCheck(false)
+                    Dispatch({Type:OrderActions.ADD_ORDER , Payload:Order})
+                    SetShowAddOrder(false)
                 }}
 
             />
@@ -157,27 +161,27 @@ function CheckoutPage() {
         <div className = {Styles['Top-Div']}>
         {/* About this page details */}
         <div style={{display:'flex' , alignItems:'center' , justifyContent:'center' , fontSize:'1.6rem' , gap:'0.6rem' , backgroundColor:'#1E232B' , padding:'0.6rem' , borderRadius:'10px'}}>
-            <IoMdPaper />
-            <label className={Styles['Styled-Label']}>Checkouts</label>
+            <FaShoppingCart />
+            <label className={Styles['Styled-Label']}>Orders</label>
         </div>
         <div className = {Styles['PageDesc-Div']}>
-            <label style={{fontSize:'0.8rem' , fontFamily:'poppins'}}>Product billing page, Click on:</label>
+            <label style={{fontSize:'0.8rem' , fontFamily:'poppins'}}>Place order to vendors to replenish inventoty, Click on:</label>
             <label style={{fontSize:'0.8rem' , fontFamily:'poppins' , backgroundColor:'#2e4870ff' , padding:'0.3rem' , borderRadius:'10px' , marginRight:'0.2rem' , marginLeft:'0.2rem'}}>
-                    Add Check 
+                    Add Order 
             </label>
             <label style={{fontSize:'0.8rem' , fontFamily:'poppins'}}>
-                to add a bill and place a checkout by clicking on: 
+                to add a product and click: 
             </label>
-            <label style={{fontSize:'0.8rem' , fontFamily:'poppins' , backgroundColor:'#2e7032ff' , padding:'0.3rem' , borderRadius:'10px' , marginRight:'0.2rem' , marginLeft:'0.2rem'}}>Proceed Checkout</label>
-            <label style={{fontSize:'0.8rem' , fontFamily:'poppins'}}>button.</label>
+            <label style={{fontSize:'0.8rem' , fontFamily:'poppins' , backgroundColor:'#2e7032ff' , padding:'0.3rem' , borderRadius:'10px' , marginRight:'0.2rem' , marginLeft:'0.2rem'}}>Place Order</label>
+            <label style={{fontSize:'0.8rem' , fontFamily:'poppins'}}>button to place a order via Email to vendor.</label>
         </div>
         </div>
         <div className = {Styles['Action-Div']}>
         {/* Product add Button , clear button */}
                 
-        <button onClick={() => SetShowAddCheck(true)} className= {Styles['Action-Button']}><IoIosAdd size={'1rem'} color='#adbdd5ff'/>Add Check</button>
-        <button onClick={() => {Dispatch({Type:CheckActions.CLEAR_CHECK})}} className= {Styles['Action-Button']}><VscClearAll size={'1rem'} color='#adbdd5ff'/>Clear all</button>
-        <label style={{position:'absolute' , right:'0' , fontSize:'0.8rem' , fontFamily:'poppins' , backgroundColor:'#6fb6f471' , padding:'0.3rem' , borderRadius:'10px' , marginRight:'0.2rem' , marginLeft:'0.2rem'}}>Total Checks: {CheckoutState?.length - 1}</label>
+        <button onClick={() => SetShowAddOrder(true)} className= {Styles['Action-Button']}><FaCartPlus size={'1rem'} color='#adbdd5ff'/>Add Order</button>
+        <button onClick={() => {Dispatch({Type:OrderActions.CLEAR_ORDER})}} className= {Styles['Action-Button']}><VscClearAll size={'1rem'} color='#adbdd5ff'/>Clear all</button>
+        <label style={{position:'absolute' , right:'0' , fontSize:'0.8rem' , fontFamily:'poppins' , backgroundColor:'#6fb6f471' , padding:'0.3rem' , borderRadius:'10px' , marginRight:'0.2rem' , marginLeft:'0.2rem'}}>Total Orders: {OrderState?.length - 1}</label>
         </div>
         <div className = {Styles['Table-Div']}>
             <table
@@ -196,19 +200,19 @@ function CheckoutPage() {
                     </tr>
                 </thead>
                 <tbody className= {Styles['Table-Body']}>
-                    {CheckoutState && CheckoutState.map(
-                        (Check , Index) => (Index !== 0 ?
+                    {OrderState && OrderState.map(
+                        (Order , Index) => (Index !== 0 ?
                             <tr>
                                 <td>{Index}</td>
-                                <td>{Check.ProductName}</td>
-                                <td>{Check.Quantity}</td>
-                                <td>{Check.Price}</td>
+                                <td>{Order.ProductName}</td>
+                                <td>{Order.Quantity}</td>
+                                <td>{Order.Price}</td>
                                 <td>
                                     <ActionButton 
                                         ButtonColor={'transparent'}
                                         Logo={MdDeleteOutline}
                                         ToolTipText={'Remove'}
-                                        Callback={() => {Dispatch({Type:CheckActions.REMOVE_CHECK , Payload:Check.ProductName})}}
+                                        Callback={() => {Dispatch({Type:OrderActions.REMOVE_ORDER , Payload:Order.ProductName})}}
                                     />
                             </td>
                             </tr>
@@ -221,15 +225,15 @@ function CheckoutPage() {
         </div>
         <div className = {Styles['Summary-Div']}>
             
-            <label style={{fontSize:'0.8rem' , fontFamily:'poppins'}}>Total Cost:</label>
+            <label style={{fontSize:'0.8rem' , fontFamily:'poppins'}}>Total Order Cost:</label>
             <label style={{fontSize:'0.8rem' , fontFamily:'poppins' , backgroundColor:'#2e4870ff' , padding:'0.3rem' , borderRadius:'10px' , marginRight:'0.2rem' , marginLeft:'0.2rem'}}>
                 {/*TBD: Remove the / 2 in production: It is Added to eliminate double counting due to strict mode */}
-                    {TotalCost / 2} 
+                    {TotalCost ? TotalCost / 2 : 0} 
             </label>
         </div>
         <div className = {Styles['Footer-Div']}>
             <Tooltip title = '' arrow>
-                    <button onClick={() => {ProceedToCheckout({TotalItems:CheckoutState?.length - 1 , ProductItems:CheckoutState , TotalCost:TotalCost})}} style={{backgroundColor:'rgba(46, 146, 42, 1)'}} className= {Styles['Action-Button']}><TiTick size={'1rem'} color='#adbdd5ff'/>Proceed CheckOut</button>
+                    <button onClick={() => {ProceedToPlaceOrder({TotalItems:OrderState.length , ProductItems:OrderState , TotalCost:TotalCost})}} style={{backgroundColor:'rgba(46, 146, 42, 1)'}} className= {Styles['Action-Button']}><LiaCartArrowDownSolid size={'1rem'} color='#adbdd5ff'/>Place Order</button>
             </Tooltip>
                     
         </div>
@@ -238,4 +242,4 @@ function CheckoutPage() {
   )
 }
 
-export default CheckoutPage
+export default OrderPage

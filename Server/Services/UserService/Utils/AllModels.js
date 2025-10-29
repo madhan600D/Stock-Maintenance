@@ -22,6 +22,8 @@ import ProductModel from "../Models/InventoryModels/Product.Model.js";
 import VendorModel from "../Models/InventoryModels/Vendor.Model.js";
 import CheckOutModel from "../Models/InventoryModels/CheckOut.Model.js";
 import CurrencyModel from "../Models/InventoryModels/Currency.Model.js";
+import ProductDeliveryTimeModel from "../Models/InventoryModels/ProductDeliveryTime.Model.js";
+import ConfirmedOrdersModel from "../Models/InventoryModels/ConfirmedOrders.model.js";
 import OrdersModel from "../Models/InventoryModels/Orders.Model.js";
 import HolidayModel from "../Models/InventoryModels/Holiday.Model.js";
 import ScreensModel from "../Models/InventoryModels/Screens.Model.js";
@@ -46,7 +48,7 @@ export async function InitializeDataBase(){
       pendingUsers: pendingUserModel(userDB, DataTypes),
       ConfigurationSettings: configurationSettingsModel(userDB, DataTypes),
       ConsumedEvents: ConsumedEventsModel(userDB, DataTypes),
-      ProducedEvents: producedEventsModel(userDB, DataTypes),
+      ProducedEvents: producedEventsModel(userDB, DataTypes), 
       LoadingTexts: LoadingTextsModel(userDB, DataTypes),
       RoleDetails: RoleDetailsModel(userDB, DataTypes),
       userErrorLog: userErrorLogModel(userDB , DataTypes),
@@ -57,6 +59,8 @@ export async function InitializeDataBase(){
       CheckOuts: CheckOutModel(InventoryDB, DataTypes),
       Currency: CurrencyModel(InventoryDB, DataTypes),
       Orders: OrdersModel(InventoryDB, DataTypes),
+      ConfirmedOrders:ConfirmedOrdersModel(InventoryDB , DataTypes),
+      ProductDeliveryTime:ProductDeliveryTimeModel(InventoryDB , DataTypes),
       Holidays: HolidayModel(InventoryDB, DataTypes),
       Screens: ScreensModel(InventoryDB, DataTypes),
       OrgState: OrganizationStateModel(InventoryDB , DataTypes),

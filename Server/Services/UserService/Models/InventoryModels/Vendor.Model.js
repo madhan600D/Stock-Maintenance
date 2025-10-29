@@ -30,8 +30,8 @@ export default (sequelize , DataTypes) => {
     timestamps: true,
     createdAt:'VendorCreatedAt' ,
     updatedAt:false,
-    tableName: 'Vendor',
+    tableName: 'Vendors',
   });
 
-  return VendorModel
+  return VendorModel 
 }

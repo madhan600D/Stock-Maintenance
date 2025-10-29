@@ -30,6 +30,22 @@ export const CreateUserController = async (Topic , Partition , Message) =>{
                 return {success:false , message:"Mail resent failed at Notification service end"}
             } 
         }
+        else if(Message.Event === "CreateExternalUser"){
+            const ObjUserCreation  = new UserCreation(Message.Data.UserMail , Message.Data.UserName);
+            const UserData = {UserName:Message.Data.UserName , UserMail:Message.Data.UserMail}
+            
+            const NewUser = await ObjUserCreation.CreateUser(UserData.UserName , UserData.UserMail , "" , CreateUserTransaction , false);
+
+            if(NewUser.success){
+                await CreateUserTransaction.commit()
+                return NewUser
+            }
+            else{
+                await CreateUserTransaction.rollback();
+                return NewUser
+            }
+            
+        }
     } catch (error) {
         !CreateUserTransaction.finished ? await CreateUserTransaction.rollback() : ""
         return {success:false , message:`Notification Server side error at User Creation Controller` + error.message}

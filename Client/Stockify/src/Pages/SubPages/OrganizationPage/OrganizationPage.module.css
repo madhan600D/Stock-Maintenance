@@ -7,7 +7,21 @@
     min-height: 40rem;
     height: 100%;
 }
-
+.Form-Div{
+    display: flex;
+    background-color:#303232;
+    border:1px solid #ffffff81;
+    z-index: 2;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    padding: 1rem;
+    height:max-content;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    width: max-content;
+    overflow: hidden;
+}
 .Top-Div{
     display: flex;
     flex-direction: row;

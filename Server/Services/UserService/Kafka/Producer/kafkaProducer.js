@@ -34,9 +34,17 @@ export class KafkaProducer{
     }
     LogEvent = async (topic , event) => {
         try {
+            let EventAttribute ;
+
+            if(event.Data.hasOwnProperty('HTML')){
+                EventAttribute = "<HTML></HTML>"
+            }
+            else{
+                EventAttribute = event.Data;
+            }
             const ProducedEvent = await this.DataBase.AllModels.ProducedEvents.create({
                 Topic:topic,
-                Event:JSON.stringify(event.Data),
+                Event:JSON.stringify(EventAttribute),
                 IsResponseReceived:false
             })
             return ProducedEvent.ProducedEventID

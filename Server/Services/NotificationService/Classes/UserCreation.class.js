@@ -9,16 +9,34 @@ export class UserCreation{
         this.KafkaResponse = {}
         this.ErrorObj = {success:true , message:""}
     }
-    CreateUser = async (UserName , UserMail , RequestHash , transaction) => {
+    CreateUser = async (UserName , UserMail , RequestHash = "" , transaction , SendMailVerification = true) => {
         try {
-            
-            
             await this.UserDataValidations(UserName , UserMail)
+
             if (!this.ErrorObj.success) {
                 return {success:false , message:"User validation failed"}
             } 
             this.UserData = { UserName, UserMail }
+
+            await this.InitializeUserTables(transaction);
             
+            //TBD:Send Verification Email
+            if(SendMailVerification){
+                var IsEmailSent = await this.ObjVerificationEmail.SendEmailVerification(RequestHash , "Verification" , transaction)
+                return IsEmailSent;
+            }
+            return {success:true , message:"User created successfully"}
+            
+        }
+        catch(error) {
+            this.ErrorObj = {success:false , message:"System error while user data validations" + error.message};
+            return {success:false , message:"User Creation failed NS"}
+
+        }
+    }
+
+    async InitializeUserTables(transaction){
+        try {
             //Database
             const IsDataAddedAtUserTable = await this.AddUserToUsersTable(this.UserData , transaction)
             if (!this.ErrorObj.success) {
@@ -31,24 +49,9 @@ export class UserCreation{
             if (!this.ErrorObj.success) {
                 return {success:false , message:"User creation failed"}
             }
-            //TBD:Send Verification Email
-            const IsEmailSent = await this.ObjVerificationEmail.SendEmailVerification(RequestHash , "Verification" , transaction)
-            //TBD: Produce a kafka response: User Added Succesfully
-            if(IsEmailSent?.success){
-                // let KafkaResponse = {}
-                // this.KafkaResponse.Event = 'EmailSent'
-                // this.KafkaResponse.Data = {Success:true , UserName:this.UserData.UserName , UserMail:this.UserData.UserMail}
-                // await ObjNotificationKafkaProducer.ProduceEvent(KafkaResponse.Event , 'user.create_user.response' , this.KafkaResponse)
-                return {success:true}
-            }
-            else{
-                
-                return {success:false}
-            }
-        }
-        catch(error) {
-            this.ErrorObj = {success:false , message:"System error while user data validations" + error.message};
-
+        } catch (error) {
+            console.log(error)
+            this.ErrorObj = {success:false , message:"System error while table initializations" + error.message};
         }
     }
     UserDataValidations = async (UserName , UserMail) => {

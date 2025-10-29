@@ -27,8 +27,6 @@ function ItemAdder({ButtonText , ItemLimit , Description , ButtonCallBack}) {
     const HandleItemAddClick = async () => {
         if(BulkMailRef?.current.value){
             MailValidate()
-            // //Clear the input box
-            // BulkMailRef.current.value = ""
         }
         else{
             ShowToast()
@@ -106,20 +104,16 @@ function ItemAdder({ButtonText , ItemLimit , Description , ButtonCallBack}) {
                     TBCallBack={() => {}}
                     Reference={BulkMailRef}
                     IsLoading={false}
-                    ColorPallete={["rgba(40, 185, 198, 0.66)" , "rgba(2, 69, 75, 0.66)"]}
+                    ColorPallete={["#de4613a8" , "#d02908a8"]}
                 />
             </div>
             
-            {/* <button ref={ButtonRef} className = {Styles['Submit-Btn']} onClick={() => {HandleItemAddClick()}}>
-                <BsFillSendArrowUpFill className = {Styles['Add-Svg']} />
-            </button> */}
-
             <ButtonWithToolTip
                 Reference={ButtonRef}
                 ButtonLogo={BsFillSendArrowUpFill}
                 ButtonCallBack={HandleMainCallBack}
                 ToolTipText={ButtonText}
-                ColorPalatte={["rgba(255, 255, 255, 0.66)" , "rgba(255, 255, 255, 0.66)" , "rgba(1, 113, 147, 0.66)"]}
+                ColorPalatte={["rgba(255, 255, 255, 0.66)" , "rgba(255, 255, 255, 0.66)" , "#de4613a8"]}
             />
 
         </div>

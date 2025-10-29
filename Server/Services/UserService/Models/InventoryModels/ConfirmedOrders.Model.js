@@ -1,10 +1,11 @@
 export default (sequelize , DataTypes) => {
-    const OrderModel = sequelize.define('Orders', {
-        OrderID:{
+    const OrderConfirmModel = sequelize.define('OrderConfirm', {
+        OrderHistoryID:{
             type:DataTypes.INTEGER,
             allowNull:false,
             primaryKey:true,
             autoIncrement:true
+
         },
         OrganizationID:{ 
             type:DataTypes.INTEGER,
@@ -22,10 +23,6 @@ export default (sequelize , DataTypes) => {
                 key:'VendorID'
             }
         },
-        OrderDate:{
-            type:DataTypes.DATEONLY,
-            allowNull:false
-        },
         //Array of JSON containing order details
         OrderJSON:{
             type:DataTypes.STRING,
@@ -38,31 +35,30 @@ export default (sequelize , DataTypes) => {
                 this.setDataValue("OrderJSON", JSON.stringify(value));
             },
         },
-        OrderCost:{
+        DaysToDeliver:{
             type:DataTypes.INTEGER,
             allowNull:false,
         },
-        //Is order active or not, Giving the ability to cancel the order
-        Active:{
-            type:DataTypes.BOOLEAN,
-            allowNull:false
+        OrderCost:{
+            type:DataTypes.INTEGER,
+            allowNull:false,
         }
     } , {
-        tableName:'Orders',
+        tableName:'OrderConfirm',
         timestamps:true,
-        createdAt:'OrderPlacedAt',
-        updatedAt:false
+        updatedAt:false,
+        createdAt:'OrderDeliveredAt'
     })
 
-    OrderModel.associate = (models) => {
-        OrderModel.belongsTo(models.organizations, {
-            foreignKey: 'OrganizationID',
-            targetKey: 'organizationId', 
-        });
-        OrderModel.belongsTo(models.Vendors, {
+    OrderConfirmModel.associate = (models) => { 
+        OrderConfirmModel.belongsTo(models.Vendors, {
             foreignKey: 'VendorID',
             targetKey: 'VendorID', 
         });
+        OrderConfirmModel.belongsTo(models.organizations, {
+            foreignKey: 'OrganizationID',
+            targetKey: 'organizationId', 
+        });
     }
-    return OrderModel;
+    return OrderConfirmModel;
 }

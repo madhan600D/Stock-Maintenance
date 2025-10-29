@@ -7,10 +7,13 @@ import useOrg from '../Stores/OrgStore.js'
     
     //Fallback States
     IsProductsLoading:false,
+
+    //Global States
     Category:[],
     Products:[],
     Vendors:[],
     Currency:[],
+    Orders:[],
     HighSellingProducts:[],
     PNL:{TotalRevenue:0 , TotalExpense:0},
     GetProducts : async(CatID = 0) => {
@@ -87,6 +90,35 @@ import useOrg from '../Stores/OrgStore.js'
             return {success:false , message:error?.response.data.message || "Error processing this checkout"}
         }
         
+    },
+    AddOrder:async(Data) => {
+        try {
+            //Remove first dummy product
+            Data.ProductItems = Data.ProductItems.filter(P => P.ProductName !== "");
+            const Validation = Validate("AddOrder", Data);
+            //Assign Product IDs
+            
+            const Products = UseProduct.getState().Products;
+            for (let Product of Data.ProductItems){
+                let GlobalProductIndex =  Products[0].findIndex(Prod => Product.ProductName == Prod.ProductName);
+                Product.ProductID = Products[0][GlobalProductIndex].ProductID
+            }
+            if(!Validation.success){
+                return {success:false , message:Validation.message || "Checkout validation failed."}
+            }
+            const res = await AxiosInstance.put('api/userservice/inv/add_order' , Data);
+            const DataFromBackEnd = res.data.data;
+
+            //Fill GlobalState:Order
+
+            set((State) => ({
+                Orders:[...State.Orders , ...DataFromBackEnd]
+            }))
+            return {success:true , message:"Order placed successfully....!"};
+        } catch (error) {
+            console.log(error)
+            return {success:false , message:error?.response?.data?.message ?? "Error while placing order"};
+        }
     },
     GetCurrency:async() => {
         try {
@@ -249,6 +281,13 @@ const Validate =  (ValidationType , Data) => {
         return {success:true , message:"Validation successfull ...!"}
     }
     else if(ValidationType == "AddCheckout"){
+        const {TotalItems , ProductItems , TotalCost} = Data;
+        if(TotalItems < 1){
+            return {success:false , message:"Select atleast one item to checkout"};
+        }
+        return {success:true};
+    }
+    else if(ValidationType == "AddOrder"){
         const {TotalItems , ProductItems , TotalCost} = Data;
         if(TotalItems < 1){
             return {success:false , message:"Select atleast one item to checkout"};

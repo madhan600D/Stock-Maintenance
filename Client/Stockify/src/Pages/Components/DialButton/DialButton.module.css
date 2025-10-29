@@ -1,14 +1,73 @@
+.Main-Div{
+    width: max-content;
+    display: flex;
+    align-items: center;
+    position: relative;
+    flex-direction: column-reverse;
+}
 
+.Dial-Div{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 0.5rem;
+    width: 2rem;
+    height: 2rem;
+}
 
+.Map-Div{
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 1rem;
+}
 
+.Action-Button{
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.2rem;
+    font-size: 0.8rem;
+    font-family: 'Poppins', sans-serif;
+    background-color: rgba(62, 76, 98, 0.358);
+    padding: 0.4rem;
+    border-radius: 50%;
+    width: 3rem;
+    height: 3rem;
+    margin: 0 0.2rem;
+    border: 1px solid rgba(138, 136, 132, 0.397);
+    opacity: 0;          
+    transform: translateY(3rem);  
+    transition: all 0.3s ease;
+}
 
+/* Animate on hover of Main-Div or Dial-Div */
+.Main-Div:hover .Action-Button {
+    animation: RollAnimation 0.5s ease forwards;
+}
 
+.Main-Div:hover .X-Logo {
+    transition: all 0.3s ease;
+    transform: rotateZ(45deg);
+}
 
+@keyframes RollAnimation{
+    0%{
+        opacity: 0;
+        transform: translateY(3rem);
+    }
+    100%{
+        opacity: 1;
+        transform: translateY(-1rem);
+    }
+}
 
-
-
+.X-Logo{
+    font-size: 2rem;
+    transition: all 0.3s ease;
+}
 
 .X-Logo:hover{
-    transition: all 0.3s ease-in-out;
-    transform: rotatez(45deg);
+    
 }

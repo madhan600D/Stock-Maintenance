@@ -121,6 +121,8 @@ function SideBar() {
   {
     MenuLogo: FaCartArrowDown,
     MenuText: "Orders",
+    URL:'/orders',
+    Callback:HandleSubPageChange
   },
   {
     MenuLogo: FaUsers,

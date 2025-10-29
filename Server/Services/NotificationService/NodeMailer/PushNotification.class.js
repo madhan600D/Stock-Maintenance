@@ -33,7 +33,7 @@ SendMail = async (transaction) => {
             where: {
                 [Op.and]: [
                     { ReceiverID: this.UserData.UserID }, 
-                    { Subject: this.ParentMailOptions.subject }
+                    { Subject: this.ParentMailOptions.subject || ""}
                 ]
             } , transaction:transaction
         });
@@ -116,14 +116,17 @@ SendMail = async (transaction) => {
                 this.ErrorObj.success = false
                 return 
             }
-            const IsBucketOverFlow = await objNotificationDB.NotificationBuckets.findOne(
-                    {include: 
-                    [{
-                        model: objNotificationDB.Users,
-                        attributes: ['UserName'] 
-                    }]},
-                    {where:{UserName:UserName} , transaction}
-                )
+            const IsBucketOverFlow = await objNotificationDB.NotificationBuckets.findOne({
+            where: { UserID: this.UserData.UserID },
+            include: [
+                {
+                    model: objNotificationDB.Users,
+                    attributes: ['UserName']
+                }
+            ],
+            transaction
+        });
+
             if(!IsBucketOverFlow){
                 //Create a bucket If not bucket is available: (First Mail to Receipient)
                 const CreatedBucket = await objNotificationDB.NotificationBuckets.create(
@@ -132,7 +135,7 @@ SendMail = async (transaction) => {
                         BucketCreatedTime:CurrentTime,
                         NotificationsInBucket:0,
                     } , {transaction: transaction}
-                )
+                ) 
                 return {success:true}
             }
             //Calculate time differnece between Mail Bucket Created Time and now

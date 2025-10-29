@@ -11,6 +11,8 @@ import { GetProductsForOrganization, AddProductForOrganization , GetCategoryForO
 import { AlterWorker, GetUsers , GetVendors } from '../Controller/InventoryControllers/UserManagement.controller.js';
 import { AddVendor } from '../Controller/InventoryControllers/Vendor.controller.js';
 import { AddCheckOut , GetCurrentDayCheckout} from '../Controller/InventoryControllers/Checkout.controller.js';
+import { ConfirmOrder, PlaceManualOrder } from '../Controller/InventoryControllers/Order.controller.js';
+import { ConfirmOrderValidate } from '../MiddleWares/EndPointValidations/InventoryEndPointValidations/Orders.validate.js';
 
 const InventoryRouter = express.Router();
 
@@ -42,5 +44,9 @@ InventoryRouter.get('/get_today_checkout' , GetCurrentDayCheckout);
 InventoryRouter.get('/get_workforce' ,  GetUsers);
 InventoryRouter.get('/get_vendors' ,  GetVendors);
 InventoryRouter.patch('/alter_worker' , AlterWorker);
+
+//Order Routers
+InventoryRouter.put('/add_order' , PlaceManualOrder)
+InventoryRouter.put('/confirm_order' , ConfirmOrderValidate , ConfirmOrder);
 export default InventoryRouter
 
