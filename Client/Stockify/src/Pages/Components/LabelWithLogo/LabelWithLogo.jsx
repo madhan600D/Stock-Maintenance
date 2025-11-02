@@ -6,8 +6,8 @@ import { GiPlainSquare } from "react-icons/gi";
 function LabelWithLogo({Header , Value , Logo , BGColor , Dimension}) {
   return (
     <div className = {Styles['Main-Div']} style={{
-    height: Dimension !== undefined ? `${Dimension[1]}px` : "",
-    width: Dimension !== undefined ? `${Dimension[0]}px` : ""
+    height: Dimension !== undefined ? `${Dimension[1]}` : "",
+    width: Dimension !== undefined ? `${Dimension[0]}` : ""
     }}>
         <div style={{backgroundColor:BGColor}} className={Styles['Logo-Div']}>
             <Logo className = {Styles['Logo']} />

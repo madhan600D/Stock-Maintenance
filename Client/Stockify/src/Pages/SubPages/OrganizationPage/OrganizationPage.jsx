@@ -6,6 +6,9 @@ import { BsBuildingFill } from "react-icons/bs";
 import { StateToTable } from '../../../Utils/QueryToObject';
 import { HiMiniMegaphone } from "react-icons/hi2";
 import { CiShare2 } from "react-icons/ci";
+import { FaShop } from "react-icons/fa6";
+import { SlCalender } from "react-icons/sl";
+
 
 //Stores
 import useOrg from '../../../Stores/OrgStore';
@@ -15,11 +18,15 @@ import Table from '../../Components/Table/Table.jsx'
 import DialButton from '../../Components/DialButton/DialButton.jsx';
 import InviteToOrgPage from '../InviteToOrgPage/InviteToOrgPage.jsx';
 import TextBoxWithLogo from '../../Components/TextBoxWithLogo/TextBoxWithLogo.jsx';
+import Button from '@mui/material/Button';
+import ActionButton from '../../Components/ActionButton/ActionButton.jsx';
+import TypingSuspense from '../../Components/Suspense Components/TypingSuspense/TypingSuspense.jsx';
 function OrganizationPage() {
     const [ShowInviteDiv , SetShowInviteDiv] = useState(false);
+    const [ShowCloseDayPage , SetShowCloseDayPage] = useState(false);
     const [OrganizationDataState , SetOrganizationDataState] = useState();
     const [PNLData , SetPNLData] = useState();
-    const {OrganizationData} = useOrg();
+    const {OrganizationData , IsClosingDay} = useOrg();
     const FormRef = useRef()
    const OrgDataEditColumnMap = new Map([
   [
@@ -35,7 +42,7 @@ function OrganizationPage() {
   ]
 ]);
 
-    const DialActions = [{Logo:HiMiniMegaphone , Callback:() => {SetShowInviteDiv(true)} , Tooltip:"Invite"} , {Logo:CiShare2 , Callback:() => {console.log("Summa")} , Tooltip:"Share"}]
+    const DialActions = [{Logo:HiMiniMegaphone , Callback:() => {SetShowInviteDiv(true)} , Tooltip:"Invite"} , {Logo:CiShare2 , Callback:() => {console.log("Summa")} , Tooltip:"Share"} , {Logo:SlCalender , Callback:() => {SetShowCloseDayPage(true)} ,Tooltip:"CloseDay"}]
     //Effects
     useEffect(() => {
         const OrgDetailsTable = StateToTable(useOrg.getState().OrganizationData , {} , ["RunDate" , "OrganizationName","CurrentDaySales","ClosingTime","Weekends"])
@@ -50,6 +57,7 @@ function OrganizationPage() {
             if(FormRef.current && !FormRef.current.contains(Event.target)){
                 FormRef.current.value = ""
                 SetShowInviteDiv(false);
+                SetShowCloseDayPage(false);
             }
         }
         document.addEventListener("mousedown" , HandleClick);
@@ -59,6 +67,31 @@ function OrganizationPage() {
     <div className = {Styles['Main-Div']}>
             <div ref={FormRef} className={Styles['Form-Div']}  style={{transform: ShowInviteDiv ? "translate(25%, 10%)" : "translate(25%, -110%)"}}>
                 <InviteToOrgPage />
+            </div>
+            <div ref={FormRef} className={Styles['Form-Div']}  style={{transform: ShowCloseDayPage ? "translate(60%, 10%)" : "translate(60%, -110%)"}}>
+                <div className = {Styles['CloseDay-Div']}>
+                    <div className = {Styles['Top-Div']}>
+                            {/* About this page details */}
+                            <div style={{display:'flex' , alignItems:'center' , justifyContent:'center' , fontSize:'1.6rem' , gap:'0.6rem' , backgroundColor:'#1E232B' , padding:'0.6rem' , borderRadius:'10px'}}>
+                                <FaShop />
+                                <label className={Styles['Styled-Label']}>Close Day</label>
+                            </div>
+                    </div>
+                    <div className = {Styles['PageDesc-Div']} style={{marginBottom:'2rem'}}>
+                                <label style={{fontSize:'0.8rem' , fontFamily:'poppins' }}>Move you'r organization to the next day by clicking:</label>
+                                <label style={{fontSize:'0.8rem' , fontFamily:'poppins' , backgroundColor:'#2e4870ff' , padding:'0.8rem' , borderRadius:'10px' , marginRight:'0.2rem' , marginLeft:'0.2rem'}}>
+                                        <SlCalender /> Close Day
+                                </label>
+                                <label style={{fontSize:'0.8rem' , fontFamily:'poppins'}}>
+                                    Button.
+                                </label>
+                    </div>
+                    <div style={{display:'flex' , justifyContent:'center' , width:'100%'}}>
+                        <button disabled = {IsClosingDay} style={{width:'15rem' , height:'3rem'}} onClick={() => console.log("test")} className= {Styles['Action-Button']}>{IsClosingDay == true ? <TypingSuspense /> :<SlCalender size={'1rem'} color='#adbdd5ff'/>}{!IsClosingDay ? 'Close Day' : ''}</button>
+                        
+                    </div>
+                    
+                </div>
             </div>
          <div className = {Styles['Top-Div']}>
                    {/* About this page details */}

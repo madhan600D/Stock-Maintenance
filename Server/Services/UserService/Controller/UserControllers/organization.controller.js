@@ -6,6 +6,10 @@ import objInventoryDataBase from '../../Utils/InventoryDB.js'
 
 //Kafka
 import {ObjUserKafkaProducer} from '../../Kafka/Producer/kafkaProducer.js'
+
+//Objects
+import {ObjDateManipulations} from '../../Class/DateManipulation.class.js'
+import ObjAutoCloseDay from "../../Class/AutoCloseDay.class.js"
 export const joinOrg = async (req , res) => {
     //TBD: When adding user to a ORG a mail is sent to Admin and a task will be added in his task list
     //API Structure:{JoinId , userName , userId} request
@@ -104,7 +108,7 @@ export const createOrg = async (req , res) => {
 
         //Data entry in OrgState Table
         const OrgState = await objInventoryDataBase.AllModels.OrgState.create({
-            OrganizationID:newOrganization.organizationId , RunDate: dayjs().format("YYYY-MM-DD") , CurrentDaySales:0 , ClosingTime:ClosingTime , Weekends:Weekends.toString() , AutoDayShiftFlag: 1
+            OrganizationID:newOrganization.organizationId , RunDate: dayjs().format("YYYY-MM-DD") , CurrentDaySales:0 , ClosingTime:ClosingTime , Weekends:Weekends.toString() , AutoDayShiftFlag: 1 , IsDayClosed:0
         } , {transaction:CreateOrgTransaction})
 
         //Data entry to PNL Table
@@ -195,3 +199,42 @@ export const acceptOrgRequest = async (req) =>{
         await objUserDb.AllModels.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
     }
 }
+
+export const ManualCloseDay = async(req , res) => {
+    try {
+        //Declarations
+        let ClientData = {};
+        var Transaction = await objInventoryDataBase.InventoryDB.transaction();
+
+        const OrganizationState = await objInventoryDataBase.AllModels.OrgState.findOne({where:{OrganizationID:req.user.organizationId}});
+        const NextRundate = await ObjDateManipulations.GetNextBusinessDay(OrganizationState.RunDate , {OrganizationID:req.user.organizationId});
+
+        if(!NextRundate.success){
+            return res.status(500).json({Success:NextRundate.success , message:NextRundate.message});
+        }
+
+        const [Count, NewOrganizationState] = await objInventoryDataBase.AllModels.OrgState.update(
+                                    { RunDate: NextRundate.data, CurrentDaySales: 0  , IsDayClosed:1},
+                                    {
+                                        where: { OrganizationID: req.user.organizationId },
+                                        transaction: Transaction,
+                                        returning: true,
+                                        raw:true
+                                    }
+                                    );
+                                    
+        ClientData.OrgState = NewOrganizationState[0];
+
+        //Update internal Orgstate Map
+        ObjAutoCloseDay.OrganizationCloseTimings.set(ClientData.OrgState.OrganizationID , {ClosingTime:NewOrganizationState[0].ClosingTime , IsDayClosed:NewOrganizationState[0].IsDayClosed})
+
+        await Transaction.commit()
+        //TBD:Simulation and place auto orders
+        return res.status(200).json({success:true , message:"Organization closed and moved to the next day...!"})
+    } catch (error) {
+        await objUserDb.AllModels.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
+        await Transaction.rollback()
+    }
+}
+
+

@@ -1,5 +1,7 @@
 import { Op } from "sequelize"
 import objUserDb from "../../../Utils/userDB.js"
+import AccessControl from "../../../Class/AccessControl.class.js"
+import { ActionEnum, ControlEnum } from "../../../Declarations/PublicEnums.js"
 export const CreateOrgValidate = async (req , res , next) => {
     try {
         const {OrganizationName , TypeOfBusiness , Address , ClosingTime , Weekends} = req?.body 
@@ -44,7 +46,6 @@ export const GroupInviteToOrgValidate = async (req , res , next) => {
         //Validate if self invitation is triggered
         GroupOfUsers = GroupOfUsers.filter((User) => User !== IsValidAdmin.user.userMail && User !== '');
 
-        console.log(GroupOfUsers)
         //Attach Org Data to the next middle ware
         req.OrganizationData = {OrganizationName:IsValidAdmin.organization.organizationName ,
                                 OrganizationJoiningCode:IsValidAdmin.organization.OrganizationJoiningCode};
@@ -52,6 +53,22 @@ export const GroupInviteToOrgValidate = async (req , res , next) => {
         req.UserData = {UserName:IsValidAdmin.user.userName , UserID:UserID}
 
         next();
+    } catch (error) {
+        await objUserDb.AllModels.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
+        return res.status(500).json({success:false , message:error.message})
+    }
+}
+
+export const CloseDayValidate = async(req , res , next) => {
+    try {
+        const ObjAccessControl = new AccessControl()
+        const IsPermitted = await ObjAccessControl.VerifyAccessControl(req.user.userId , ActionEnum.ALTER , ControlEnum.SETTINGS);
+
+        if(!IsPermitted){
+            return res.status(400).json({success:false , message:"You don't have access to close day."})
+        }
+
+        next()
     } catch (error) {
         await objUserDb.AllModels.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
         return res.status(500).json({success:false , message:error.message})

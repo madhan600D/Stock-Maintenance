@@ -2,7 +2,7 @@ import useOrg from "../Stores/OrgStore.js";
 import UseProduct from "../Stores/ProductStore.js";
 
 export const useFillInventoryStates = () => {
-  const { GetProducts, GetCategory, GetVendors, GetCurrency , GetCurrentDayCheckout } = UseProduct();
+  const { GetProducts, GetCategory, GetVendors, GetCurrency , GetCurrentDayCheckout, FillOrderStates ,CurrentOrders} = UseProduct();
   const {FillOrgData} = useOrg();
 
   const FillInventoryStates = async () => {
@@ -13,8 +13,10 @@ export const useFillInventoryStates = () => {
         GetVendors(),
         GetCurrency(),
         FillOrgData(),
-        GetCurrentDayCheckout()
+        GetCurrentDayCheckout(),
+        FillOrderStates()
       ]);
+      console.log("These are current orders:" , CurrentOrders)
     } catch (error) {
       console.log("Failed to load", error.message);
     }

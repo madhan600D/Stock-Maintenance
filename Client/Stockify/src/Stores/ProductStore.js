@@ -13,7 +13,8 @@ import useOrg from '../Stores/OrgStore.js'
     Products:[],
     Vendors:[],
     Currency:[],
-    Orders:[],
+    CurrentOrders:[],
+    OrderHistory:[],
     HighSellingProducts:[],
     PNL:{TotalRevenue:0 , TotalExpense:0},
     GetProducts : async(CatID = 0) => {
@@ -91,6 +92,22 @@ import useOrg from '../Stores/OrgStore.js'
         }
         
     },
+    FillOrderStates:async() => {
+        try {
+            const res = await AxiosInstance.get('/api/userservice/inv/get_orders');
+            const DataFromBackEnd = res.data.data;
+
+            //Fill states
+            if(DataFromBackEnd){
+                set({CurrentOrders:[DataFromBackEnd.CurrentOrders],
+                    OrderHistory:[DataFromBackEnd.OrderHistory]})
+            }
+            return {success:true}
+        } catch (error) {
+            console.log(error)
+            return {success:false , message:error}
+        }
+    },
     AddOrder:async(Data) => {
         try {
             //Remove first dummy product
@@ -107,17 +124,65 @@ import useOrg from '../Stores/OrgStore.js'
                 return {success:false , message:Validation.message || "Checkout validation failed."}
             }
             const res = await AxiosInstance.put('api/userservice/inv/add_order' , Data);
-            const DataFromBackEnd = res.data.data;
+            let DataFromBackEnd = res.data.data;
+
+            //Stringify the order array
+            DataFromBackEnd = DataFromBackEnd.map((Order) => ({...Order , OrderData:JSON.stringify(Order.OrderData)}))
 
             //Fill GlobalState:Order
 
             set((State) => ({
-                Orders:[...State.Orders , ...DataFromBackEnd]
+                CurrentOrders:[[...State.CurrentOrders[0] , ...DataFromBackEnd]]
             }))
+
+            setTimeout(() => {
+            console.log("✅ Added CurrentOrders:", UseProduct.getState().CurrentOrders);
+            }, 0);
             return {success:true , message:"Order placed successfully....!"};
         } catch (error) {
             console.log(error)
             return {success:false , message:error?.response?.data?.message ?? "Error while placing order"};
+        }
+    },
+    ConfirmOrder:async(OrderID) => {
+        try {
+            const Validation = Validate("ConfirmOrder", OrderID);
+            if(!Validation.success){
+                return {success:false , message:Validation?.message || "order validation failed at client side"}
+            }
+            const res = await AxiosInstance.put('/api/userservice/inv/confirm_order' , {OrderID:OrderID});
+            const DataFromBackEnd = res.data.data;
+            //Return from server: {ProductData:{ProductID:NewQuantity} , TotalExpense:TotalExpense , OrderHistory}
+
+            //Update client zustand objects
+            set((state) => {
+                            const NewOrders = state.CurrentOrders[0].filter((Order) => (Order.OrderID !== OrderID))
+                            console.log("Zustand Neworders",NewOrders)
+                            return{
+                            //Update PNL
+                            PNL: {
+                                TotalRevenue: state.PNL.TotalRevenue,
+                                TotalExpense: DataFromBackEnd.TotalExpense
+                            },
+                            //Update products quantity
+                            Products: state.Products.map((Product) =>
+                                DataFromBackEnd.ProductData.some((NewProduct) => NewProduct.ProductID === Product.ProductID)
+                                ? { ...Product, Quantity: DataFromBackEnd.ProductData.find(P => P.ProductID === Product.ProductID).Quantity }
+                                : Product),
+                            //Update current orders
+                            CurrentOrders:[[...NewOrders]],
+                            
+                            
+
+                            //Update Order History
+                            OrderHistory: [...state.OrderHistory , DataFromBackEnd.OrderHistory]
+                            }});
+            setTimeout(() => {
+            console.log("✅ Updated CurrentOrders:", UseProduct.getState().CurrentOrders);
+            }, 0);
+            return {success:true , message:"Order delivery confirmed...!"}
+        } catch (error) {
+            return {success:false , message:error}
         }
     },
     GetCurrency:async() => {
@@ -130,8 +195,9 @@ import useOrg from '../Stores/OrgStore.js'
                 return{success:true}
             }
         } catch (error) {
-            return{success:true , message:error?.response?.data?.message ?? "Error while loading currency"};
             console.log(error.message)
+            return{success:true , message:error?.response?.data?.message ?? "Error while loading currency"};
+            
         }
     },
     GetCurrentDayCheckout:async() => {
@@ -291,6 +357,12 @@ const Validate =  (ValidationType , Data) => {
         const {TotalItems , ProductItems , TotalCost} = Data;
         if(TotalItems < 1){
             return {success:false , message:"Select atleast one item to checkout"};
+        }
+        return {success:true};
+    }
+    else if(ValidationType == "ConfirmOrder"){
+        if(!Data || Data === ''){
+            return {success:false , message:"Please reselect a order to confirm."}
         }
         return {success:true};
     }

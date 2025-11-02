@@ -88,7 +88,8 @@ function Table({TableName , TableArg , ColumnPalette , RowPalette , UpdateButton
         EDIT_TABLE: "EDIT_TABLE",
         SORT_TABLE: "SORT_TABLE",
         FILTER_TABLE:"FILTER_TABLE",
-        REFRESH_TABLE:"REFRESH_TABLE"
+        REFRESH_TABLE:"REFRESH_TABLE",
+        REINIT_TABLE:"REINIT_TABLE"
 
     });
     function Reducer(State , Action){
@@ -104,6 +105,8 @@ function Table({TableName , TableArg , ColumnPalette , RowPalette , UpdateButton
             case TableActions.EDIT_TABLE:
                 SetMode("Edit")
                 return State;
+            case TableActions.REINIT_TABLE:
+                return TableArg;
             default:
                 return State;
         }
@@ -115,6 +118,9 @@ function Table({TableName , TableArg , ColumnPalette , RowPalette , UpdateButton
     useEffect(() => {
         TableState.Columns.map((Col , Idx) => {ColumnPixel.push(Col.Col?.length * 20)}) 
     }, [TableState]);
+    useEffect(() => {
+        Dispatch({type:TableActions.REINIT_TABLE})
+    } , [TableArg])
     //Theme
     const FilterBox = createTheme({
         components: {

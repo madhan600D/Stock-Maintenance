@@ -90,8 +90,9 @@ class Orders{
                 else{
                     return {success:false , message:"Order placement failed"} 
                 }
-                 
-                OrderDataToClient.push(NewOrder)
+                const NewOrderStruct = {OrderID:NewOrder.OrderID , VendorName:VendorAPI.VendorName , OrderDate:NewOrder.OrderDate , OrderData:NewOrder.OrderJSON , OrderCost:NewOrder.OrderCost , IsOrderActive:1}
+
+                OrderDataToClient.push(NewOrderStruct)
             }
             return {success:true , message:"Order placed Successfully" , data:OrderDataToClient}
         } catch (error) {
@@ -103,7 +104,7 @@ class Orders{
     async ConfirmOrder(OrderData , UserData){
         try {
         //0.Declarations
-        var Transaction = await objInventoryDataBase.InventoryDB.transaction() , ProductDataToClient = {ProductData:{} , TotalExpense:0};
+        var Transaction = await objInventoryDataBase.InventoryDB.transaction() , ProductDataToClient = {ProductData:[] , TotalExpense:0};
         //1.Calculate time to deliver
         const TimeToDeliver = this.GetTimeToDeliver(OrderData.OrderDate , UserData.RunDate);
 
@@ -113,25 +114,30 @@ class Orders{
         
         await OrderToConfirm.destroy({transaction:Transaction});
 
-        await objInventoryDataBase.AllModels.ConfirmedOrders.create({
+        const NewOrderHistory = await objInventoryDataBase.AllModels.ConfirmedOrders.create({
             OrganizationID:UserData.OrganizationID,
             VendorID:OrderDataFromDB.VendorID,
             OrderJSON:OrderDataFromDB.OrderJSON,
+            OrderConfirmDate:UserData.RunDate,
             DaysToDeliver:TimeToDeliver,
             OrderCost:OrderDataFromDB.OrderCost,
-        } , {transaction:Transaction});
+        } , {transaction:Transaction , returning:true}); 
 
         //3.Parse OrderJSON and update inventory
         for (const [Key, Value] of Object.entries(OrderDataFromDB.OrderJSON)){
             const [ProductRow , ProductCount] = await objInventoryDataBase.AllModels.Products.increment({Quantity:Value.Quantity} , {where:{ProductID:Value.ProductID} , returning:true , transaction:Transaction});
 
-            ProductDataToClient.ProductData[Value.ProductID] = ProductRow && ProductRow[0][0].Quantity;
+            ProductDataToClient.ProductData.push({ProductID:ProductRow[0][0].ProductID , Quantity:ProductRow[0][0].Quantity})
         }
 
         //4.PNL increment
         const [NewPNL , PNLCount] = await objInventoryDataBase.AllModels.PNL.increment({TotalExpense:OrderDataFromDB.OrderCost} , 
             {where:{OrganizationID:UserData.OrganizationID} , returning:true , transaction:Transaction});
-        ProductDataToClient.TotalExpense = NewPNL.TotalExpense;
+        
+        //5. Attach datas for client
+        ProductDataToClient.TotalExpense = NewPNL[0][0].TotalExpense;
+        ProductDataToClient.OrderHistory = {OrderHistoryID:NewOrderHistory.OrderHistoryID , OrderConfirmDate:NewOrderHistory.OrderConfirmDate , OrderData:NewOrderHistory.OrderJSON , DaysToDeliver:NewOrderHistory.DaysToDeliver , OrderCost:NewOrderHistory.OrderCost}
+
         
         //5.Commit tran
         await Transaction.commit();

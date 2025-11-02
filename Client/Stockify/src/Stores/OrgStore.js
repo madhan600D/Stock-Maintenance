@@ -4,6 +4,7 @@ const useOrg = create((set , get) => ({
     IsNewOrgLoading:false,
     IsJoiningOrg:false,
     IsBulkMailLoading : false,
+    IsClosingDay:true,
     OrganizationData:{},
     AllOrganizations:[],
     CreateOrg : async (OrgData) => {
@@ -94,6 +95,17 @@ const useOrg = create((set , get) => ({
         finally{
             set({IsBulkMailLoading :false})
         } 
+    },
+    CloseDay:async() => {
+        set({IsClosingDay:true});
+        try {
+            
+        } catch (error) {
+            return {success:false , message:"Error while closing the day(Client)...!"}
+        }
+        finally{
+            set({IsClosingDay:true});
+        }
     }
 }))
 

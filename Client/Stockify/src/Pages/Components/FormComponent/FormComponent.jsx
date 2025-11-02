@@ -56,7 +56,6 @@ function FormComponent({Structure, ReducerState  , Reference , LoadingState , Lo
             Object.entries(Value).map((SubSection, SubSectionIndex) => (
               <>
                 <label className={Styles['SubSection-Label']}>{SubSection[0]}</label>
-                {console.log(SubSection)}
                 <div className={Styles['SubSection-Div']} key={SubSectionIndex} style={{gridTemplateColumns: `repeat(${SubSection[1].GridSpan}, 1fr)`}}>
                   {SubSection[1].ArrayOfElements.map((Component, Idx) => (
                     <React.Fragment key={Idx}>{Component}</React.Fragment>

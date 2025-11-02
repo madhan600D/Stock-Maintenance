@@ -1,8 +1,42 @@
+import { col } from "sequelize";
 import { ObjOrder } from "../../Class/Order.class.js";
 import objInventoryDataBase from "../../Utils/InventoryDB.js";
 import objUserDb from "../../Utils/userDB.js";
 
+export const GetOrders = async (req , res) => {
+    try {
+        //Declarations
+        let DataToClient = {}
+        //Database call
+        const CurrentOrdersDB = await objInventoryDataBase.AllModels.Orders.findAll({
+            include:[
+                {
+                    model:objInventoryDataBase.AllModels.Vendors,
+                    attributes:['VendorName']
+                }],
+            attributes:['OrderID' ,[col('Vendor.VendorName'), 'VendorName'] , 'OrderDate' , ['OrderJSON', 'OrderData'], 'OrderCost' , ['Active' , 'IsOrderActive']],
+            where:{OrganizationID:req.user.organizationId},
+            raw:true})
 
+        const OrderHistoryDB = await objInventoryDataBase.AllModels.ConfirmedOrders.findAll({
+            include:[
+                {
+                    model:objInventoryDataBase.AllModels.Vendors,
+                    attributes:['VendorName']
+                }],
+            attributes:['OrderHistoryID',[col('Vendor.VendorName'), 'VendorName'] , 'OrderConfirmDate' , ['OrderJSON', 'OrderData'], 'OrderCost','DaysToDeliver' ],
+            where:{OrganizationID:req.user.organizationId},
+            raw:true})
+
+        DataToClient.CurrentOrders = CurrentOrdersDB;
+        DataToClient.OrderHistory = OrderHistoryDB;
+
+        return res.status(200).json({success:true , data:DataToClient});
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({success:true , message:error});
+    }
+}
 export const PlaceManualOrder = async (req , res) => {
     try {
         const OrgData = await objUserDb.AllModels.organizations.findOne({where:{organizationId:req.user.organizationId}});

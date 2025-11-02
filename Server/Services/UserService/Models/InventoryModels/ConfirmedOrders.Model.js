@@ -23,6 +23,10 @@ export default (sequelize , DataTypes) => {
                 key:'VendorID'
             }
         },
+        OrderConfirmDate:{
+            type:DataTypes.DATEONLY,
+            allowNull:false
+        },
         //Array of JSON containing order details
         OrderJSON:{
             type:DataTypes.STRING,
@@ -45,9 +49,7 @@ export default (sequelize , DataTypes) => {
         }
     } , {
         tableName:'OrderConfirm',
-        timestamps:true,
-        updatedAt:false,
-        createdAt:'OrderDeliveredAt'
+        timestamps:false
     })
 
     OrderConfirmModel.associate = (models) => { 

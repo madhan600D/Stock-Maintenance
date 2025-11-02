@@ -26,12 +26,17 @@ export default (sequelize , DataTypes) => {
         Weekends:{
             type:DataTypes.STRING,
             allowNull:true,
-            defaultValue:"SAT#SUN"
+            defaultValue:"SAT,SUN"
         },
         //Flag used to auto shift org to next day at closing time:true
         AutoDayShiftFlag:{
             type:DataTypes.BOOLEAN,
             allowNull:true
+        },
+        IsDayClosed:{
+            type:DataTypes.BOOLEAN,
+            allowNull:false,
+            defaultValue:0
         }
     } , 
         {tableName:'OrgState',

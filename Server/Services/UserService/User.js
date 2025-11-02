@@ -6,6 +6,7 @@ import signUpRouter from './Router/signup.routes.js';
 import objUserDb from './Utils/userDB.js'
 import objInventoryDataBase from './Utils/InventoryDB.js'
 import organizationRouter from './Router/organization.routes.js';
+import {ObjUserServiceStartup} from './Class/Startup.class.js'
 import InventoryRouter from './Router/Inventory.routes.js'; 
 dotenv.config();
 
@@ -29,6 +30,7 @@ try {
   userServer.listen(port, () => {
     objUserDb.connectDB();
     objInventoryDataBase.connectDB();
+    ObjUserServiceStartup.Startup()
     console.log(`Main server is running on port: ${port}`);
   }); 
 } catch (error) {

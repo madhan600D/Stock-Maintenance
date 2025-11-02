@@ -13,7 +13,7 @@ function PageSelector({CurrentPage , SetCurrentPage , PageHeader , Dimension = [
     }
 
   return (
-    <div className = {Styles['Main-Div']} style={{width:Dimension[0] , height:Dimension}}>
+    <div className = {Styles['Main-Div']} style={{width:Dimension[0] , height:Dimension[1]}}>
         <button onClick={() => HandlePageSelectorButtonClick('Login')} className = {Styles['LoginPage-Btn']} style={{background:SelectedPage === 'Login' ? "#3c3c3cb6" : "none" , boxShadow:SelectedPage === 'Login' ? "inset 0 0 10px rgba(255, 255, 255, 0.259)" : "" , borderRadius:SelectedPage === 'Login' ? "5px" : "0" , border:SelectedPage === 'SignUp' ? "solid 1px rgba(255, 255, 255, 0.07)" : "0" ,border:SelectedPage === 'Login' ? "3px solid rgba(255, 255, 255, 1)": "1px solid rgba(255, 255, 255, 0.07)" }}>
             {PageHeader[0]}
         </button>
