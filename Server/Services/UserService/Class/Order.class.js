@@ -128,6 +128,8 @@ class Orders{
             const [ProductRow , ProductCount] = await objInventoryDataBase.AllModels.Products.increment({Quantity:Value.Quantity} , {where:{ProductID:Value.ProductID} , returning:true , transaction:Transaction});
 
             ProductDataToClient.ProductData.push({ProductID:ProductRow[0][0].ProductID , Quantity:ProductRow[0][0].Quantity})
+
+            
         }
 
         //4.PNL increment
@@ -137,10 +139,31 @@ class Orders{
         //5. Attach datas for client
         ProductDataToClient.TotalExpense = NewPNL[0][0].TotalExpense;
         ProductDataToClient.OrderHistory = {OrderHistoryID:NewOrderHistory.OrderHistoryID , OrderConfirmDate:NewOrderHistory.OrderConfirmDate , OrderData:NewOrderHistory.OrderJSON , DaysToDeliver:NewOrderHistory.DaysToDeliver , OrderCost:NewOrderHistory.OrderCost}
-
         
-        //5.Commit tran
+        
+        
+        //6.Update Average Lead Time Tracker
+            const LeadTimeTrackerData = await objInventoryDataBase.AllModels.LeadTimeTracker.findOne({where:{[Op.and]:[{VendorID:OrderDataFromDB.VendorID , OrganizationID:UserData.OrganizationID}]} , raw:true});
+
+            if(LeadTimeTrackerData){
+                //Calculate new average
+                const NewAverage = ((LeadTimeTrackerData.AverageLeadTime * LeadTimeTrackerData.NoOfRecords) + TimeToDeliver === 0 ? 1 : TimeToDeliver) / LeadTimeTrackerData.NoOfRecords + 1
+
+                await objInventoryDataBase.AllModels.LeadTimeTracker.update({AverageLeadTime:NewAverage} , {where:{[Op.and]:[{VendorID:OrderDataFromDB.VendorID , OrganizationID:UserData.OrganizationID}]} , transaction:Transaction})
+            }
+            else{
+                //Create new record
+                await objInventoryDataBase.AllModels.create({
+                    VendorID:OrderDataFromDB.VendorID,
+                    OrganizationID:UserData.OrganizationID,
+                    AverageLeadTime:TimeToDeliver === 0 ? 1 : TimeToDeliver,
+                    NoOfRecords:1
+                } , {transaction:Transaction})
+            }
+
+        //7.Commit tran
         await Transaction.commit();
+        
         return {success:true , message:"Order confirmed successfully" , data: ProductDataToClient};
         } catch (error) {
             await Transaction.rollback();

@@ -10,6 +10,7 @@ export const AddCheckOut = async(req , res) => {
         //Key:VendorID , Value:ArrayOfProductIDs
         var ProductsToBeOrdered = new Map()
         var Transaction = await objInventoryDataBase.InventoryDB.transaction();
+        const OrgState = await objInventoryDataBase.AllModels.OrgState.findOne({where:{OrganizationID:req.user.organizationId} , raw:true})
         
         //Update product
         //Syantax Model.decrement('columnName', { by: 1, where: { id: someId } });
@@ -20,6 +21,25 @@ export const AddCheckOut = async(req , res) => {
                                 Transaction:Transaction,
                                 returning: true
                                 });
+            
+            //Update Daily Sales Tracker table
+            const ProductSale = await objInventoryDataBase.AllModels.DailyProductSales.findOne({where:{[Op.and]:[{ProductID:CartProduct.ProductID , RunDate : OrgState.RunDate}]}})
+
+            if(ProductSale){
+                const [NewSale , RowCount] = await objInventoryDataBase.AllModels.DailyProductSales.increment('Quantity', {
+                                by: CartProduct.Quantity,
+                                where: {[Op.and]:[{ProductID:CartProduct.ProductID , RunDate : OrgState.RunDate}]},
+                                Transaction:Transaction,
+                                returning: true
+                                });
+            }
+            else{
+                await objInventoryDataBase.AllModels.DailyProductSales.create({
+                    ProductID:CartProduct.ProductID,
+                    RunDate:OrgState.RunDate,
+                    SaleQuantity:CartProduct.Quantity
+                })
+            }
 
             //TBD:Auto Order placement If Threshold breaches, Call Kafka service.Two Mails one to the vendor and one to the admin and add a order data
             

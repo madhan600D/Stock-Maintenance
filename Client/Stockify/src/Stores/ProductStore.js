@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import AxiosInstance from '../Lib/AxiosInstance.js';
 import useOrg from '../Stores/OrgStore.js'
+import { ClientSocketEventsEnum, EventActionsEnum } from '../Declarations/ClientPublicEnums.js';
+import useUser from './UserStore.js';
 
  const UseProduct = create((set , get) => ({
     IsAuthenticated:false,
@@ -135,9 +137,6 @@ import useOrg from '../Stores/OrgStore.js'
                 CurrentOrders:[[...State.CurrentOrders[0] , ...DataFromBackEnd]]
             }))
 
-            setTimeout(() => {
-            console.log("✅ Added CurrentOrders:", UseProduct.getState().CurrentOrders);
-            }, 0);
             return {success:true , message:"Order placed successfully....!"};
         } catch (error) {
             console.log(error)
@@ -225,16 +224,14 @@ import useOrg from '../Stores/OrgStore.js'
             const res = await AxiosInstance.put('/api/userservice/inv/add_product' , Data);
             const DataFromBackEnd = res.data.data;
 
-            if(DataFromBackEnd){
-                set((state) => ({
-                            Products: [...state.Products, DataFromBackEnd.ProductData],
-                            PNL: {
-                                ...state.PNL,
-                                TotalExpense: state.PNL.TotalExpense + DataFromBackEnd.PNLData.TotalExpense
-                            }
-                            }));
-                return{success:true , message:"Product added successfully"}
-            }
+            set((state) => ({
+                        Products: [[...state.Products[0], DataFromBackEnd.ProductData]],
+                        PNL: {
+                            ...state.PNL,
+                            TotalExpense: state.PNL.TotalExpense + DataFromBackEnd.PNLData.TotalExpense
+                        }
+                        }));
+
         } catch (error) {
             console.log(error.message)
             return {success:false , message:"Error at Product PUT ...!"}
@@ -298,8 +295,60 @@ import useOrg from '../Stores/OrgStore.js'
             console.log(error.message)
             return {success:false , message:error.response.data.message || "Failed to add category"}
         }
-    }
+    },
+    //Socket events and handlers
+    InitInventorySocketEvents:async() => {
+            try {
+                //Initialize all socket events
+                useUser.getState().SocketState.on(ClientSocketEventsEnum.PRODUCT_EVENT , (Payload) => {get().ProductEventHandler(Payload)});
+            } catch (error) {
+                console.log("error while init SocketEvents" , error)
+            }
+        },
+    DeInitInventorySocketEvents:() =>{
+        try {
+            const TempSocket = useUser.getState().SocketState;
+            if(!TempSocket) return;
+            TempSocket.off();
+        } catch (error) {
+            console.log(error)
+        }
+    },
+    ProductEventHandler:async(Payload) => {
+        try {
+            //Set Toast and Update Zustand States
+            switch (Payload.EventType){
+                case EventActionsEnum.ADD:
+                    console.log("New Product socket event called...!")
+                    set((state) => ({
+                            Products: [[...state.Products[0], Payload.InventoryData.ProductData]],
+                            PNL: {
+                                ...state.PNL,
+                                TotalExpense: state.PNL.TotalExpense + Payload.InventoryData.PNLData.TotalExpense
+                            }
+                        }));
 
+                        //Add Socket Message
+                        let SocketMessage = {Message:`${Payload.InventoryData.ProductData.ProductName} added to onventory. States updated..!`}
+                        useUser.getState().UpdateSocketMessageState(SocketMessage);
+                case EventActionsEnum.ALTER:
+                    //Set Global States
+                    set((State) => {
+                        const NewProductState = Products[0].map(Prod => (Prod.ProductID === Payload.NewProduct.ProductID ? Payload.NewProduct : Prod))    
+
+                        return {
+                            Products:[[NewProductState]],
+                            PNL : {...State.PNL , TotalExpense:Payload.NewPNL.TotalExpense} 
+                        }
+                    })
+                    
+            }
+        } catch (error) {
+            console.log("Error at ProductEventHandler: " ,error)
+            return {success:false , message:error}
+        }
+
+    }
 
 
 }))

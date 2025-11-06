@@ -89,7 +89,7 @@ function ProductPage() {
         const HandleAddProduct = async() => {
           try {
             const IsSuccess = await AddProduct(ProductState);
-            ShowToast(IsSuccess.success , IsSuccess.message)
+  
           } catch (error) {
             ShowToast(false , error.message || "Failed to add product")
           }

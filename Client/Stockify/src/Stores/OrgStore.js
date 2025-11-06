@@ -4,7 +4,7 @@ const useOrg = create((set , get) => ({
     IsNewOrgLoading:false,
     IsJoiningOrg:false,
     IsBulkMailLoading : false,
-    IsClosingDay:true,
+    IsClosingDay:false,
     OrganizationData:{},
     AllOrganizations:[],
     CreateOrg : async (OrgData) => {
@@ -99,12 +99,21 @@ const useOrg = create((set , get) => ({
     CloseDay:async() => {
         set({IsClosingDay:true});
         try {
-            
+            const res = await AxiosInstance.get('/api/userservice/org/close-day');
+            const DataFromBackEnd = res.data?.data;
+
+            //Update internal state
+            set((State) => {
+                return{
+                    OrganizationData:[[{...State.OrganizationData[0][0] , RunDate:DataFromBackEnd.OrgState.RunDate , CurrentDaySales:0}]]
+                }
+            })
+            return {success:true , message:res.data.message};
         } catch (error) {
             return {success:false , message:"Error while closing the day(Client)...!"}
         }
         finally{
-            set({IsClosingDay:true});
+            set({IsClosingDay:false});
         }
     }
 }))

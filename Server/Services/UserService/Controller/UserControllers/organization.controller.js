@@ -225,12 +225,12 @@ export const ManualCloseDay = async(req , res) => {
                                     
         ClientData.OrgState = NewOrganizationState[0];
 
-        //Update internal Orgstate Map
+        //Update internal Org state Map
         ObjAutoCloseDay.OrganizationCloseTimings.set(ClientData.OrgState.OrganizationID , {ClosingTime:NewOrganizationState[0].ClosingTime , IsDayClosed:NewOrganizationState[0].IsDayClosed})
 
         await Transaction.commit()
         //TBD:Simulation and place auto orders
-        return res.status(200).json({success:true , message:"Organization closed and moved to the next day...!"})
+        return res.status(200).json({success:true , message:"Organization closed and moved to the next day...!" , data:ClientData})
     } catch (error) {
         await objUserDb.AllModels.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
         await Transaction.rollback()

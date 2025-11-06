@@ -1,4 +1,3 @@
-import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors'
 import cookieParser from 'cookie-parser';
@@ -8,26 +7,40 @@ import objInventoryDataBase from './Utils/InventoryDB.js'
 import organizationRouter from './Router/organization.routes.js';
 import {ObjUserServiceStartup} from './Class/Startup.class.js'
 import InventoryRouter from './Router/Inventory.routes.js'; 
-dotenv.config();
 
-const userServer = express();
+//Sevrer
+import {MainServer} from './Class/Socket.class.js'
+import http from 'http'
+import {Server} from 'socket.io'
+import express from 'express'
+
+dotenv.config();
 const port = process.env.userPort;
+
+
+const App = express()
+
+
 //Setup Middlewares
-userServer.use(cors({
+App.use(cors({
     origin:'http://localhost:5173',
     credentials:true
 }))
-userServer.use(express.json({ limit: '20mb' }));
-userServer.use(cookieParser())
-userServer.use('/api/userservice', signUpRouter);
-userServer.use('/api/userservice/org' , organizationRouter)
-userServer.use('/api/userservice/inv' , InventoryRouter)
 
+//Router Setup
+App.use(express.json({ limit: '20mb' }));
+App.use(cookieParser())
+App.use('/api/userservice', signUpRouter);
+App.use('/api/userservice/org' , organizationRouter)
+App.use('/api/userservice/inv' , InventoryRouter)
 
+//Create Htpp Sevrer
+const HttpServer = http.createServer(App)
 
+//Instantiate socket server.
+await MainServer.InitSocketServer(HttpServer)
 try {
-  
-  userServer.listen(port, () => {
+  HttpServer.listen(port, () => {
     objUserDb.connectDB();
     objInventoryDataBase.connectDB();
     ObjUserServiceStartup.Startup()

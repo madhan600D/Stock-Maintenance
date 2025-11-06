@@ -1,6 +1,9 @@
 import { create } from 'zustand';
 import AxiosInstance from '../Lib/AxiosInstance.js';
-
+import {connect, io} from 'socket.io-client'
+//Declarations
+const ServerURL = import.meta.env.MODE === 'development' ? 'http://localhost:5000/' : '/' ;
+import { ClientSocketEventsEnum } from '../Declarations/ClientPublicEnums.js';
 //Methods
 
 const useUser = create((set , get) => ({
@@ -15,10 +18,11 @@ const useUser = create((set , get) => ({
     SuspenseTexts:[],
     UserData:{},
     OrganizationData:{},
+    SocketState:null,
     CurrentOrg:null,
+    LastSocketMessage:'',
     IsAdmin:false,
     IsError:null,
-
 
     SignUp: async (UserCredentials) => {
         let ObjError = {success:true , message:''}
@@ -107,7 +111,7 @@ const useUser = create((set , get) => ({
                     OrganizationName: DataFromBackend.data.OrganizationName
                 }
             });
-                return {success:true , message:DataFromBackend.message}
+                
             }
             else{
                 set({IsAuthenticated:false});
@@ -115,6 +119,12 @@ const useUser = create((set , get) => ({
                 set({OrganizationData:{}})
                 return {success:false , message:DataFromBackend.message}
             }
+
+            //Socket state reinit
+            if (!get().SocketState?.connected){
+                await get().ConnectSocket();
+            }  
+            return {success:true , message:DataFromBackend.message}
         } catch (error) {
             set({IsAuthenticated:false})
             return{success:false , message:error.response ? error.response.data.message : error.message};
@@ -145,6 +155,8 @@ const useUser = create((set , get) => ({
                 }
             });
             
+            //WebSocket connection:
+            await get().ConnectSocket()
             return {success:true , message:DataFromBackend.message , data:DataFromBackend};
         } catch (error) {
             console.log(error)
@@ -154,10 +166,77 @@ const useUser = create((set , get) => ({
             set({IsLoginLoading:false})
         }
     },
+    ConnectSocket:async() => {
+        try {
+            const {UserData , OrganizationData} = get();
+
+            if(!UserData || !OrganizationData) return;
+
+            const ClientSocketServer = new io(ServerURL , {
+                query:{
+                    UserID:UserData.UserID,
+                    OrganizationID:OrganizationData.OrganizationID
+                }
+            })
+
+            ClientSocketServer.connect();
+
+            //Update Zustand socket states
+            set({SocketState:ClientSocketServer});
+
+            //Initialize listeners
+            await get().InitializeSocketEvents(ClientSocketServer);
+        } catch (error) {
+            console.log(error)
+            return {success:false , message:"Socket connection failed",error}
+        }
+    },
+    InitializeSocketEvents:async(Socket) => {
+        try {
+            //Neutralize the listener before initiating
+            // Socket.off(ClientSocketEventsEnum.ROOM_CONFIRMATION)
+
+            //Initialize all socket events
+            Socket.on(ClientSocketEventsEnum.ROOM_CONFIRMATION , (Payload) => {get().RoomConfirmationHandler(Payload)});
+        } catch (error) {
+            console.log("error while init SocketEvents" , error)
+        }
+    }
+    ,
+    RoomConfirmationHandler:(Payload) => {
+        try {
+            //Payload.Message:{"User is online now!"}
+            set({LastSocketMessage:Payload.Message});
+
+        } catch (error) {
+            console.log(error)
+        }
+    },
+    DisconnectSockets:async() => {
+        try {
+            const ExistingSocket = get().SocketState;
+            if(ExistingSocket){
+                ExistingSocket.disconnect()
+                set({SocketState:null})
+            }
+            return
+
+        } catch (error) {
+            console.log(error)
+        }
+    },
+    UpdateSocketMessageState:async(Payload) => {
+        try {
+            set({LastSocketMessage:Payload.Message});
+        } catch (error) {
+            console.log(error)
+        }
+    },
     Logout: async () => {
         try {
             const res = await AxiosInstance.get('/api/userservice/logout');
             await get().ValidateUser();
+            await get().DisconnectSockets();
             return {success:true , message:"Logged out successfully...!"}
         } catch (error) {
             return {success:true , message:"Logged out failed...!"}

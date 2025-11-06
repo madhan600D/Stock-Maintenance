@@ -3,6 +3,8 @@ import objInventoryDataBase from "../../Utils/InventoryDB.js";
 
 import cloudinary from "../../Lib/Cloudinary.js";
 import objUserDb from "../../Utils/userDB.js";
+import { MainServer } from "../../Class/Socket.class.js";
+import { EventActionsEnum, SocketEventsEnum } from "../../Declarations/PublicEnums.js";
 
 
 export const GetProductsForOrganization = async (req , res) => {
@@ -34,8 +36,9 @@ export const GetProductsForOrganization = async (req , res) => {
 
 export const AddProductForOrganization = async (req , res) => {
     try {
-        const Transaction = await objInventoryDataBase.InventoryDB.transaction()
+        var Transaction = await objInventoryDataBase.InventoryDB.transaction();
         const {ProductName , ProductImage , ProductPrice, ActualPrice , Quantity, CurrencyName, CategoryName, Unit, VendorName, ExpirationDate, ReorderThreshold} = req.body;
+        let SocketPayload = {}
 
 
 
@@ -62,8 +65,8 @@ export const AddProductForOrganization = async (req , res) => {
         }
         
         //Add the product
-        const NewProduct = await objInventoryDataBase.AllModels.Products.create({OrganizationID:req.user.organizationId,ProductName:ProductName, ProductPrice:ProductPrice, ActualPrice:ActualPrice, CategoryID:!IsCategoryExsists ? NewCategory.CategoryID : IsCategoryExsists.CategoryID, ProductImage:CloudinaryResponse.secure_url, VendorID:Vendor.VendorID, IsExpired:false, ExpirationDate:ExpirationDate,ReorderThreshold:ReorderThreshold, Unit:Unit, Quantity:Quantity , CurrencyID:Currency.CurrencyID} , {returning: ['ProductID', 'ProductName', 'Quantity' , 'ProductPrice'] , 
-        Transaction});
+        const NewProduct = await objInventoryDataBase.AllModels.Products.create({OrganizationID:req.user.organizationId,ProductName:ProductName, ProductPrice:ProductPrice, ActualPrice:ActualPrice, CategoryID:!IsCategoryExsists ? NewCategory.CategoryID : IsCategoryExsists.CategoryID, ProductImage:CloudinaryResponse.secure_url, VendorID:Vendor.VendorID, IsExpired:false, ExpirationDate:ExpirationDate,ReorderThreshold:ReorderThreshold, Unit:Unit, Quantity:Quantity , CurrencyID:Currency.CurrencyID} , {returning: [] , 
+        transaction:Transaction});
 
         const ProductExpense = ActualPrice * Quantity;  
 
@@ -73,8 +76,16 @@ export const AddProductForOrganization = async (req , res) => {
                                 { where: { OrganizationID: req.user.organizationId }, returning: true });
         
         //Prepare Client Data
-        const RawClientData = {ProductData: {ProductID:NewProduct.ProductID , ProductName:ProductName , ProductPrice:NewProduct.ProductPrice}, PNLData: PNLUpdate[0][0]};
- 
+        const RawClientData = {ProductData: NewProduct.dataValues, PNLData: PNLUpdate[0][0]};
+        
+        //Call Socket Event:
+        SocketPayload.InventoryData = RawClientData;
+        SocketPayload.UserData = {OrganizationID:req.user.organizationId , UserID:req.user.userId};
+        SocketPayload.EventType = EventActionsEnum.ADD
+
+        const IsDataBroadcasted = await MainServer.HandleProductEvent(SocketPayload);
+        
+        await Transaction.commit();
         return res.status(200).json({success:true , message:"Product and category created successfully ...!" , data:RawClientData})
 
     } catch (error) {

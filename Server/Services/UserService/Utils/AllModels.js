@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 import {DataBaseInit} from "./DataBaseInit.js";
-// User-related Models
+// User-related Models 
 import userRoleModel from "../Models/UserModels/userRoleModel.js";
 import organizationModel from "../Models/UserModels/organizationModel.js";
 import sessionModel from "../Models/UserModels/sessionModel.js";
@@ -18,6 +18,9 @@ import RoleDetailsModel from "../Models/UserModels/RoleDetailsModel.js";
 
 // Inventory-related Models
 import CategoryModel from "../Models/InventoryModels/Category.Model.js";
+import PredcitedLTDModel from "../Models/InventoryModels/PredcitedLTD.Model.js";
+import DailyProductSalesModel from "../Models/InventoryModels/DailyProductSales.Model.js";
+import LeadTimeTrackerModel from "../Models/InventoryModels/LeadTimeTracker.Model.js";
 import ProductModel from "../Models/InventoryModels/Product.Model.js";
 import VendorModel from "../Models/InventoryModels/Vendor.Model.js";
 import CheckOutModel from "../Models/InventoryModels/CheckOut.Model.js";
@@ -52,9 +55,13 @@ export async function InitializeDataBase(){
       LoadingTexts: LoadingTextsModel(userDB, DataTypes),
       RoleDetails: RoleDetailsModel(userDB, DataTypes),
       userErrorLog: userErrorLogModel(userDB , DataTypes),
+
       // Inventory System
       Category: CategoryModel(InventoryDB, DataTypes),
       Products: ProductModel(InventoryDB, DataTypes),
+      PredictedLTD:PredcitedLTDModel(InventoryDB , DataTypes),
+      LeadTimeTracker:LeadTimeTrackerModel(InventoryDB , DataTypes),
+      DailyProductSales:DailyProductSalesModel(InventoryDB , DataTypes), 
       Vendors: VendorModel(InventoryDB, DataTypes),
       CheckOuts: CheckOutModel(InventoryDB, DataTypes),
       Currency: CurrencyModel(InventoryDB, DataTypes),

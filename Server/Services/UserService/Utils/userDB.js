@@ -6,12 +6,12 @@ class UserDatabase {
     this.userDB = null;
   }
 
-  async Init() {
+  async Init() { 
     const { Models, userDB } = await InitializeDataBase();
     this.AllModels = Models;
-    this.userDB = userDB;
-
-    // Apply associations if any
+    this.userDB = userDB; 
+ 
+    // Apply associations if any 
     Object.values(this.AllModels).forEach((model) => {
       if (model.associate) {
         model.associate(this.AllModels); 

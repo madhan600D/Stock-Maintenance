@@ -21,12 +21,14 @@ import TextBoxWithLogo from '../../Components/TextBoxWithLogo/TextBoxWithLogo.js
 import Button from '@mui/material/Button';
 import ActionButton from '../../Components/ActionButton/ActionButton.jsx';
 import TypingSuspense from '../../Components/Suspense Components/TypingSuspense/TypingSuspense.jsx';
+import ShowToast from '../../Components/Toast/Toast.js';
+import { ToastContainer } from 'react-toastify';
 function OrganizationPage() {
     const [ShowInviteDiv , SetShowInviteDiv] = useState(false);
     const [ShowCloseDayPage , SetShowCloseDayPage] = useState(false);
     const [OrganizationDataState , SetOrganizationDataState] = useState();
     const [PNLData , SetPNLData] = useState();
-    const {OrganizationData , IsClosingDay} = useOrg();
+    const {OrganizationData , IsClosingDay , CloseDay} = useOrg();
     const FormRef = useRef()
    const OrgDataEditColumnMap = new Map([
   [
@@ -45,12 +47,12 @@ function OrganizationPage() {
     const DialActions = [{Logo:HiMiniMegaphone , Callback:() => {SetShowInviteDiv(true)} , Tooltip:"Invite"} , {Logo:CiShare2 , Callback:() => {console.log("Summa")} , Tooltip:"Share"} , {Logo:SlCalender , Callback:() => {SetShowCloseDayPage(true)} ,Tooltip:"CloseDay"}]
     //Effects
     useEffect(() => {
-        const OrgDetailsTable = StateToTable(useOrg.getState().OrganizationData , {} , ["RunDate" , "OrganizationName","CurrentDaySales","ClosingTime","Weekends"])
+        const OrgDetailsTable = StateToTable(OrganizationData , {} , ["RunDate" , "OrganizationName","CurrentDaySales","ClosingTime","Weekends"])
         SetOrganizationDataState(OrgDetailsTable)
         
-        const PNL = StateToTable(useOrg.getState().OrganizationData , {} , ["TotalRevenue" , "TotalExpense"])
+        const PNL = StateToTable(OrganizationData , {} , ["TotalRevenue" , "TotalExpense"])
         SetPNLData(PNL)
-    } , [])
+    } , [OrganizationData])
     //Events
     useEffect(() => {
         const HandleClick = (Event) => {
@@ -63,6 +65,15 @@ function OrganizationPage() {
         document.addEventListener("mousedown" , HandleClick);
         return () => document.removeEventListener("mousedown", HandleClick);
     } , [])
+    //Functions
+    async function HandleCloseDay(){
+        try {
+            const IsDayClosed = await CloseDay()
+            ShowToast(IsDayClosed.success , IsDayClosed.message);
+        } catch (error) {
+            console.log(error)
+        }
+    }
   return (
     <div className = {Styles['Main-Div']}>
             <div ref={FormRef} className={Styles['Form-Div']}  style={{transform: ShowInviteDiv ? "translate(25%, 10%)" : "translate(25%, -110%)"}}>
@@ -87,7 +98,7 @@ function OrganizationPage() {
                                 </label>
                     </div>
                     <div style={{display:'flex' , justifyContent:'center' , width:'100%'}}>
-                        <button disabled = {IsClosingDay} style={{width:'15rem' , height:'3rem'}} onClick={() => console.log("test")} className= {Styles['Action-Button']}>{IsClosingDay == true ? <TypingSuspense /> :<SlCalender size={'1rem'} color='#adbdd5ff'/>}{!IsClosingDay ? 'Close Day' : ''}</button>
+                        <button disabled = {IsClosingDay} style={{width:'15rem' , height:'3rem'}} onClick={() => HandleCloseDay()} className= {Styles['Action-Button']}>{IsClosingDay == true ? <TypingSuspense /> :<SlCalender size={'1rem'} color='#adbdd5ff'/>}{!IsClosingDay ? 'Close Day' : ''}</button>
                         
                     </div>
                     
@@ -142,7 +153,7 @@ function OrganizationPage() {
                         DialButtonColor={'#004a71ff'}      
                     />
             </div>
-            
+            <ToastContainer />
     </div>
   )
 }

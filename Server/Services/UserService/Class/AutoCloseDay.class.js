@@ -34,10 +34,13 @@ class AutoCloseDay{
             
             for(let OrganizationID of this.OrganizationCloseTimings.keys()){
                 if(this.IsToCloseDay(OrganizationID)){
+                    //TBD: Product simulation and auto order placement
+
                     //Process Close Day
                     console.log(`Closing the day for: ${OrganizationID}`)
                     await this.UpdateOrgState(OrganizationID);
-                    //TBD: Product simulation and auto order placement
+                    
+                    
                     //TBD: Call socket class and intimate that the day is closed
                 }
             }
