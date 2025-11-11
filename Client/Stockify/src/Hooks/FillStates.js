@@ -1,5 +1,6 @@
 import useOrg from "../Stores/OrgStore.js";
 import UseProduct from "../Stores/ProductStore.js";
+import useUser from "../Stores/UserStore.js";
 
 export const useFillInventoryStates = () => {
   const { GetProducts, GetCategory, GetVendors, GetCurrency , GetCurrentDayCheckout, FillOrderStates ,CurrentOrders , InitInventorySocketEvents} = UseProduct();
@@ -15,7 +16,6 @@ export const useFillInventoryStates = () => {
         FillOrgData(),
         GetCurrentDayCheckout(),
         FillOrderStates(),
-
         //Initialize events
         InitInventorySocketEvents(),
       ]);

@@ -1,6 +1,11 @@
 import objInventoryDataBase from "../Utils/InventoryDB.js";
 import { ObjDateManipulations } from "./DateManipulation.class.js";
 
+//Modules
+import Simulation from '../Class/Simulation.class.js'
+import { Op } from "sequelize";
+import { ObjOrder } from "./Order.class.js";
+
 class AutoCloseDay{
     constructor(Database){
         this.Database = Database;
@@ -34,7 +39,39 @@ class AutoCloseDay{
             
             for(let OrganizationID of this.OrganizationCloseTimings.keys()){
                 if(this.IsToCloseDay(OrganizationID)){
-                    //TBD: Product simulation and auto order placement
+                    //Product simulation and auto order placement
+                    const ProductsOfOrganization = await objInventoryDataBase.AllModels.Products.findAll({where:{OrganizationID:OrganizationID} , raw:true});
+                    let ProductEWMA  = [] , OrderArray = []
+
+                    for(let Product of ProductsOfOrganization){
+                        var ObjSimulation = new Simulation(Product , objInventoryDataBase);
+
+                        const LTDforProduct = await ObjSimulation.ForecastDemand()
+
+                        if(LTDforProduct >= Product.Quantity){
+                            //Add to order array
+                            OrderArray.push({ProductID:Product.ProductID , ProductName:Product.ProductName , Quantity:LTDforProduct})
+
+                            //ProductEWMA result for DB updation
+                            ProductEWMA.push({ProductID:Product.ProductID , SimulatedLTD:LTDforProduct})
+                        }
+                    }
+
+                    
+                    //Prepare parameters for order
+                    const OrganizationData = await objInventoryDataBase.AllModels.organizations.findOne({where:{organizationId:OrganizationID} , raw:true});
+
+                    const OrgState = await objInventoryDataBase.AllModels.OrgState.findOne({where:{OrganizationID:OrganizationID}});
+
+                    //Update EWMA results in DB
+                    await ObjSimulation.UpdateEWMAResult(ProductEWMA , {OrganizationID:OrganizationData.organizationId , RunDate:OrgState.RunDate});
+
+                    let UserDataParam = {OrganizationID:OrganizationID , OrganizationName:OrganizationData.OrganizationName , RunDate:OrgState.RunDate};
+
+                    //Place order
+                    await ObjOrder.PlaceManualOrder(UserDataParam , OrderArray);
+                    console.log(`Auto Order Placed for ${OrganizationData.OrganizationName}. Order Details: ${OrderArray}`);
+
 
                     //Process Close Day
                     console.log(`Closing the day for: ${OrganizationID}`)
@@ -44,7 +81,8 @@ class AutoCloseDay{
                     //TBD: Call socket class and intimate that the day is closed
                 }
             }
-        } catch (error) {
+        } 
+        catch (error) {
             this.ErrorObj = {success:false , message:error}
             console.log(this.ErrorObj)
             return this.ErrorObj

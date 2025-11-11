@@ -74,8 +74,7 @@ import useUser from './UserStore.js';
             const Products = UseProduct.getState().Products;
 
             //Assign Checkout date as rundate
-            console.log(useOrg.getState().OrganizationData , useOrg.getState().OrganizationData)
-            Data.CheckoutDate = useOrg.getState().OrganizationData.RunDate
+            Data.CheckoutDate = useOrg.getState().OrganizationData[0][0].RunDate
             //Assign Product IDs
             for (let Product of Data.ProductItems){
                 let GlobalProductIndex =  Products[0].findIndex(Prod => Product.ProductName == Prod.ProductName);
@@ -265,7 +264,7 @@ import useUser from './UserStore.js';
                 return {success:Validation.success , message: Validation.message}
             }
             const res = await AxiosInstance.put('/api/userservice/inv/add_vendor' , Input);
-            const DataFromBackEnd = res.data.data;
+            const DataFromBackEnd = res.data.data; 
             if(!DataFromBackEnd){
                 return {success:false , message: "Failed to add vendor"}
             }

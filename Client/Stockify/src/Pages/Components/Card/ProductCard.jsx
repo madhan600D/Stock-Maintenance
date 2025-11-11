@@ -61,7 +61,6 @@ function ProductCard({ProductID , ProductName , ProductPrice , ActualPrice , Ven
         return {...state , ProductPrice:action.payload}
       case CardActions.SET_PRODUCT_IMAGE:
         UpdateKeyValue.current.set("ProductImage" , action.payload);
-        console.log(UpdateKeyValue)
         return {...state , ProductImage:action.payload}
       case CardActions.SET_QUANTITY:
         UpdateKeyValue.current.set("Quantity" , action.payload);

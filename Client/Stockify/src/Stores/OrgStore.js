@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import AxiosInstance from '../Lib/AxiosInstance.js';
+import useUser from './UserStore.js';
 const useOrg = create((set , get) => ({
     IsNewOrgLoading:false,
     IsJoiningOrg:false,
@@ -110,10 +111,29 @@ const useOrg = create((set , get) => ({
             })
             return {success:true , message:res.data.message};
         } catch (error) {
-            return {success:false , message:"Error while closing the day(Client)...!"}
+            console.log(error)
+            return{success:false , message:error.response ? error.response.data.message : error.message};   
         }
         finally{
             set({IsClosingDay:false});
+        }
+    },
+    LeaveOrganization:async() => {
+        try {
+            const res = await AxiosInstance.get('/api/userservice/org/leave-org');
+
+            const DataFromBackEnd = res.data?.data;
+            // await useUser.get().ValidateUser()
+
+            if(DataFromBackEnd.success){
+                
+            }
+            return {success:true  , message:DataFromBackEnd.message}
+
+            
+        } catch (error) {
+            console.log(error)
+            return{success:false , message:error.response ? error.response.data.message : error.message};   
         }
     }
 }))
@@ -154,8 +174,9 @@ const Validate =  (ValidationType , Data) => {
             return {success:true}
         }
     } catch (error) {
-        return {success:false , message:"Error at organization validation ...!"}
         console.log(error.message)
+        return {success:false , message:"Error at organization validation ...!"}
+        
     }
 
 }

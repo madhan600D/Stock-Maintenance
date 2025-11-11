@@ -89,6 +89,7 @@ function ProductPage() {
         const HandleAddProduct = async() => {
           try {
             const IsSuccess = await AddProduct(ProductState);
+            ShowToast(IsSuccess?.success , IsSuccess?.message);
   
           } catch (error) {
             ShowToast(false , error.message || "Failed to add product")
@@ -251,6 +252,7 @@ function ProductPage() {
             },
           },
         });
+        
         const CreateProductLayout = {
           "Basic Product Info": [
             {
@@ -417,6 +419,7 @@ function ProductPage() {
           }
         }]
         };
+  
   return (
     <div className = {Styles['Main-Div']}>
        <div className = {Styles['Top-Div']}>
@@ -458,7 +461,7 @@ function ProductPage() {
                 <LabelWithLogo 
                     Logo={FaBoxOpen}
                     Header={"Total Products"}
-                    Value={Products[0].length || "NA"}
+                    Value={Products[0]?.length || "NA"}
                     BGColor={'#282f31ff'}
                     Dimension={[250 , 100]}
                 />
@@ -472,7 +475,7 @@ function ProductPage() {
                 <LabelWithLogo 
                     Logo={FaTrophy}
                     Header={"Top Seller"}
-                    Value={HighSellingProducts[0][0].ProductName}
+                    Value={HighSellingProducts[0][0]?.ProductName}
                     BGColor={'#a5ff7bff'}
                     Dimension={[250 , 100]}
                 />
@@ -542,7 +545,6 @@ function ProductPage() {
                     SubmitCallback={() => {HandleAddProduct()}}
                 />
             </div>
-            <ToastContainer />
             <div className= {Styles['Top-Div']} style={{backgroundColor:'#13171d84' , padding:'1.5rem',borderRadius:'20px' ,display:'flex' , flexDirection:'column' , marginTop:'2rem'}}>
                 <div>
                     <div style={{display:'flex' , alignItems:'center' , justifyContent:'center' , fontSize:'1rem' , gap:'0.6rem' , backgroundColor:'#1E232B' , padding:'0.6rem' , borderRadius:'10px'}}>
@@ -561,6 +563,7 @@ function ProductPage() {
                   
                 </div>
               </div>
+              <ToastContainer />
     </div>
   )
 }

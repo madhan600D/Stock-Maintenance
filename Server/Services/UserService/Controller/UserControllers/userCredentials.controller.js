@@ -4,8 +4,10 @@ import objUserDb from '../../Utils/userDB.js'
 import { GenerateJWT } from '../../Utils/GenerateJWT.js'
 import { TimeFormatter } from '../../Utils/timeFormatter.js'
 import dotenv from 'dotenv'
-import { Op } from 'sequelize'
+import { Model, Op } from 'sequelize'
 import {ObjUserKafkaProducer} from '../../Kafka/Producer/kafkaProducer.js'
+import {ProfileActionsServer} from '../../Declarations/PublicEnums.js'
+import cloudinary from '../../Lib/Cloudinary.js'
 dotenv.config();
 export const signUpUser = async (req , res) => {
     try {
@@ -78,7 +80,7 @@ export const addUser = async (req , res) => {
             //Add session Data
             const currentTime = new Date()
             await objUserDb.AllModels.sessions.create({userId:newUser.userId , loggedInAt:Date(TimeFormatter(currentTime)) , LoggedOutAt:'' , isActive:true})
-
+        
             const DataToClient = {UserName: newUser.userName,
                     UserMail: newUser.userMail,
                     UserID: newUser.userId}
@@ -98,21 +100,28 @@ export const addUser = async (req , res) => {
 }
 
 export const ValidateUser = async (req , res) => {
-    if(req.user){
-        const UserAndOrgData = await objUserDb.AllModels.users.findOne({
-                                where: { userId: req.user.userId },
-                                include: [
-                                    {
-                                    model: objUserDb.AllModels.organizations,
-                                    attributes: ['organizationName', 'organizationId']
-                                    }
-                                ]
-                                });
+    try {
+        if(req.user){
+            const UserAndOrgData = await objUserDb.AllModels.users.findOne({ 
+                                    where: { userId: req.user.userId },
+                                    include: [
+                                        {
+                                        model: objUserDb.AllModels.organizations,
+                                        attributes: ['organizationName', 'organizationId']
+                                        }
+                                    ]
+                                    });
+            const RoleData = await objUserDb.AllModels.roles.findOne({where:{userId:req.user.userId}})
+            const UserData = {UserName:UserAndOrgData.userName , UserMail:UserAndOrgData.userMail , UserID:UserAndOrgData.userId , ProfilePic:UserAndOrgData.profilePic,OrganizationID:UserAndOrgData.organization.organizationId , OrganizationName:UserAndOrgData.organization.organizationName , Role:RoleData.role}
 
-        const UserData = {UserName:UserAndOrgData.userName , UserMail:UserAndOrgData.userMail , UserID:UserAndOrgData.userId , OrganizationID:UserAndOrgData.organization.organizationId , OrganizationName:UserAndOrgData.organization.organizationName}
-        return res.status(200).json({success:true , message:"Valid user",data:UserData})
+            return res.status(200).json({success:true , message:"Valid user",data:UserData})
     } 
-    return res.status(200).json({success:false , message:"Invalid user"}) 
+    } catch (error) {
+        console.log(error)
+        return res.status(400).json({success:false , message:"Invalid user"})  
+    }
+    
+    
 }
 
 //This handles the mail verification
@@ -157,6 +166,8 @@ export const logInUser = async (req , res) => {
         const userCredentials = await objUserDb.AllModels.users.findOne({
                                                         include:[{model:objUserDb.AllModels.organizations , attributes:['organizationId' , 'organizationName']}] , 
                                                         where:{[Op.or]:{userName:userName , userMail:userName}}})
+        
+        const RoleDetails = await objUserDb.AllModels.roles.findOne({where:{userId:userCredentials.userId}});
         if(!userCredentials){
             return res.status(400).json({success:false , message:"Invalid userName ....!"})
         }
@@ -188,7 +199,7 @@ export const logInUser = async (req , res) => {
             //TBD:Setup a socket protocol to logout the currrently logged in user
             //Kill the old session if exsits 
             const newSession = await objUserDb.AllModels.sessions.create({userId:userCredentials.userId , loggedInAt:currentTime , LoggedOutAt:'' , isActive:true})
-            const userData = {UserID:userCredentials.userId , UserMail:userCredentials.userMail , UserName:userCredentials.userName , OrganizationID:userCredentials.organization.organizationId , OrganizationName:userCredentials.organization.organizationName , ProfilePic:userCredentials.profilePic}
+            const userData = {UserID:userCredentials.userId , UserMail:userCredentials.userMail , UserName:userCredentials.userName , OrganizationID:userCredentials.organization.organizationId , OrganizationName:userCredentials.organization.organizationName , ProfilePic:userCredentials.profilePic , Role:RoleDetails?.role || 'NA'};
             return res.cookie("jwt",
                 JwtToken , {
                     maxAge: 60 * 60 * 1000,
@@ -223,6 +234,52 @@ export const LogOutUser = async (req , res) => {
         return res.status(200).json({success:true , message:"User logged out successfully...!"})                                                        
     } catch (error) {
         await objUserDb.AllModels.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
+        return req.status(500).json({success:false , message:error.message})   
+    }
+}
+export const EditProfile = async(req , res) => {
+    try {
+        //Payload:{Key:TypeofAction , Value:Value}
+        const PayloadAsObject = req.body; 
+        if(!PayloadAsObject){
+            return res.status(400).json({success:false , message:"Missing Param Payload ...!"})
+        }
+        //Loop and complete action
+        let DataToClient = {}
+        var Transaction = await objUserDb.userDB.transaction();
+        for(let [Action , Value] of Object.entries(PayloadAsObject)){ 
+            if(Action == ProfileActionsServer.CHANGE_PROFILE_IMAGE){
+                if(Value.length < 1){
+                    return res.status(400).json({success:false , message:"Image not uploaded. Try again ...!"})
+                }
+                let CloudinaryResponse = await cloudinary.uploader.upload(Value)
+
+                //Update in Database
+                const NewProfilePic = await objUserDb.AllModels.users.update({profilePic:CloudinaryResponse.secure_url} , {where:{userId:req.user.userId} , returning:true , transaction:Transaction}); 
+
+                DataToClient.ProfilePic = NewProfilePic.profilePic;
+            }
+            if(Action == ProfileActionsServer.CHANGE_PASSWORD){
+                //Validation is done at frontend
+                const OldUserData = await objUserDb.AllModels.users.findOne({where:{userId:req.user.userId}});
+                const IsPasswordMatch = await bcrypt.compare(Value.NewPassword , OldUserData.password);
+                if(!IsPasswordMatch){
+                    await objUserDb.AllModels.userErrorLog.create({ErrorDescription:"Old and New password hash does not match" , ClientorServer:'client'});
+
+                    return req.status(400).json({success:false , message:"Old and New password hash does not match"})   
+                }
+                const PasswordSalt = await bcrypt.genSalt(10)
+                const NewPasswordHash = await bcrypt.hash(Value.NewPassword , PasswordSalt)
+
+                await objUserDb.AllModels.users.update({password:NewPasswordHash} , {where:{userId:req.user.userId} , transaction:Transaction})
+
+            }
+        }
+        await Transaction.commit();
+        return res.status(200).json({success:true , message:"Profile updated successfully." , data:DataToClient});
+    } catch (error) {
+        await objUserDb.AllModels.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
+        await Transaction.rollback()
         return req.status(500).json({success:false , message:error.message})   
     }
 }
@@ -298,6 +355,28 @@ export const verifyOTP = async (OTP) => {
         return {success:true}
     } catch (error) {
         await objUserDb.AllModels.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
+        return req.status(500).json({success:false , message:error.message}) 
+    }
+}
+export const LeaveOrg = async (req , res) => {
+    try {
+        //1. Update userTableID 1
+        //2. Remove in Roles Table.
+        //0.Declarations
+        var Transaction = await objUserDb.userDB.transaction()
+        //1.
+        const NewOrganization = await objUserDb.AllModels.users.update({organizationId:1} , {where:{userId:req.user.userId} , transaction:Transaction});
+
+        //2.
+        await objUserDb.AllModels.roles.destroy({where:{userId:req.user.userId} ,transaction:Transaction});
+
+        //3.
+        await Transaction.commit();
+        return res.status(200).json({success:true , message:"Successfully left the organization..!" ,data:NewOrganization});
+        
+    } catch (error) {
+        await objUserDb.AllModels.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
+        await Transaction.rollback()
         return req.status(500).json({success:false , message:error.message}) 
     }
 }

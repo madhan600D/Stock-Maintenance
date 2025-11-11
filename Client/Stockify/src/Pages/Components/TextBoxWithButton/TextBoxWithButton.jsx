@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import Styles from './TextBoxWithButton.module.css'
 
 import FallBackSpinner from '../Suspense Components/FallBackSpinner/FallBackSpinner';
-function TextBoxWithButton({Logo , ButtonLogo , IsMandatory , FloatingText , Type , ButtonCallBack , EnterCallBack , TBCallBack , Reference , IsSuspense ,ColorPallete}) {
+function TextBoxWithButton({Logo , ButtonLogo , IsMandatory , FloatingText , Type , ButtonCallBack , EnterCallBack , TBCallBack , Reference , IsSuspense ,ColorPallete , Width = '100%'}) {
     //Hooks
     const [TextBoxData , SetTextBoxData] = useState('');
     const [DataTypeRegex , SetDataTypeRegex] = useState();
@@ -44,7 +44,7 @@ function TextBoxWithButton({Logo , ButtonLogo , IsMandatory , FloatingText , Typ
 
 
   return (
-    <div className= {Styles['Main-Div']}>
+    <div className= {Styles['Main-Div']} style={{width:Width}}>
         <div className = {Styles['Logo-Div']} style = {{background:ColorPallete[0]}}>
             <Logo />
         </div>

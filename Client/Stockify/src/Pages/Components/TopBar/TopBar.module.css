@@ -3,20 +3,47 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    background-color: rgba(0, 255, 255, 0.319);
-    position: relative;
+    background-color: #272b34;
+    border-bottom: solid 1px rgba(0, 22, 45, 0.305);
+    padding-left: 1rem;
+    position:sticky;
+    top:0;
+    z-index: 5;
 }
 
 .User-Div{
     display: flex;
     place-items: end;
     right: 0;
+    margin-right: 1rem;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.619);
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 0.5rem;
+    gap:0.5rem;
+    border-radius: 6px;
+    padding-bottom: 0.5rem;
+    transition: all 0.5s ease;
+}
+
+.User-Div:active{
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.619);
 }
 
 .Profile-Div{
-    border: 1px solid white;
     border-radius: 50%;
-    padding: 0.3rem;
+}
+
+.Special-Label{
+    font-size: x-large;
+    color: rgb(255, 255, 255);
+    letter-spacing: 0.05rem;
+
+}
+
+.Special-Label::first-letter {
+  color: rgb(44, 113, 118);  
+  font-weight: bold;
 }
 
 .Profile-Img{

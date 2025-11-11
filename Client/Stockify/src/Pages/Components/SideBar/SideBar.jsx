@@ -145,12 +145,6 @@ function SideBar() {
     URL:'/checkouts'
   },
   {
-    MenuLogo: CgProfile,
-    MenuText: "Profile",
-    Callback:HandleSubPageChange,
-    URL:'/profile'
-  },
-  {
     MenuLogo: IoSettings,
     MenuText: "Settings"
   },
@@ -192,7 +186,7 @@ function SideBar() {
           <div className={Styles['logo']}>
             <img src = {EnventoryLogo} alt="ENventory Logo" className={Styles['']} />
           </div>
-          <FaWindowClose className={Styles['SideBar-Svg']} />
+          {/* <FaWindowClose className={Styles['SideBar-Svg']} /> */}
         </div>
         <div className = {Styles['Content-Div']}>
           {CurrentMenus}

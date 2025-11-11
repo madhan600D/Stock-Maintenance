@@ -93,12 +93,6 @@ function App() {
             path="/create-org"
             element={IsAuthenticated ? OrganizationData.OrganizationID !== 1 ? <Navigate to={'/home'} /> : <CreateOrgPage /> : <Navigate to={'/login'} />}
           />
-
-          <Route
-            path="/invite-to-org"
-            element = {<InviteToOrgPage />}
-          />
-
           <Route
             path='/join-org'
             element = {IsPageLoading ? <PageSuspense /> : IsAuthenticated ? OrganizationData.OrganizationID == 1 ? <JoinOrgPage /> : <Navigate to = {'/home'} /> : <Navigate to = {'/login'} />} />

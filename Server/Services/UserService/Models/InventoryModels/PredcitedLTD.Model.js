@@ -7,6 +7,14 @@ export default (sequelize , DataTypes) => {
             autoIncrement:true 
 
         },
+        OrganizationID:{
+            type:DataTypes.INTEGER,
+            allowNull:false, 
+            references:{
+                model:'organizations',
+                key:'organizationId'
+            }
+        }, 
         //JSON of ProductID:Predicted EWMA 
         PredictedEWMAJSON:{ 
             type:DataTypes.STRING,
@@ -25,7 +33,13 @@ export default (sequelize , DataTypes) => {
         }
     } , {
         tableName:'PredictedLTD',
-        timeStamps:false
+        timestamps:false
     })
+    PredcitedLTDModel.associate = (models) => {
+        PredcitedLTDModel.belongsTo(models.organizations, {
+            foreignKey:'OrganizationID',
+            targetKey:'organizationId'
+        });
+    }
     return PredcitedLTDModel;
 }

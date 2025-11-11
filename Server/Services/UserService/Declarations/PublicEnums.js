@@ -37,3 +37,14 @@ export const EventActionsEnum = Object.freeze({
     ALTER:"ALTER",
     DELETE:"DELETE"
 })
+
+export const ProfileActionsServer = Object.freeze({
+      CHANGE_PASSWORD : "CHANGE_PASSWORD",
+      CHANGE_PROFILE_IMAGE: "CHANGE_PROFILE_IMAGE",
+})
+
+export const RolesEnum = Object.freeze({
+      Admin : "Admin",
+      Manager:"Manager",
+      Staff:"Staff"
+})

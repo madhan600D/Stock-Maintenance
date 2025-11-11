@@ -21,11 +21,13 @@ import PageSuspense from '../Components/Suspense Components/PageSuspense/PageSus
 import TypingSuspense from '../Components/Suspense Components/TypingSuspense/TypingSuspense';
 import ItemAdder from '../Components/ItemAdder/ItemAdder.jsx';
 import SearchBox from '../Components/SearchBox/SearchBox.jsx';
+import { useNavigate } from 'react-router-dom';
 
 function JoinOrgPage() {
     //Login: Code , SignUp: Refferal
     const [CurrentPage , SetCurrentPage] = useState("Login");
     const [FormData , SetFormData] = useState({JoinMethod:"" ,OrganizationJoiningCode:"" , OrganizatinName:""})
+    const navigate = useNavigate()
     const [OTP , SetOTP] = useState();
     const OTPRef = useRef();
     //Store
@@ -48,10 +50,11 @@ function JoinOrgPage() {
     const HandleSubmitButtonClick = async () =>{
         const IsSuccess = await JoinOrg(FormData)
         if(IsSuccess.success){
-            ShowToast()
+            ShowToast(IsSuccess.success , IsSuccess.message)
+            navigate('../home')
         }
         else{
-
+            ShowToast(IsSuccess.success , IsSuccess.message)
         }
     }
     const HandleTextBoxChange = async () => {

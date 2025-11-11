@@ -26,7 +26,7 @@ export const AddCheckOut = async(req , res) => {
             const ProductSale = await objInventoryDataBase.AllModels.DailyProductSales.findOne({where:{[Op.and]:[{ProductID:CartProduct.ProductID , RunDate : OrgState.RunDate}]}})
 
             if(ProductSale){
-                const [NewSale , RowCount] = await objInventoryDataBase.AllModels.DailyProductSales.increment('Quantity', {
+                const [NewSale , RowCount] = await objInventoryDataBase.AllModels.DailyProductSales.increment('SaleQuantity', {
                                 by: CartProduct.Quantity,
                                 where: {[Op.and]:[{ProductID:CartProduct.ProductID , RunDate : OrgState.RunDate}]},
                                 Transaction:Transaction,

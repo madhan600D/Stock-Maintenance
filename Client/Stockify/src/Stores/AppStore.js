@@ -14,7 +14,7 @@ import OrderPage from '../Pages/SubPages/OrderPage/OrderPage.jsx';
 const URLToPage = {'/invite-to-org':InviteToOrgPage , '/dashboard': DashboardPage , '/category':AddCategoryPage , '/vendors':VendorPage , '/products' : ProductPage , '/checkouts':CheckoutPage , '/profile':ProfilePage , '/orgpage':OrganizationPage , '/orders':OrderPage}
 
 const useApp = create((set , get) => ({
-    CurrentPage:'',
+    CurrentPage:ProfilePage,
     
     SetCurrentPage: async(NewURL) => {
         try {

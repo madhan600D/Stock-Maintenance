@@ -4,6 +4,7 @@ import {connect, io} from 'socket.io-client'
 //Declarations
 const ServerURL = import.meta.env.MODE === 'development' ? 'http://localhost:5000/' : '/' ;
 import { ClientSocketEventsEnum } from '../Declarations/ClientPublicEnums.js';
+
 //Methods
 
 const useUser = create((set , get) => ({
@@ -15,8 +16,10 @@ const useUser = create((set , get) => ({
     IsAddUserLoading:false,
     IsUserValidationLoading:false,
     IsPageLoading:false,
+    IsProfileUpdating:false,
     SuspenseTexts:[],
     UserData:{},
+    CurrentRole:'',
     OrganizationData:{},
     SocketState:null,
     CurrentOrg:null,
@@ -50,6 +53,18 @@ const useUser = create((set , get) => ({
                 return ObjError;
             }
     },
+    GetRole:async() => {
+        try {
+            const res = await AxiosInstance.get(`/api/userservice/org/get-role?UserID:${UserData.UserID}`);
+
+            const DataFromBackEnd = res.data.data;
+
+            set({CurrentRole:DataFromBackEnd})
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    ,
     AddUser: async (UserCredentials) => {
         set({IsAddUserLoading:true})
         let DataFromBackend , ObjError = {success:true , message:''};
@@ -70,7 +85,8 @@ const useUser = create((set , get) => ({
                 UserData: {
                     UserName: DataFromBackend.data.UserName,
                     UserMail: DataFromBackend.data.UserMail,
-                    UserID: DataFromBackend.data.UserID
+                    UserID: DataFromBackend.data.UserID,
+                    ProfilePic: DataFromBackend.data.ProfilePic
                 },
                 OrganizationData: {
                     OrganizationID: 1,
@@ -104,8 +120,11 @@ const useUser = create((set , get) => ({
                 UserData: {
                     UserName: DataFromBackend.data.UserName,
                     UserMail: DataFromBackend.data.UserMail,
-                    UserID: DataFromBackend.data.UserID
+                    UserID: DataFromBackend.data.UserID,
+                    ProfilePic: DataFromBackend.data.ProfilePic
+                    
                 },
+                CurrentRole:DataFromBackend.data.Role,
                 OrganizationData: {
                     OrganizationID: DataFromBackend.data.OrganizationID,
                     OrganizationName: DataFromBackend.data.OrganizationName
@@ -147,8 +166,11 @@ const useUser = create((set , get) => ({
                 UserData: {
                     UserName: DataFromBackend.data.UserName,
                     UserMail: DataFromBackend.data.UserMail,
-                    UserID: DataFromBackend.data.UserID
+                    UserID: DataFromBackend.data.UserID,
+                    ProfilePic:DataFromBackend.data.ProfilePic
+                    
                 },
+                CurrentRole:DataFromBackend.data.Role,
                 OrganizationData: {
                     OrganizationID: DataFromBackend.data.OrganizationID,
                     OrganizationName: DataFromBackend.data.OrganizationName
@@ -166,6 +188,29 @@ const useUser = create((set , get) => ({
             set({IsLoginLoading:false})
         }
     },
+    UpdateProfile:async(Payload) => {
+        set({IsProfileUpdating:true})
+        try {
+            //Convert Map to Object
+            const PayloadAsObject = Object.fromEntries(Payload);
+
+            const res = await AxiosInstance.post('/api/userservice/update-profile' , PayloadAsObject);
+            const DataFromBackEnd = res.data?.data;
+            if(DataFromBackEnd){
+                set((State) => ({
+                    UserData:{...State.UserData , ProfilePic:DataFromBackEnd.ProfilePic}
+                }))
+            }
+            return {success:true , message:"Profile updated successfully"};
+        } catch (error) {
+            console.log(error)
+            return{success:false , message:error.response ? error.response.data.message : error.message};   
+        }
+        finally{
+            set({IsProfileUpdating:false})
+        }
+    }
+    ,
     ConnectSocket:async() => {
         try {
             const {UserData , OrganizationData} = get();
@@ -188,7 +233,7 @@ const useUser = create((set , get) => ({
             await get().InitializeSocketEvents(ClientSocketServer);
         } catch (error) {
             console.log(error)
-            return {success:false , message:"Socket connection failed",error}
+            return{success:false , message:error.response ? error.response.data.message : error.message};   
         }
     },
     InitializeSocketEvents:async(Socket) => {
@@ -239,7 +284,8 @@ const useUser = create((set , get) => ({
             await get().DisconnectSockets();
             return {success:true , message:"Logged out successfully...!"}
         } catch (error) {
-            return {success:true , message:"Logged out failed...!"}
+            console.log(error)
+            return{success:false , message:error.response ? error.response.data.message : error.message};   
         }
     },
     GetLoadingTexts: async () => {

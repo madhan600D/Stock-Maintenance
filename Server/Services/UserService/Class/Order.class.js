@@ -29,7 +29,7 @@ class Orders{
             //Get Vendor Data
             const VendorData = await this.DataBase.AllModels.Vendors.findOne({where:{VendorID:VendorID} ,raw:true});
 
-            //Place orders of products that will be soon breach the reorder threshold.
+            //Place orders of products that will be soon breach the reorder threshold.TBD: Simulate and combine order
             this.ClubOrder(VendorID , OrderData , UserData);
 
             //Filter products that are in running orders.
@@ -50,6 +50,7 @@ class Orders{
         }
     } 
     async PlaceManualOrder(UserData , OrderJSON , TotalExpense){
+        //API:{UserData}: {OrganizationName , organizationId , RunDate}
         //API:{OrderJson}: [{ProductID , ProductName ,Quantity} , {ProductID, ProductName ,Quantity}]
         try {
             //Reset global variables
@@ -77,7 +78,7 @@ class Orders{
                 //DB Updation 
                 if(IsSuccess){
                     NewOrder = await objInventoryDataBase.AllModels.Orders.create(
-                    {OrganizationID:UserData.organizationId ,
+                    {OrganizationID:UserData.organizationId || UserData.OrganizationID,
                      VendorID:VendorAPI.VendorID,
                      IsDelivered:false,
                      OrderDate:UserData.RunDate,
@@ -153,7 +154,7 @@ class Orders{
             }
             else{
                 //Create new record
-                await objInventoryDataBase.AllModels.create({
+                await objInventoryDataBase.AllModels.LeadTimeTracker.create({
                     VendorID:OrderDataFromDB.VendorID,
                     OrganizationID:UserData.OrganizationID,
                     AverageLeadTime:TimeToDeliver === 0 ? 1 : TimeToDeliver,

@@ -1,7 +1,7 @@
 import { Op } from "sequelize"
 import objUserDb from "../../../Utils/userDB.js"
 import AccessControl from "../../../Class/AccessControl.class.js"
-import { ActionEnum, ControlEnum } from "../../../Declarations/PublicEnums.js"
+import { ActionEnum, ControlEnum, RolesEnum } from "../../../Declarations/PublicEnums.js"
 export const CreateOrgValidate = async (req , res , next) => {
     try {
         const {OrganizationName , TypeOfBusiness , Address , ClosingTime , Weekends} = req?.body 
@@ -68,6 +68,20 @@ export const CloseDayValidate = async(req , res , next) => {
             return res.status(400).json({success:false , message:"You don't have access to close day."})
         }
 
+        next()
+    } catch (error) {
+        await objUserDb.AllModels.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
+        return res.status(500).json({success:false , message:error.message})
+    }
+}
+
+export const LeaveOrgValidate = async(req , res , next) => {
+    try {
+        //1. No admin can leave the organization.
+        const RoleDetail = await objUserDb.AllModels.roles.findOne({where:{userId:req.user.userId}});
+        if(RoleDetail.role === RolesEnum.Admin){
+            return res.status(400).json({success:false , message:"Admin can't exit org"})
+        }
         next()
     } catch (error) {
         await objUserDb.AllModels.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})

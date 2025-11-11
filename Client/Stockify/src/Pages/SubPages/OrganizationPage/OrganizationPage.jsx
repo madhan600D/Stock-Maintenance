@@ -23,6 +23,7 @@ import ActionButton from '../../Components/ActionButton/ActionButton.jsx';
 import TypingSuspense from '../../Components/Suspense Components/TypingSuspense/TypingSuspense.jsx';
 import ShowToast from '../../Components/Toast/Toast.js';
 import { ToastContainer } from 'react-toastify';
+import BarChart from '../../Components/Graphs/BarChart/BarChart.jsx';
 function OrganizationPage() {
     const [ShowInviteDiv , SetShowInviteDiv] = useState(false);
     const [ShowCloseDayPage , SetShowCloseDayPage] = useState(false);
@@ -145,7 +146,11 @@ function OrganizationPage() {
                 </div>
             </div>
             <div>
-
+                <BarChart 
+                    Data={[{ValX:'PS4' , ValY:100} , {ValX:'Xbox1' , ValY:600} , {ValX:'PC' , ValY:800} , {ValX:'Nintendo' , ValY:1000}]}
+                    Height={300}
+                    Width={400}
+                />
             </div>
             <div style={{position:'absolute' , right:0 , bottom:0}}>
                     <DialButton 
