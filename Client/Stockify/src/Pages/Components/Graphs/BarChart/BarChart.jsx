@@ -46,8 +46,11 @@ function BarChart({ Data, Height, Width }) {
     // Y Axis
     SVG.append("g").call(d3.axisLeft(YScale));
 
+    //Bar Colors
+    const ColorScale = d3.scaleOrdinal(d3.schemeOranges)
     //Bars setup 
     const Bar = SVG .selectAll("rect") .data(Data) 
+
     
     Bar.enter().append("rect") 
         .attr('x' , (D) => XScale(D.ValX)) 
@@ -56,7 +59,7 @@ function BarChart({ Data, Height, Width }) {
         .attr('fill' , 'steelblue')
         .attr("y", Height)                // Start from bottom (invisible)
         .attr("height", 0)                // Start with zero height
-        .attr("fill", "orange")
+        .attr("fill", 'orange')
         .transition()                     // Animate to final position
         .duration(500)                   // 1 second animation
         .ease(d3.easeLinear)           // Smooth easing
@@ -65,7 +68,12 @@ function BarChart({ Data, Height, Width }) {
 
   }, [Data, Height, Width]);
 
-  return <svg ref={SVGRef} className={Styles["Main-SVG"]} />;
+  return (
+    <div className = {Styles['Main-Div']}>
+      <svg ref={SVGRef} className={Styles["Main-SVG"]} />
+    </div>
+    
+);
 }
 
 export default BarChart;

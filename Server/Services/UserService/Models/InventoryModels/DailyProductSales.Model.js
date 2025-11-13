@@ -6,6 +6,14 @@ export default (sequelize , DataTypes) => {
             primaryKey:true,
             autoIncrement:true
         },
+        OrganizationID:{
+            type:DataTypes.INTEGER,
+            allowNull:false,
+            references:{
+                model:'organizations',
+                key:'organizationId'
+            }
+        },
         ProductID:{ 
             type:DataTypes.INTEGER,
             allowNull:false,
@@ -23,13 +31,17 @@ export default (sequelize , DataTypes) => {
             allowNull:false
         }
     } , {
-        tableName:'DailyProductSales',
-        timeStamps:false
+        tableName:'DailyProductSales', 
+        timestamps:false
     })
     DailyProductSalesModel.associate = (Models) => {
         DailyProductSalesModel.belongsTo(Models.Products, {
             foreignKey: 'ProductID',
             targetKey: 'ProductID', 
+        })
+        DailyProductSalesModel.belongsTo(Models.organizations, {
+            foreignKey: 'OrganizationID',
+            targetKey: 'organizationId', 
         });
     }
     return DailyProductSalesModel;

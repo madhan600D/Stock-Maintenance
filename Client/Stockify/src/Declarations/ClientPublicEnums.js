@@ -11,3 +11,9 @@ export const EventActionsEnum = Object.freeze({
     ALTER:"ALTER",
     DELETE:"DELETE"
 })
+
+export const GraphTypes = Object.freeze({
+    BAR_CHART:"BAR_CHART",
+    SINGLELINE_CHART:"SINGLELINE_CHART",
+    MULTILINE_CHART:"MULTILINE_CHART"
+})

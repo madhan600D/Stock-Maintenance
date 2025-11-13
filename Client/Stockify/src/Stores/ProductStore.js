@@ -17,6 +17,9 @@ import useUser from './UserStore.js';
     Currency:[],
     CurrentOrders:[],
     OrderHistory:[],
+    OrganizationAnalytics:[],
+    ProductAnalytics:[],
+    VendorAnalytics:[],
     HighSellingProducts:[],
     PNL:{TotalRevenue:0 , TotalExpense:0},
     GetProducts : async(CatID = 0) => {
@@ -31,6 +34,24 @@ import useUser from './UserStore.js';
             console.log(error.message)
             return {success:false , message:"Error at organization validation ...!"}
             
+        }
+    },
+    GetPerformance:async() => {
+        try {
+            const res = await AxiosInstance.get('/api/userservice/inv/get_analytics');
+            const DataFromBackEnd = res.data?.data;
+
+            //Fill states
+            set({
+                OrganizationAnalytics:[DataFromBackEnd.OrganizationAnalytics],
+                ProductAnalytics:[DataFromBackEnd.ProductAnalytics],
+                VendorAnalytics:[DataFromBackEnd.VendorAnalytics],
+            })
+
+            return
+        } catch (error) {
+            console.log(error.message)
+            return {success:false , message:"Error at while filling analytics ...!"}
         }
     },
     GetCategory : async(CatID = 0) => {

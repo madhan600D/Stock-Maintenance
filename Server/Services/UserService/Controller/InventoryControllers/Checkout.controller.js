@@ -37,7 +37,8 @@ export const AddCheckOut = async(req , res) => {
                 await objInventoryDataBase.AllModels.DailyProductSales.create({
                     ProductID:CartProduct.ProductID,
                     RunDate:OrgState.RunDate,
-                    SaleQuantity:CartProduct.Quantity
+                    SaleQuantity:CartProduct.Quantity,
+                    OrganizationID:req.user.organizationId
                 })
             }
 

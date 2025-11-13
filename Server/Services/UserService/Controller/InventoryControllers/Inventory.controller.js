@@ -1,4 +1,4 @@
-import { Op, Transaction, where } from "sequelize";
+import { col, fn, Op, Transaction, where } from "sequelize";
 import objInventoryDataBase from "../../Utils/InventoryDB.js";
 
 import cloudinary from "../../Lib/Cloudinary.js";
@@ -212,5 +212,61 @@ export const GetCurrency = async (req , res) => {
         return res.status(200).json({success:true , message:"Products removed successfully" , data:Currency})
     } catch (error) {
         console.log("Failed to get currency")
+    }
+}
+
+
+export const GetAnalytics = async (req , res) => {
+    try {
+        //1. GetOrganizationPerformance
+        const OrganizationAnalytics = await objInventoryDataBase.AllModels.DailyProductSales.findAll({
+            attributes:['RunDate' , [fn('SUM' , col('SaleQuantity')) , 'Sales']],
+            group:['RunDate'],
+            where:{OrganizationID:req.user.organizationId},
+            raw:true
+        })
+
+        //2.ProductPerformance
+        const ProductAnalytics = await objInventoryDataBase.AllModels.DailyProductSales.findAll({
+            include: [
+                {
+                    model: objInventoryDataBase.AllModels.Products,
+                    attributes: [] 
+                }
+                ],
+            attributes: [
+                'RunDate',
+                'SaleQuantity',
+                [col('Product.ProductName'), 'ProductName']
+            ],
+            where:{OrganizationID:req.user.organizationId},
+            order:[['SaleQuantity' , 'DESC']],
+            limit:10,
+            raw: true 
+            });
+        
+        //3.VendorPerformance
+        const VendorAnalytics = await objInventoryDataBase.AllModels.ConfirmedOrders.findAll({
+        include: [
+            {
+            model: objInventoryDataBase.AllModels.Vendors,
+            attributes: []
+            }
+        ],
+        attributes: [
+            [col('Vendor.VendorName'), 'VendorName'],
+            [fn('COUNT', col('OrderConfirm.VendorID')), 'DeliveredOrders']
+        ],
+        group: ['Vendor.VendorName', 'OrderConfirm.VendorID'],
+        raw: true
+        });
+
+        let DataToClient = {OrganizationAnalytics:OrganizationAnalytics , ProductAnalytics:ProductAnalytics , VendorAnalytics:VendorAnalytics};
+
+        return res.status(200).json({success:true , data:DataToClient});
+
+    } catch (error) {
+        await objUserDb.AllModels.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
+        return req.status(500).json({success:false , message:error.message})
     }
 }

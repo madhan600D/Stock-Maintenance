@@ -8,7 +8,7 @@ class UserServiceStartup{
     async Startup(){
         try {
             console.log("Startup initiated ...!")
-            await this.StartAutoDayShifter()
+            // await this.StartAutoDayShifter()
         } catch (error) {
             
         }
