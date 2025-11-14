@@ -18,7 +18,7 @@ export default (Sequelize , DataTypes) => {
         }
     },
     CheckOutDate:{
-        type:DataTypes.DATE,
+        type:DataTypes.DATEONLY,
         allowNull:false
     },
     NoOfItems:{

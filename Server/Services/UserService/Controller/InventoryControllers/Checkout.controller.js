@@ -108,6 +108,8 @@ export const GetCurrentDayCheckout = async (req , res) => {
     
         clientData.MostSellingProducts = MergedCheckouts.sort((a , b) => b.Quantity - a.Quantity);
 
+        // console.log('Most seller from server' , clientData) 
+
         return res.status(200).json({success:true , data:clientData});
         
     } catch (error) {
@@ -116,3 +118,17 @@ export const GetCurrentDayCheckout = async (req , res) => {
 }
 
 
+export const GetCheckOuts = async (req , res) => {
+    try {
+        const Checkouts = await objInventoryDataBase.AllModels.CheckOuts.findAll({
+            where:{OrganizationID:req.user.organizationId},
+            attributes:['CheckOutID' , 'CheckOutDate' , 'TotalCost'],
+            raw:true
+        })
+
+        return res.status(200).json({success:true , data:Checkouts});
+        
+    } catch (error) {
+        console.log(error)
+    }
+}

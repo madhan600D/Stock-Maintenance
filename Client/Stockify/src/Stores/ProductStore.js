@@ -14,6 +14,7 @@ import useUser from './UserStore.js';
     Category:[],
     Products:[],
     Vendors:[],
+    CheckOuts:[],
     Currency:[],
     CurrentOrders:[],
     OrderHistory:[],
@@ -21,6 +22,7 @@ import useUser from './UserStore.js';
     ProductAnalytics:[],
     VendorAnalytics:[],
     HighSellingProducts:[],
+    AverageLeadTime:[],
     PNL:{TotalRevenue:0 , TotalExpense:0},
     GetProducts : async(CatID = 0) => {
         try {
@@ -69,6 +71,22 @@ import useUser from './UserStore.js';
             console.log(error.message)
             return {success:false , message:"Error at organization validation ...!"}
             
+        }
+    },
+    GetCheckoutsClient:async() => {
+        try {
+            const res = await AxiosInstance.get('api/userservice/inv/get_checkouts');
+            const DataFromBackEnd = res.data.data;
+            if(DataFromBackEnd){
+                set({CheckOuts:[DataFromBackEnd]})
+                return {success:true}
+            }
+            else{
+                return
+            }
+        } catch (error) {
+            console.log(error.message)
+            return {success:false , message:"Error at Vendor get ...!"}
         }
     },
     GetVendors:async() => {
@@ -202,6 +220,18 @@ import useUser from './UserStore.js';
             return {success:true , message:"Order delivery confirmed...!"}
         } catch (error) {
             return {success:false , message:error}
+        }
+    },
+    GetEWMAAnalytics:async() => {
+        try {
+            const res = await AxiosInstance.get('/api/userservice/inv/get_ewma_analytics');
+
+            const DataFromBackEnd = res?.data?.data;
+            
+            set({AverageLeadTime:[DataFromBackEnd.AverageLeadTime]})
+        } catch (error) {
+            console.log(error.message)
+            return{success:true , message:error?.response?.data?.message ?? "Error while loading EWMA Analytics"};
         }
     },
     GetCurrency:async() => {

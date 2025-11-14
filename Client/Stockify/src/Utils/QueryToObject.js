@@ -42,7 +42,7 @@ export const StateToChart =  (Query , Attributes = [] , ChartType) =>{
         let GraphObject = []
         switch (ChartType){
             case GraphTypes.SINGLELINE_CHART:
-                for(let Data of Query[0]){
+                for(let Data of Query[0] ){
                     const SingleSeries = {
                         XVal:Data[Attributes[0]],
                         YVal:[Data[Attributes[1]]]
@@ -60,6 +60,18 @@ export const StateToChart =  (Query , Attributes = [] , ChartType) =>{
                     GraphObject.push(Temp)
                 }
                 return GraphObject;
+            case GraphTypes.BAR_CHART_OBJECT:
+                Object.entries(Query[0]).forEach(([Key, Value], Index) => {
+                const Obj = {
+                    ValX: Attributes[Index],
+                    ValY: Query[0][Attributes[Index]]
+                };
+                GraphObject.push(Obj);
+            });
+
+                
+                
+                return GraphObject
             }
     } catch (error) {
         console.log(error)

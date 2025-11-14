@@ -15,6 +15,7 @@ const URLToPage = {'/invite-to-org':InviteToOrgPage , '/dashboard': DashboardPag
 
 const useApp = create((set , get) => ({
     CurrentPage:ProfilePage,
+    SideBarState:'OPEN',
     
     SetCurrentPage: async(NewURL) => {
         try {
@@ -23,9 +24,16 @@ const useApp = create((set , get) => ({
             return
 
         } catch (error) {
-            
+            console.log(error)
         }
     },
+    SetSideBarState:async() =>{
+        try {
+            set((State) => ({SideBarState:State.SideBarState = State?.SideBarState == 'OPEN' ? 'CLOSE' : 'OPEN'}))
+        } catch (error) {
+            console.log(error)
+        }
+    }
 }))
 
 

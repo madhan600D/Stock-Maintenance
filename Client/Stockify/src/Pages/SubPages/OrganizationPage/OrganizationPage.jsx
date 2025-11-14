@@ -3,7 +3,7 @@ import Styles from './OrganizationPage.module.css'
 
 //Icons
 import { BsBuildingFill } from "react-icons/bs";
-import { StateToTable } from '../../../Utils/QueryToObject';
+import { StateToChart, StateToTable } from '../../../Utils/QueryToObject';
 import { HiMiniMegaphone } from "react-icons/hi2";
 import { CiShare2 } from "react-icons/ci";
 import { FaShop } from "react-icons/fa6";
@@ -24,12 +24,18 @@ import TypingSuspense from '../../Components/Suspense Components/TypingSuspense/
 import ShowToast from '../../Components/Toast/Toast.js';
 import { ToastContainer } from 'react-toastify';
 import BarChart from '../../Components/Graphs/BarChart/BarChart.jsx';
+import { GraphTypes } from '../../../Declarations/ClientPublicEnums.js';
+import UseProduct from '../../../Stores/ProductStore.js';
 function OrganizationPage() {
+    //States
     const [ShowInviteDiv , SetShowInviteDiv] = useState(false);
     const [ShowCloseDayPage , SetShowCloseDayPage] = useState(false);
     const [OrganizationDataState , SetOrganizationDataState] = useState();
     const [PNLData , SetPNLData] = useState();
+    const [OrgActivityData , SetOrgActivityData] = useState();
+
     const {OrganizationData , IsClosingDay , CloseDay} = useOrg();
+    const {CheckOuts , OrderHistory , CurrentOrders} = UseProduct();
     const FormRef = useRef()
    const OrgDataEditColumnMap = new Map([
   [
@@ -48,11 +54,20 @@ function OrganizationPage() {
     const DialActions = [{Logo:HiMiniMegaphone , Callback:() => {SetShowInviteDiv(true)} , Tooltip:"Invite"} , {Logo:CiShare2 , Callback:() => {console.log("Summa")} , Tooltip:"Share"} , {Logo:SlCalender , Callback:() => {SetShowCloseDayPage(true)} ,Tooltip:"CloseDay"}]
     //Effects
     useEffect(() => {
-        const OrgDetailsTable = StateToTable(OrganizationData , {} , ["RunDate" , "OrganizationName","CurrentDaySales","ClosingTime","Weekends"])
+        const OrgDetailsTable = StateToTable(OrganizationData , {} , ["RunDate" , "OrganizationName","Weekends"])
         SetOrganizationDataState(OrgDetailsTable)
         
-        const PNL = StateToTable(OrganizationData , {} , ["TotalRevenue" , "TotalExpense"])
-        SetPNLData(PNL)
+        // const PNL = StateToTable(OrganizationData , {} , ["TotalRevenue" , "TotalExpense"])
+        // SetPNLData(PNL)
+
+        const PNLGraph = StateToChart(OrganizationData && OrganizationData[0] , ['TotalRevenue' , 'TotalExpense'] , GraphTypes.BAR_CHART_OBJECT)
+
+        SetPNLData(PNLGraph);
+
+        const OrganizationActivity = {TotalCheckouts:CheckOuts[0]?.length, TotalOrders:CurrentOrders[0]?.length + OrderHistory[0]?.length , DeliveredOrders:OrderHistory[0]?.length , StandingOrders:CurrentOrders[0]?.length}
+        const OrgActivity = StateToChart([OrganizationActivity] , ['TotalCheckouts','TotalOrders' , 'DeliveredOrders' , 'StandingOrders'] , GraphTypes.BAR_CHART_OBJECT)
+        SetOrgActivityData(OrgActivity);
+
     } , [OrganizationData])
     //Events
     useEffect(() => {
@@ -134,19 +149,26 @@ function OrganizationPage() {
 
                 )}
                 </div>
-                <div style={{marginTop:'1rem'}}>
-                    {PNLData && PNLData?.Columns && (
-                        <Table 
-                            TableName={"Profit to Loss"}
-                            TableArg={PNLData}
-                            Dimensions={['25%' , '']}
-                            DisplayOptions = {false}
-                        />
-                    )}
+                <div style={{marginTop:'1rem'}} className = {Styles['Graph-Div']}>
+                    <BarChart 
+                        Data={PNLData}
+                        ChartName='PNL Ratio'
+                        Height={200}
+                        Width={300}
+                        XLabel='Expense/Revenue'
+                        YLabel='Value'
+                    />
+
+                    <BarChart 
+                        Data={OrgActivityData}
+                        ChartName='Organization Activity'
+                        Height={200}
+                        Width={300}
+                        XLabel='Activity'
+                        YLabel='Value'
+                        CustomColors
+                    />
                 </div>
-            </div>
-            <div>
-                
             </div>
             <div style={{position:'absolute' , right:0 , bottom:0}}>
                     <DialButton 

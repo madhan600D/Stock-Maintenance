@@ -17,6 +17,7 @@ import Table from '../../Components/Table/Table.jsx';
 
 //Icons
 import { FaShoppingCart } from "react-icons/fa";
+import { FaBoxOpen } from "react-icons/fa";
 import { VscClearAll } from "react-icons/vsc";
 import { MdDeleteOutline } from "react-icons/md";
 import { LiaCartArrowDownSolid } from "react-icons/lia";
@@ -24,7 +25,6 @@ import { FaCartPlus } from "react-icons/fa";
 import { FaHistory } from "react-icons/fa";
 import { IoCartOutline } from "react-icons/io5";
 import { FaClipboardCheck } from "react-icons/fa6";
-import { TiTick } from "react-icons/ti";
 import { PiListDashesFill } from "react-icons/pi";
 import { ToastContainer } from 'react-toastify';
 import LabelWithLogo from '../../Components/LabelWithLogo/LabelWithLogo.jsx';
@@ -306,16 +306,16 @@ function OrderPage() {
                 <div style={{display:'flex' , gap:'1rem' ,width:'100%' , justifyContent:'space-around' , marginBottom:'2rem'}}>
                     <LabelWithLogo 
                         Header={"Open Orders"}
-                        Value={10}
-                        Logo={FaHistory}
-                        BGColor={'rgba(136, 255, 72, 0.8)'}
+                        Value={CurrentOrders[0]?.length}
+                        Logo={FaBoxOpen}
+                        BGColor={'rgba(136, 255, 72, 0.52)'}
                         Dimension={['25rem' , '5rem']}
                     />
                     <LabelWithLogo 
                         Header={"Order History"}
-                        Value={10}
+                        Value={OrderHistory[0]?.length}
                         Logo={FaHistory}
-                        BGColor={'rgba(148, 49, 0, 0.8)'}
+                        BGColor={'rgba(148, 49, 0, 0.45)'}
                         Dimension={['25rem' , '5rem']}
                     />
                 </div>

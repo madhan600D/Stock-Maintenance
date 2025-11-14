@@ -7,10 +7,10 @@ import { AddVendorValidate } from '../MiddleWares/EndPointValidations/InventoryE
 import { AddCheckOutValidate } from '../MiddleWares/EndPointValidations/InventoryEndPointValidations/CheckOut.validate.js';
 
 //Controllers
-import { GetProductsForOrganization, AddProductForOrganization , GetCategoryForOrganization, AlterProductForOrganization, DeleteProducts, AddCategoryForOrganization, GetCurrency, GetAnalytics} from '../Controller/InventoryControllers/Inventory.controller.js';
+import { GetProductsForOrganization, AddProductForOrganization , GetCategoryForOrganization, AlterProductForOrganization, DeleteProducts, AddCategoryForOrganization, GetCurrency, GetAnalytics, GetEWMAAnalytics} from '../Controller/InventoryControllers/Inventory.controller.js';
 import { AlterWorker, GetUsers , GetVendors } from '../Controller/InventoryControllers/UserManagement.controller.js';
 import { AddVendor } from '../Controller/InventoryControllers/Vendor.controller.js';
-import { AddCheckOut , GetCurrentDayCheckout} from '../Controller/InventoryControllers/Checkout.controller.js';
+import { AddCheckOut , GetCheckOuts, GetCurrentDayCheckout} from '../Controller/InventoryControllers/Checkout.controller.js';
 import { ConfirmOrder, GetOrders, PlaceManualOrder } from '../Controller/InventoryControllers/Order.controller.js';
 import { ConfirmOrderValidate } from '../MiddleWares/EndPointValidations/InventoryEndPointValidations/Orders.validate.js';
 
@@ -39,6 +39,7 @@ InventoryRouter.get('/get_currency' , GetCurrency);
 //CheckOut Routers
 InventoryRouter.put('/add_checkout' , AddCheckOutValidate , AddCheckOut);
 InventoryRouter.get('/get_today_checkout' , GetCurrentDayCheckout);
+InventoryRouter.get('/get_checkouts' , GetCheckOuts)
 
 //User Routers
 InventoryRouter.get('/get_workforce' ,  GetUsers);
@@ -49,6 +50,9 @@ InventoryRouter.patch('/alter_worker' , AlterWorker);
 InventoryRouter.put('/add_order' , PlaceManualOrder)
 InventoryRouter.put('/confirm_order' , ConfirmOrderValidate , ConfirmOrder);
 InventoryRouter.get('/get_orders' , GetOrders);
+
+//EWMA Routers
+InventoryRouter.get('/get_ewma_analytics' , GetEWMAAnalytics)
 
 //Analytics Routers
 InventoryRouter.get('/get_analytics' , GetAnalytics);

@@ -63,3 +63,15 @@
     
     transform: scale(0.93);
 }
+
+.Graph-Div{
+    display: grid;
+    grid-template-columns:auto auto;
+    justify-content: space-around;
+    grid-auto-rows: max-content;
+    grid-auto-columns: max-content;
+    gap: 0.5rem;
+    background-color: #959ba415;
+    padding: 1rem;
+    border-radius: 20px;
+}

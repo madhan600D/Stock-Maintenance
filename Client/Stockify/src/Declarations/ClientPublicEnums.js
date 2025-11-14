@@ -15,5 +15,6 @@ export const EventActionsEnum = Object.freeze({
 export const GraphTypes = Object.freeze({
     BAR_CHART:"BAR_CHART",
     SINGLELINE_CHART:"SINGLELINE_CHART",
-    MULTILINE_CHART:"MULTILINE_CHART"
+    MULTILINE_CHART:"MULTILINE_CHART",
+    BAR_CHART_OBJECT:'BAR_CHART_OBJECT'
 })

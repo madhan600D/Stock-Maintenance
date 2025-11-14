@@ -245,29 +245,29 @@ export const ManualCloseDay = async(req , res) => {
                 //Add to order array
                 OrderArray.push({ProductID:Product.ProductID , ProductName:Product.ProductName , Quantity:LTDforProduct.data})
 
-                //ProductEWMA result for DB updation
-                ProductEWMA.push({ProductID:Product.ProductID , SimulatedLTD:LTDforProduct.data})
+                
             }
+            //ProductEWMA result for DB updation
+            ProductEWMA.push({ProductID:Product.ProductID , SimulatedLTD:LTDforProduct.data})
         }
 
+        //Prepare parameters for order
+        const OrganizationData = await objInventoryDataBase.AllModels.organizations.findOne({where:{organizationId:req.user.organizationId} , raw:true});
+
+        const OrgState = await objInventoryDataBase.AllModels.OrgState.findOne({where:{OrganizationID:req.user.organizationId}});
+
+        let UserDataParam = {OrganizationID:req.user.organizationId , OrganizationName:OrganizationData.OrganizationName , RunDate:OrgState.RunDate};
+
         if(OrderArray.length > 0){
-            //Prepare parameters for order
-            const OrganizationData = await objInventoryDataBase.AllModels.organizations.findOne({where:{organizationId:req.user.organizationId} , raw:true});
-
-            const OrgState = await objInventoryDataBase.AllModels.OrgState.findOne({where:{OrganizationID:req.user.organizationId}});
-
-            //Update EWMA results in DB
-            await ObjSimulation.UpdateEWMAResult(ProductEWMA , {OrganizationID:OrganizationData.organizationId , RunDate:OrgState.RunDate , Transaction}); 
-
-            let UserDataParam = {OrganizationID:req.user.organizationId , OrganizationName:OrganizationData.OrganizationName , RunDate:OrgState.RunDate};
-
             //Place order
             await ObjOrder.PlaceManualOrder(UserDataParam , OrderArray);
 
             console.log(`Order Placed for ${OrganizationData.OrganizationName}. Order Details: ${OrderArray}`);
             
         }
-        
+        //Update EWMA results in DB
+        await ObjSimulation.UpdateEWMAResult(ProductEWMA , {OrganizationID:OrganizationData.organizationId , RunDate:OrgState.RunDate , Transaction}); 
+
         const NextRundate = await ObjDateManipulations.GetNextBusinessDay(OrganizationState.RunDate , {OrganizationID:req.user.organizationId});
 
         if(!NextRundate.success){

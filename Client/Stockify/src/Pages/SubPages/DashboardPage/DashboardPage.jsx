@@ -26,7 +26,7 @@ import BarChart from '../../Components/Graphs/BarChart/BarChart.jsx';
 
 function DashboardPage() {
   //Destructure Store hooks
-  const {GetProducts , OrganizationAnalytics , ProductAnalytics , Products , VendorAnalytics} = UseProduct();
+  const {GetProducts , OrganizationAnalytics , ProductAnalytics , Products , VendorAnalytics , Category , PNL} = UseProduct();
   const {OrganizationData} = useOrg();
 
   //States
@@ -66,26 +66,27 @@ function DashboardPage() {
             <LabelWithLogo 
                 Logo={MdWindow}
                 Header={"Categories"}
-                Value={8}
+                Value={Category[0]?.length}
                 BGColor={"#1e7a00ff"}
             />
             <LabelWithLogo 
                 Logo={BsBoxes}
                 Header={"Products"}
-                Value={54}
+                Value={Products[0].length}
                 BGColor={"#2b7877ff"}
             />
             <LabelWithLogo 
                 Logo={FaHandsHelping}
                 Header={"Investment"}
-                Value={'$4500'}
+                Value={`$${OrganizationData[0][0]?.TotalExpense}`}
                 BGColor={"#a14134ff"}
             />
             <LabelWithLogo 
                 Logo={BsCurrencyDollar}
                 Header={"Turnover"}
-                Value={'$8500'}
+                Value={`$${OrganizationData[0][0]?.TotalRevenue}`}
                 BGColor={"#2f2d2cff"}
+
             />
         </div>
         <div className = {Styles['Top-Div2']}>
@@ -118,9 +119,12 @@ function DashboardPage() {
           
         />
         <BarChart 
+          ChartName='No of orders delivered'
           Data={VendorChartData}
           Height={300}
           Width={500}
+          XLabel='Vendors'
+          YLabel='Delivered Orders'
         />
 
       </div>

@@ -22,7 +22,7 @@ const useOrg = create((set , get) => ({
             DataFromBackend  = res.data.data;
 
             //Set Global org state
-            set({OrganizationData:{OrganizationData:{OrganizationName:DataFromBackend.OrganizationName , OrganizationID: DataFromBackend.OrganizationID} , OrganizationJoiningCode: DataFromBackend.OrganizationJoiningCode , RunDate:DataFromBackend.RunDate , CurrentDaySales:DataFromBackend.OrgState.CurrentDaySales , ClosingTime:DataFromBackend.ClosingTime ,Weekends:DataFromBackend.OrgState.Weekends , TotalExpense:DataFromBackend.PNL.TotalExpense , TotalRevenue:DataFromBackend.PNL.TotalRevenue}});
+            set({OrganizationData:{OrganizationData:{OrganizationName:DataFromBackend.OrganizationName , OrganizationID: DataFromBackend.OrganizationID , OrganizationJoiningCode: DataFromBackend.OrganizationJoiningCode , RunDate:DataFromBackend.RunDate , CurrentDaySales:DataFromBackend.OrgState.CurrentDaySales , ClosingTime:DataFromBackend.ClosingTime ,Weekends:DataFromBackend.OrgState.Weekends , TotalExpense:DataFromBackend.PNL.TotalExpense , TotalRevenue:DataFromBackend.PNL.TotalRevenue}}});
 
             //Set message to error object
             ObjError.message = "Organization created successfully"

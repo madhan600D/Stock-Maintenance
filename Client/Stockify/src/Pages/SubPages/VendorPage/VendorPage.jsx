@@ -7,6 +7,11 @@ import { MdOutlineEventAvailable } from "react-icons/md";
 import { FaHourglassEnd } from "react-icons/fa6";
 import { MdBusinessCenter } from "react-icons/md";
 import { IoLocationSharp } from "react-icons/io5";
+import { FaTruck } from "react-icons/fa";
+import { CiViewTable } from "react-icons/ci";
+
+import { VscGraphLine } from "react-icons/vsc";
+
 
 //Components
 import SimpleButton from '../../Components/SimpleButton/SimpleButton';
@@ -20,23 +25,31 @@ import TextBoxWithLogo from '../../Components/TextBoxWithLogo/TextBoxWithLogo.js
 import MenuItem from '@mui/material/MenuItem';
 import { GiSatelliteCommunication } from "react-icons/gi";
 import Table from '../../Components/Table/Table.jsx';
+import BarChart from '../../Components/Graphs/BarChart/BarChart.jsx'
 
 //Stores
 import UseProduct from '../../../Stores/ProductStore.js';
-import { StateToTable } from '../../../Utils/QueryToObject.js';
+import { StateToChart, StateToTable } from '../../../Utils/QueryToObject.js';
 import ShowToast from '../../Components/Toast/Toast.js';
 import { ToastContainer } from 'react-toastify';
+import PageSelector from '../../Components/PageSelector/PageSelector.jsx';
+import { GraphTypes } from '../../../Declarations/ClientPublicEnums.js';
 
 function VendorPage() {
     //Hooks
     const [ShowDiv , SetShowDiv] = useState(false);
     const [TableData , SetTableData] = useState();
+    const [AverageLeadTimeGraphData , SetAverageLeadTimeGraphData] = useState();
+
+    //Login --> Graph , SignUp --> Table
+    const [CurrentView , SetCurrentView] = useState("Login");
+
     const VendorNameRef = useRef();
     const VendorLocationRef = useRef();
     const VendorAPIRef = useRef();
 
     //Destructure
-    const {GetVendors , Vendors , AddVendor} = UseProduct();
+    const {GetVendors , Vendors , AddVendor , AverageLeadTime , CurrentOrders} = UseProduct();
     const InitialState = {VendorName:"" , VendorLocation:"" , VendorAPIType:"" , VendorAPI:""}
 
 
@@ -45,11 +58,15 @@ function VendorPage() {
         async function CallTheGetVendors() {
             const IsSuccess =  await GetVendors();
             if(IsSuccess){
-                const table =  StateToTable(UseProduct.getState().Vendors, {}); 
+                const table =  StateToTable(Vendors, {} , ['VendorName' , 'VendorLocation' , 'VendorAPI']); 
                 SetTableData(table);
             }
         }   
         CallTheGetVendors()
+        console.log('This is CurentOrders' , CurrentOrders)
+        const AverageLeadTimeGraph = StateToChart(AverageLeadTime , ['VendorName' , 'AverageLeadTime' ] , GraphTypes.BAR_CHART);
+        SetAverageLeadTimeGraphData(AverageLeadTimeGraph);
+
     } , [])
     //Themes
     const APISelect = createTheme({
@@ -209,29 +226,35 @@ function VendorPage() {
     }
   return (
     <div className = {Styles['Main-Div']}>
-        <div className = {Styles['Start-Div']}>
-            <label className = {Styles['Vendor-Label']}>Vendors</label>
-            <SimpleButton 
+      <div className = {Styles['Top-Div']}>
+            {/* About this page details */}
+            <div style={{display:'flex' , alignItems:'center' , justifyContent:'center' , fontSize:'1.6rem' , gap:'0.6rem' , backgroundColor:'#1E232B' , padding:'0.6rem' , borderRadius:'10px'}}>
+                <FaTruck />
+                <label className = {Styles['Vendor-Label']}>Vendors</label>
+            </div>
+            <div className = {Styles['Simple-Button']}>
+              <SimpleButton 
                 ButtonText={"ADD VENDOR"}
                 BGColor={"#0f9ec6ff"}
                 Dimensions={[10, 3]}
                 Callback={() => {SetShowDiv(Prev => !Prev)}}
             />
+            </div>          
         </div>
-        <div className= {Styles['Top-Div']}>
+        <div className= {Styles['Top2-Div']}>
             <LabelWithLogo 
                 Logo={MdOutlineEventAvailable}
                 Header={"Available Vendors"}
-                Value={30}
-                BGColor={'#282f31ff'}
-                Dimension={[500 , 100]}
+                Value={Vendors[0]?.length}
+                BGColor={'#1d2b2fff'}
+                Dimension={['30rem' , '7.5rem']}
             />
             <LabelWithLogo 
                 Logo={FaHourglassEnd}
                 Header={"Vendors With Pending Orders"}
-                Value={4}
-                BGColor={'#282f31ff'}
-                Dimension={[500 , 100]}
+                Value={CurrentOrders[0]?.length}
+                BGColor={'#2d1911ff'}
+                Dimension={['30rem' , '7.5rem']}
             />
         </div>
 
@@ -244,14 +267,36 @@ function VendorPage() {
             />
         </div>
         
-        <div className = {Styles['Table-Div']}>
-            {TableData && (
+        <div className = {Styles['Mid-Div']}>
+          <div className = {Styles['PageSelect-Div']}>
+            <PageSelector
+                PageHeader={[<div className = {Styles['PageTab-Div']}><VscGraphLine size={28} color="#4A90E2" /><label style={{fontSize:'0.8rem' ,fontFamily:'poppins'}}>Graphs</label></div>  , <div className = {Styles['PageTab-Div']}><CiViewTable  size={28} color="#4A90E2" /><label style={{fontSize:'0.8rem' , fontFamily:'poppins'}}>Table</label></div>]}
+                CurrentPage={CurrentView}
+                SetCurrentPage={SetCurrentView}
+                Dimension={['40rem' , 'auto']}
+            />
+        </div>
+
+            { CurrentView == "SignUp" && TableData && (
                 <Table 
                 TableName={"VENDORS"}
                 TableArg={TableData}
                 ColumnPalette={["white" , "grey"]}
                 RowPalette={["grey" , "white" , "black"]}
+                Dimensions={['100%' , 'auto']}
                 />)} 
+            {
+              CurrentView == "Login" && (
+                <BarChart 
+                  ChartName='Average Lead Time'
+                  Data={AverageLeadTimeGraphData}
+                  Height = {300}
+                  Width={600}
+                  XLabel='VendorName'
+                  YLabel='Average Delivery Time(Days)'
+                />
+              )
+            }
 
         </div>
         <ToastContainer />

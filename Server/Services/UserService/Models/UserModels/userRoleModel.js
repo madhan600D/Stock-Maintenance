@@ -6,7 +6,7 @@ export default (sequelize, DataTypes) => {
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      referencess: {
+      references: {
         model: 'users',
         key: 'userId',
       },

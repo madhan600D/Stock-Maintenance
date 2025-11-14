@@ -13,9 +13,12 @@ import { BiCaretRight } from "react-icons/bi";
 import { IoMdPaper } from "react-icons/io";
 
 import { IoSettings , IoPowerSharp} from "react-icons/io5";
-import { FaWindowClose } from "react-icons/fa";
+
 import { TbReportAnalytics } from "react-icons/tb";
 import { AiOutlineStock } from "react-icons/ai";
+import { GoDotFill } from "react-icons/go";
+import { PiPresentationChartFill } from "react-icons/pi";
+
 import { MdOutlineInventory } from "react-icons/md";
 import { FaUsers } from "react-icons/fa";
 import EnventoryLogo from '../../../assets/Logo/EnventoryLogo.png'
@@ -31,7 +34,7 @@ import ShowToast from '../Toast/Toast';
 
 function SideBar() {
   const Location = useLocation()
-  const {CurrentPage , SetCurrentPage} = useApp();
+  const {CurrentPage , SetCurrentPage , SideBarState} = useApp();
   //Hooks
   const [CurrentURL , SetCurrentURL] = useState();
   const [CurrentMenus , SetCurrentMenus] = useState([]);
@@ -111,8 +114,8 @@ function SideBar() {
     URL:'/orgpage'
   },
   {
-    MenuLogo: AiOutlineStock,
-    MenuText: "Products",
+    MenuLogo: PiPresentationChartFill,
+    MenuText: "Inventory",
     ArrayOfSubMenus: [
       { MenuText: "Products" ,Callback:HandleSubPageChange , URL:'/products' },
       { MenuText: "Category" , Callback:HandleSubPageChange , URL:'/category' }
@@ -181,7 +184,7 @@ function SideBar() {
   const MaxTextLimit = 10;
   if(CurrentMenus?.length > 1){
     return (
-      <div className = {Styles['Main-Div']}>
+      <div className = {Styles['Main-Div']} style={{width: SideBarState === "OPEN" ? '20%' : '0%'}}>
         <div className = {Styles['Top-Div']}>
           <div className={Styles['logo']}>
             <img src = {EnventoryLogo} alt="ENventory Logo" className={Styles['']} />
@@ -252,7 +255,7 @@ function SubMenu({MenuText , Callback , URL}){
   }
   return (
     <div className = {Styles['SubMenu-Div']} onClick={HandleSubMenuCallBack}>
-      <BiCaretRight />
+      <GoDotFill />
       <label className = {Styles['SubMenu-Lbl']}>
         {MenuText?.length > MaxTextLimit ? MenuText.slice(0 , MaxTextLimit) + "..." : MenuText}
       </label>

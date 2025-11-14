@@ -8,6 +8,7 @@ import Tooltip from '@mui/material/Tooltip';
 
 //Images
 import DefaultProfile from '../../../assets/Resource/DefaultImage.png'
+import { BsLayoutSidebar } from "react-icons/bs";
 
 //Stores
 import useUser from '../../../Stores/UserStore.js';
@@ -17,9 +18,13 @@ function TopBar() {
   //Stores
   const {UserData} = useUser();
   const {OrganizationData} = useOrg()
-  const {SetCurrentPage} = useApp();
+  const {SetCurrentPage , SetSideBarState} = useApp();
   return (
     <div className={Styles['Main-Div']}>
+        <Tooltip title='Sidebar' arrow>
+          <BsLayoutSidebar size={'1.5rem'} onClick={() => {SetSideBarState()}}/>
+        </Tooltip>
+        
         <DateTimeDisplay />
         <div>
           <EnventoryLogo />

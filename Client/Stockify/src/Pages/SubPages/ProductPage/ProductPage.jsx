@@ -1,6 +1,7 @@
 import React, { useRef, useState , useReducer, useEffect} from 'react'
 import Styles from './ProductPage.module.css'
-import { StateToTable } from '../../../Utils/QueryToObject.js'
+import { StateToChart, StateToMultiLineChart, StateToTable } from '../../../Utils/QueryToObject.js'
+import * as d3 from 'd3'
 
 //Components
 import LabelWithLogo from '../../Components/LabelWithLogo/LabelWithLogo.jsx'
@@ -11,6 +12,10 @@ import { ThemeProvider } from '@emotion/react';
 import { createTheme } from '@mui/material/styles';
 import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
+import Table from '../../Components/Table/Table.jsx'
+import { GraphTypes } from '../../../Declarations/ClientPublicEnums.js'
+import BarChart from '../../Components/Graphs/BarChart/BarChart.jsx'
+import LineGraph from '../../Components/Graphs/LineGraph/LineGraph.jsx'
 import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import NumberInput from '../../Components/NumberInput/NumberInput.jsx'
@@ -18,6 +23,7 @@ import FormComponent from '../../Components/FormComponent/FormComponent.jsx'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+
 //Logos
 import { FaBoxOpen } from "react-icons/fa6";
 import { BiSolidFileImage } from "react-icons/bi";
@@ -40,7 +46,7 @@ import { ToastContainer } from 'react-toastify'
 import Card from '@mui/material/Card'
 import ProductCard from '../../Components/Card/ProductCard.jsx'
 import PageSelector from '../../Components/PageSelector/PageSelector.jsx'
-import Table from '../../Components/Table/Table.jsx'
+
 
 function ProductPage() {
         //States
@@ -48,21 +54,48 @@ function ProductPage() {
         const [TableData , SetTableData] = useState();
         const [MostSelling , SetMostSelling] = useState();
         const [OutOfStock , SetOutOfStock] = useState(0);
+
+        const [ProductChartData , SetProductChartData] = useState();
         const FormRef = useRef();
         //Login --> Stack , Signup --> Table
         const [CurrentView , SetCurrentView] = useState("Login");
-        const {Category , Vendors  , Products , Currency , AddProduct , HighSellingProducts}  = UseProduct();
+        const {Category , Vendors  , Products , Currency , AddProduct , HighSellingProducts , ProductAnalytics}  = UseProduct();
         const ProductNameRef = useRef();
         const ProductImageRef = useRef();
+        //Convert produuct quantity to profit
+        function QuantityToPrice(State){
+          try {
+            const SellerRatioArray = [];
+            for(let Obj of State){
+              const Price = Products[0].find(Product => Product.ProductName == Obj.ProductName)?.ProductPrice * Obj?.SaleQuantity
 
+              let Temp = {
+                Price:Price,
+                RunDate:Obj?.RunDate,
+                ProductName:Obj?.ProductName
+              }
+
+              SellerRatioArray.push(Temp);
+            }
+            return SellerRatioArray;
+          } catch (error) {
+            
+          }
+
+        }
         //Effects
         useEffect(() => {
           const table =  StateToTable(UseProduct.getState().Products, {} , ['ProductID' , 'ProductName' , 'Quantity']); 
           SetTableData(table)
-          const MostSeller = StateToTable(UseProduct.getState().HighSellingProducts , {} , ['ProductID' , 'ProductName' , 'Quantity' , 'Price'])
+          const MostSeller = StateToChart(HighSellingProducts , ['ProductName' , 'Quantity' , 'Price'] , GraphTypes.BAR_CHART);
           SetMostSelling(MostSeller)
+
+          const SellerToProductRatio = QuantityToPrice(ProductAnalytics[0]);
+          const ProductChart = StateToMultiLineChart([SellerToProductRatio] ,  [] , Products[0].map(Product => Product.ProductName) , 'Price' , 'RunDate' , 'ProductName');
           
-        } , [])
+          SetProductChartData(ProductChart);
+          
+        } , [Products , HighSellingProducts])
         //Events
         useEffect(() => {
             const HandleClick = (Event) => {
@@ -120,7 +153,7 @@ function ProductPage() {
             SET_UNIT:"SET_UNIT",
             SET_QUANTITY:"SET_QUANTITY"
         });
-    
+        
         const ProductReducer = (state, action) => {
             switch (action.type) {
                 case ProductAction.SET_PRODUCT_NAME:
@@ -480,7 +513,40 @@ function ProductPage() {
                     Dimension={[250 , 100]}
                 />
               </div>
-                
+              
+              <div style={{display:'flex' , justifyContent:'flex-start' , width:'100%'}}>
+                  <BarChart 
+                    ChartName='Most Selling Products'
+                    Data={MostSelling}
+                    Height={250}
+                    Width={1000}
+                    XLabel='Products'
+                    YLabel='Quantity'
+                    CustomColors
+                  />
+              </div>
+              <div className= {Styles['Top-Div']} style={{backgroundColor:'#13171d84' , padding:'1.5rem',borderRadius:'20px' ,display:'flex' , flexDirection:'column' , marginTop:'2rem'}}>
+                <div>
+                    <div style={{display:'flex' , alignItems:'center' , justifyContent:'center' , fontSize:'1rem' , gap:'0.6rem' , backgroundColor:'#1E232B' , padding:'0.6rem' , borderRadius:'10px'}}>
+                        <AiOutlineDollar />
+                        <label style={{fontSize:'small'}} className={Styles['Styled-Label']}>Inventory Flow</label>
+                    </div>
+                    <div style={{marginTop:'1rem'}}>
+                        <LineGraph 
+                          ChartName='Profit to Product'
+                          Data={ProductChartData}
+                          Height={300}
+                          Width={1000}
+                          XLabel='Business Date'
+                          YLabel='$ Profit'
+                          Smooth={d3.curveCardinal}
+                          LegendArray={Products[0].map(Product => Product.ProductName)}
+                        />
+                    </div>
+                    
+                </div>
+
+              </div>
 
             </div>
             <div className = {Styles['Display-Div']}>
@@ -545,24 +611,7 @@ function ProductPage() {
                     SubmitCallback={() => {HandleAddProduct()}}
                 />
             </div>
-            <div className= {Styles['Top-Div']} style={{backgroundColor:'#13171d84' , padding:'1.5rem',borderRadius:'20px' ,display:'flex' , flexDirection:'column' , marginTop:'2rem'}}>
-                <div>
-                    <div style={{display:'flex' , alignItems:'center' , justifyContent:'center' , fontSize:'1rem' , gap:'0.6rem' , backgroundColor:'#1E232B' , padding:'0.6rem' , borderRadius:'10px'}}>
-                        <AiOutlineDollar />
-                        <label style={{fontSize:'small'}} className={Styles['Styled-Label']}>Inventory Flow</label>
-                    </div>
-                </div>
-                <div style={{display:'flex' , gap:'1rem'}}>
-                  {MostSelling && (
-                    <Table 
-                    TableName={"Most Selling Products"}
-                    TableArg={MostSelling}
-                    Dimensions={["100%" , ""]}
-                  />
-                  )}
-                  
-                </div>
-              </div>
+            
               <ToastContainer />
     </div>
   )

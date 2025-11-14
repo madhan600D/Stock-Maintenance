@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
 import Styles from "./BarChart.module.css";
 
-function BarChart({ Data, Height, Width }) {
+function BarChart({ChartName = 'Data Chart' ,Data, Height, Width ,XLabel = 'XAxis' , YLabel = 'YAxis' , CustomColors = false }) {
   const SVGRef = useRef();
 
   useEffect(() => {
@@ -46,12 +46,65 @@ function BarChart({ Data, Height, Width }) {
     // Y Axis
     SVG.append("g").call(d3.axisLeft(YScale));
 
-    //Bar Colors
-    const ColorScale = d3.scaleOrdinal(d3.schemeOranges)
+    //Add Grid Lines
+      //XGrid ->
+      SVG.selectAll(".XGrid")
+        .data(XScale.domain().slice(1))
+        .join("line")
+        .attr("x1", d => XScale(d))
+        .attr("x2", d => XScale(d))
+        .attr("y1", 0)
+        .attr("y2", Height)
+        .attr("stroke", "#9a9a9a8c")
+        .attr("stroke-width", .5);
+
+      //YGrid ->
+      SVG.selectAll("yGrid")
+        .data(YScale.ticks().slice(1 , -1))
+        .join("line")
+        .attr("x1", 0)
+        .attr("x2", Width)
+        .attr("y1", d => YScale(d))
+        .attr("y2", d => YScale(d))
+        .attr("stroke", "#9a9a9a8c")
+        .attr("stroke-width", .5)
+
+      //X-Axis Label
+      SVG.append("text")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 0 - Margin.Left + 10)
+          .attr("x", 0 - (Height / 2))
+          .attr("dy", "1em")
+          .style("text-anchor", "middle")
+          .style("font-size", "14px")
+          .style("fill", "#777")
+          .style("font-family", "sans-serif")
+          .text(YLabel);
+
+          //Y-Axis Label
+          SVG.append("text")
+            .attr("y", 0 - Margin.Top)
+            .attr("x", (Width / 2))
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .style("font-size", "14px")
+            .style("fill", "#777")
+            .style("font-family", "sans-serif")
+            .text(XLabel);
+      //Chart Name
+      SVG.append("text")
+            .attr("class", "chart-title")
+            .attr("x", Width - (Margin.Left + Margin.Right) - (ChartName.length * 3))
+            .attr("y", 0 - 10)
+            .style("font-size", "12px")
+            .style("font-weight", "bold")
+            .style("font-family", "poppins")
+            .style("fill", "rgba(0, 231, 235, 0.46)")
+            .text(ChartName);
     //Bars setup 
     const Bar = SVG .selectAll("rect") .data(Data) 
 
-    
+    const ColorScale = d3.scaleOrdinal(d3.schemeCategory10)
     Bar.enter().append("rect") 
         .attr('x' , (D) => XScale(D.ValX)) 
         .attr('width' , XScale.bandwidth()) 
@@ -59,7 +112,7 @@ function BarChart({ Data, Height, Width }) {
         .attr('fill' , 'steelblue')
         .attr("y", Height)                // Start from bottom (invisible)
         .attr("height", 0)                // Start with zero height
-        .attr("fill", 'orange')
+        .attr("fill", CustomColors ? ColorScale : 'orange')
         .transition()                     // Animate to final position
         .duration(500)                   // 1 second animation
         .ease(d3.easeLinear)           // Smooth easing

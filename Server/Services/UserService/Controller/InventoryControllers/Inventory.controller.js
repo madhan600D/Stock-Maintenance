@@ -270,3 +270,41 @@ export const GetAnalytics = async (req , res) => {
         return req.status(500).json({success:false , message:error.message})
     }
 }
+
+export const GetEWMAAnalytics = async (req , res) => {
+    try {
+        //1. Get LeadTime for vendors
+        const AverageLeadTime = await objInventoryDataBase.AllModels.LeadTimeTracker.findAll({
+        include: [
+            {
+            model: objInventoryDataBase.AllModels.Vendors,
+            attributes: ['VendorName']
+            }
+        ],
+        attributes: [
+            [col('Vendor.VendorName'), 'VendorName'] , 'AverageLeadTime'
+        ],
+        where:{OrganizationID:req.user.organizationId},
+        raw: true
+        });
+
+        //2.EWMA Analytics
+        const PredictedLTD = await objInventoryDataBase.AllModels.PredictedLTD.findAll({
+        attributes: [
+            'PredictedEWMAJSON' , 'RunDate'
+        ],
+        where:{OrganizationID:req.user.organizationId},
+        raw: true
+        }); 
+
+        //3.
+        const DataToClient = {AverageLeadTime:AverageLeadTime , PredictedLTD:PredictedLTD}
+
+        return res.status(200).json({success:true , data:DataToClient})
+
+    } catch (error) {
+        await objUserDb.AllModels.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
+        return req.status(500).json({success:false , message:error.message})
+    }
+}
+

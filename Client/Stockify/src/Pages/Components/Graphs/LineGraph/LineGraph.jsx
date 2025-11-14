@@ -1,8 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
 import Styles from './LineGraph.module.css'
-//Logos
-import { FcLineChart } from "react-icons/fc";
+
 function LineGraph({ChartName = 'DataChart'  , Data, Height = 300, Width = 600  , XLabel = 'XAxis' , YLabel = 'YAxis' , Smooth = d3.curveLinear , LegendArray = []}) {
   const SVGRef = useRef();
 
@@ -104,7 +103,7 @@ function LineGraph({ChartName = 'DataChart'  , Data, Height = 300, Width = 600  
         //Y-Axis Label
         SVG.append("text")
           .attr("transform", "rotate(-90)")
-          .attr("y", 0 - Margin.Left + 10)
+          .attr("y", 0 - Margin.Left - 2.5)
           .attr("x", 0 - (Height / 2))
           .attr("dy", "1em")
           .style("text-anchor", "middle")
