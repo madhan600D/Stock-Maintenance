@@ -8,6 +8,7 @@ const useOrg = create((set , get) => ({
     IsClosingDay:false,
     OrganizationData:{},
     AllOrganizations:[],
+    Users:[],
     CreateOrg : async (OrgData) => {
         set({IsNewOrgLoading:true});
         let DataFromBackend , ObjError = {success:true , message:''}
@@ -49,6 +50,20 @@ const useOrg = create((set , get) => ({
             console.log(error)
         }
     },
+    GetAllUsers: async () => {
+        try {
+            const res = await AxiosInstance.get('/api/userservice/org/get-org-users');
+
+            const DataFromBackEnd = res.data?.data?.UsersData;
+
+            //Set internal state
+            set({Users:[DataFromBackEnd]});
+            return 
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    ,
     JoinOrg: async (OrgData) => {
         set({IsJoiningOrg:true})
         try {

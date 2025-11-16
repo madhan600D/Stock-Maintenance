@@ -32,15 +32,17 @@ export default (sequelize, DataTypes) => {
     },
   }, { 
     tableName: 'roles',
-    timeStamps:false
+    timestamps:false
   });
  
   UserRoleModel.associate = (models) => {
     UserRoleModel.belongsTo(models.users, {
       foreignKey: 'userId', 
+      targetKey:'userId'
     });
     UserRoleModel.belongsTo(models.organizations, {
       foreignKey: 'organizationId',
+      targetKey:'organizationId'
     });
     UserRoleModel.belongsTo(models.RoleDetails , {
       foreignKey:'roleId',

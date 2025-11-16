@@ -1,6 +1,6 @@
 import objUserDb from "../../Utils/userDB.js";
 import objInventoryDataBase from "../../Utils/InventoryDB.js";
-import { Op, where } from "sequelize";
+import { col, Op, Sequelize, where } from "sequelize";
 import { PrepareHTML } from "../../Utils/PrepareUserHTML.js";
 import { ObjUserKafkaProducer } from "../../Kafka/Producer/kafkaProducer.js";
 import AccessControl from "../../Class/AccessControl.class.js";
@@ -10,13 +10,29 @@ import {UserManagement} from '../../Class/UserManagement.class.js'
 
 export const GetUsers = async (req , res) => {
     try {
-        const {OrgID} = req?.query;
-        const UsersPerOrganization = await objUserDb.AllModels.users.findAll({where:{organizationId:OrgID}});
+        //1. Get Users
+        const UserData = await objUserDb.AllModels.roles.findAll({
+    include:[{
+        model: objUserDb.AllModels.users,
+        attributes: []
+    }],
+    attributes: [
+        [Sequelize.literal('[user].[userId]'), 'userId'],
+        [Sequelize.literal('[user].[userName]'), 'userName'],
+        [Sequelize.literal('[user].[profilePic]'), 'profilePic'],
+        [Sequelize.literal('[user].[userMail]'), 'userMail'],
+        'role'
+    ],
+    raw: true,
+    where: { organizationId: req.user.organizationId }
+});
 
-        return res.status(200).json({success:true , data:UsersPerOrganization})
-    } catch (error) {
-        
-    }
+        const ClientData = {UsersData:UserData}
+
+        return res.status(200).json({success:true , data:ClientData})
+    } catch (error) { 
+     console.log(error)   
+    } 
 }
 
 export const GetVendors = async (req , res) => {

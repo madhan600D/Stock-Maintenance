@@ -3,8 +3,8 @@ import UseProduct from "../Stores/ProductStore.js";
 import useUser from "../Stores/UserStore.js";
 
 export const useFillInventoryStates = () => {
-  const { GetProducts, GetCategory, GetVendors, GetCurrency , GetCurrentDayCheckout, FillOrderStates ,CurrentOrders , GetPerformance,InitInventorySocketEvents , GetCheckoutsClient , GetEWMAAnalytics , } = UseProduct();
-  const {FillOrgData} = useOrg();
+  const { GetProducts, GetCategory, GetVendors, GetCurrency , GetCurrentDayCheckout, FillOrderStates ,CurrentOrders , GetPerformance,InitInventorySocketEvents , GetCheckoutsClient , GetEWMAAnalytics} = UseProduct();
+  const {FillOrgData , GetAllUsers} = useOrg();
   const {GetTasks} = useUser();
 
   const FillInventoryStates = async () => {
@@ -15,6 +15,7 @@ export const useFillInventoryStates = () => {
         GetVendors(),
         GetCurrency(),
         FillOrgData(),
+        GetAllUsers(),
         GetCurrentDayCheckout(),
         FillOrderStates(),
         GetCheckoutsClient(),

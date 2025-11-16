@@ -129,7 +129,7 @@ function SideBar() {
     MenuLogo: FaUsers,
     MenuText: "Users",
     ArrayOfSubMenus: [
-      { MenuText: "User Management" },
+      { MenuText: "Users"  ,Callback:HandleSubPageChange , URL:'/users' },
       { MenuText: "Tasks" , Callback:HandleSubPageChange , URL:'/tasks' },
     ]
   },
