@@ -132,7 +132,7 @@ function SideBar() {
     MenuText: "Users",
     ArrayOfSubMenus: [
       { MenuText: "User Management" },
-      { MenuText: "Group Buzz" },
+      { MenuText: "Tasks" , Callback:HandleSubPageChange , URL:'/tasks' },
     ]
   },
   {

@@ -1,0 +1,34 @@
+.Main-Div{
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    height: 90vh;
+}
+.Form-Div{
+    display: flex;
+    z-index: 2;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    transition: all 0.3s ease;
+    width: 60%;
+    height: max-content;
+    overflow-y: hidden;
+}
+
+.Top-Div{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.Mid-Div{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}

@@ -32,6 +32,7 @@ import HolidayModel from "../Models/InventoryModels/Holiday.Model.js";
 import ScreensModel from "../Models/InventoryModels/Screens.Model.js";
 import OrganizationStateModel from "../Models/InventoryModels/OrganizationState.Model.js";
 import PNLModel from "../Models/InventoryModels/PNL.Model.js";
+import TaskModel from "../Models/InventoryModels/Task.Model.js";
 
 
 export async function InitializeDataBase(){
@@ -66,6 +67,7 @@ export async function InitializeDataBase(){
       CheckOuts: CheckOutModel(InventoryDB, DataTypes),
       Currency: CurrencyModel(InventoryDB, DataTypes),
       Orders: OrdersModel(InventoryDB, DataTypes),
+      Tasks:TaskModel(InventoryDB , DataTypes),
       ConfirmedOrders:ConfirmedOrdersModel(InventoryDB , DataTypes),
       ProductDeliveryTime:ProductDeliveryTimeModel(InventoryDB , DataTypes),
       Holidays: HolidayModel(InventoryDB, DataTypes),

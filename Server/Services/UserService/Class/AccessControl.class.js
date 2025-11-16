@@ -1,7 +1,7 @@
 import objUserDb from "../Utils/userDB.js"
 export default class AccessControl{
     constructor(){
-        this.UserID
+        
     }
     
     VerifyAccessControl = async (UserID , Action , Control) => {

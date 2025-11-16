@@ -48,3 +48,8 @@ export const RolesEnum = Object.freeze({
       Manager:"Manager",
       Staff:"Staff"
 })
+
+export const TaskTypesEnum = Object.freeze({
+      ACCEPT:"ACCEPT" , 
+      REJECT:"REJECT"
+})

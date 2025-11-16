@@ -21,6 +21,7 @@ const useUser = create((set , get) => ({
     UserData:{},
     CurrentRole:'',
     OrganizationData:{},
+    OpenTasks:[],
     SocketState:null,
     CurrentOrg:null,
     LastSocketMessage:'',
@@ -63,8 +64,7 @@ const useUser = create((set , get) => ({
         } catch (error) {
             console.log(error)
         }
-    }
-    ,
+    },
     AddUser: async (UserCredentials) => {
         set({IsAddUserLoading:true})
         let DataFromBackend , ObjError = {success:true , message:''};
@@ -188,6 +188,45 @@ const useUser = create((set , get) => ({
             set({IsLoginLoading:false})
         }
     },
+    GetTasks:async() => {
+    try {
+        const res = await AxiosInstance.get('/api/userservice/inv/get_tasks');
+
+        const DataFromBackEnd  = res.data?.data;
+        set({OpenTasks:[DataFromBackEnd]})
+    } catch (error) {
+        console.error(error)
+        return{success:false , message:error.response ? error.response.data.message : error.message};
+    }
+    },
+    RaiseJoinRequest:async (Payload) => {
+        try {
+            const res = await AxiosInstance.put('/api/userservice/inv/add_task' , {OrganizationName:Payload});
+
+            return {success:res.data?.success , message:res.data?.message};
+        } catch (error) {
+            console.log(error)
+            return{success:false , message:error.response ? error.response.data.message : error.message}; 
+        }
+    },
+    HandleTaskClient:async(TaskType , TaskID) => {
+        try {
+            const Params = {TaskType:TaskType , TaskID:TaskID};
+
+            const res = await AxiosInstance.patch('/api/userservice/inv/handle_task' , Params);
+            const DataFromBackEnd = res.data;
+            //Update internal state
+            if(DataFromBackEnd.success){
+                const NewOpenTasks = State.OpenTasks.filter(Task => Task.TaskID !== TaskId);
+                set((State) => {
+                    OpenTasks:[NewOpenTasks]
+                })
+            }
+        } catch (error) {
+            console.log(error)
+            return{success:false , message:error.response ? error.response.data.message : error.message};   
+        }
+    },
     UpdateProfile:async(Payload) => {
         set({IsProfileUpdating:true})
         try {
@@ -209,8 +248,7 @@ const useUser = create((set , get) => ({
         finally{
             set({IsProfileUpdating:false})
         }
-    }
-    ,
+    },
     ConnectSocket:async() => {
         try {
             const {UserData , OrganizationData} = get();

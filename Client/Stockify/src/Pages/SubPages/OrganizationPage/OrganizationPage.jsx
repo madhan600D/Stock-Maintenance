@@ -170,11 +170,12 @@ function OrganizationPage() {
                     />
                 </div>
             </div>
-            <div style={{position:'absolute' , right:0 , bottom:0}}>
-                    <DialButton 
-                        ActionArray={DialActions}
-                        DialButtonColor={'#004a71ff'}      
-                    />
+            <div className = {Styles['Dial-Div']}>
+                <DialButton 
+                    className = {Styles['Dial-Button']}
+                    ActionArray={DialActions}
+                    DialButtonColor={'#004a71ff'}      
+                />
             </div>
             <ToastContainer />
     </div>

@@ -8,11 +8,12 @@ import { AddCheckOutValidate } from '../MiddleWares/EndPointValidations/Inventor
 
 //Controllers
 import { GetProductsForOrganization, AddProductForOrganization , GetCategoryForOrganization, AlterProductForOrganization, DeleteProducts, AddCategoryForOrganization, GetCurrency, GetAnalytics, GetEWMAAnalytics} from '../Controller/InventoryControllers/Inventory.controller.js';
-import { AlterWorker, GetUsers , GetVendors } from '../Controller/InventoryControllers/UserManagement.controller.js';
+import { AddRequestTask, AlterWorker, GetOpenTasks, GetUsers , GetVendors, HandleTask } from '../Controller/InventoryControllers/UserManagement.controller.js';
 import { AddVendor } from '../Controller/InventoryControllers/Vendor.controller.js';
 import { AddCheckOut , GetCheckOuts, GetCurrentDayCheckout} from '../Controller/InventoryControllers/Checkout.controller.js';
 import { ConfirmOrder, GetOrders, PlaceManualOrder } from '../Controller/InventoryControllers/Order.controller.js';
 import { ConfirmOrderValidate } from '../MiddleWares/EndPointValidations/InventoryEndPointValidations/Orders.validate.js';
+import { AddRequestTaskValidate } from '../MiddleWares/EndPointValidations/InventoryEndPointValidations/UserManage.Validate.js';
 
 const InventoryRouter = express.Router();
 
@@ -56,5 +57,10 @@ InventoryRouter.get('/get_ewma_analytics' , GetEWMAAnalytics)
 
 //Analytics Routers
 InventoryRouter.get('/get_analytics' , GetAnalytics);
+
+//Tasks Routers
+InventoryRouter.get('/get_tasks' , GetOpenTasks);
+InventoryRouter.put('/add_task' , AddRequestTaskValidate , AddRequestTask);
+InventoryRouter.patch('/handle_task' , HandleTask);
 export default InventoryRouter
 

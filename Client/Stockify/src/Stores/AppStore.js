@@ -10,8 +10,9 @@ import CheckoutPage from '../Pages/SubPages/CheckoutPage/CheckoutPage.jsx';
 import ProfilePage from '../Pages/SubPages/ProfilePage/ProfilePage.jsx';
 import OrganizationPage from '../Pages/SubPages/OrganizationPage/OrganizationPage.jsx';
 import OrderPage from '../Pages/SubPages/OrderPage/OrderPage.jsx';
+import TasksPage from '../Pages/SubPages/TasksPage/TasksPage.jsx';
 
-const URLToPage = {'/invite-to-org':InviteToOrgPage , '/dashboard': DashboardPage , '/category':AddCategoryPage , '/vendors':VendorPage , '/products' : ProductPage , '/checkouts':CheckoutPage , '/profile':ProfilePage , '/orgpage':OrganizationPage , '/orders':OrderPage}
+const URLToPage = {'/invite-to-org':InviteToOrgPage , '/dashboard': DashboardPage , '/category':AddCategoryPage , '/vendors':VendorPage , '/products' : ProductPage , '/checkouts':CheckoutPage , '/profile':ProfilePage , '/orgpage':OrganizationPage , '/orders':OrderPage , '/tasks' : TasksPage};
 
 const useApp = create((set , get) => ({
     CurrentPage:ProfilePage,

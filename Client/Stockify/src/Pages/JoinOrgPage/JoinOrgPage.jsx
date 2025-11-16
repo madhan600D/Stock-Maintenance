@@ -14,14 +14,18 @@ import { IoSearchCircle } from "react-icons/io5";
 
 //Hooks
 
+//Components
+import PageSuspense from '../Components/Suspense Components/PageSuspense/PageSuspense';
+import SearchBox from '../Components/SearchBox/SearchBox.jsx';
+
+
 
 //Store
 import useOrg from '../../Stores/OrgStore';
-import PageSuspense from '../Components/Suspense Components/PageSuspense/PageSuspense';
-import TypingSuspense from '../Components/Suspense Components/TypingSuspense/TypingSuspense';
-import ItemAdder from '../Components/ItemAdder/ItemAdder.jsx';
-import SearchBox from '../Components/SearchBox/SearchBox.jsx';
+import useUser from '../../Stores/UserStore.js';
+
 import { useNavigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 
 function JoinOrgPage() {
     //Login: Code , SignUp: Refferal
@@ -30,8 +34,10 @@ function JoinOrgPage() {
     const navigate = useNavigate()
     const [OTP , SetOTP] = useState();
     const OTPRef = useRef();
+
     //Store
     const {IsJoiningOrg , JoinOrg , GetAllOrganizations , AllOrganizations} = useOrg()
+    const {RaiseJoinRequest} = useUser();
 
     //UseEffect to set The current page
     useEffect(() => {
@@ -60,7 +66,18 @@ function JoinOrgPage() {
     const HandleTextBoxChange = async () => {
         SetFormData((Prev) => ({...Prev , OrganizationJoiningCode:OTPRef.current.value}));
     }
+    const HandleJoinRequest = async(OrganizationName) =>{
+        try {
 
+            const IsSuccess = await RaiseJoinRequest(OrganizationName);
+            ShowToast(IsSuccess.success  , IsSuccess.message)    
+
+
+        } catch (error) {
+            ShowToast(false , "Error occured while raising request")
+        }
+        
+    }
     const HandlePageChange = async () => {
         SetCurrentPage(CurrentPage === "Login" ? "SignUp" : "Login")
     }
@@ -104,20 +121,23 @@ function JoinOrgPage() {
             If your organization accepts your request please refresh this page and you will be routed to organization's home page.</label>
             <br />
             <br />
+            {console.log("This i All Organizastion:" , AllOrganizations)};
             <SearchBox 
-            Data={AllOrganizations}
-            MaxItems={3}
-            InitialFocus={true}
-            PlaceHolder='Enter the org name to join ...'
-            Logo={IoSearchCircle}
-            ColorPallete={["red" , "red"]}
-            DataType={"STRING"}
-            FilterType={"SubString"}
-            OnSelection={() => {console.log("On selection called")}}
+                Data={AllOrganizations}
+                MaxItems={3}
+                InitialFocus={true}
+                PlaceHolder='Enter the org name to join ...'
+                Logo={IoSearchCircle}
+                ColorPallete={["red" , "red"]}
+                DataType={"STRING"}
+                SelectionCallBack={(Value) => {HandleJoinRequest(Value)}}
+                FilterType={"SubString"}
+                OnSelection={() => {console.log("On selection called")}}
             />
         </div> 
         }
         </div>
+        <ToastContainer />
     </div>
   )
 }

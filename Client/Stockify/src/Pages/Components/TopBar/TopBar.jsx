@@ -8,7 +8,8 @@ import Tooltip from '@mui/material/Tooltip';
 
 //Images
 import DefaultProfile from '../../../assets/Resource/DefaultImage.png'
-import { BsLayoutSidebar } from "react-icons/bs";
+import { CiMenuBurger } from "react-icons/ci";
+
 
 //Stores
 import useUser from '../../../Stores/UserStore.js';
@@ -21,9 +22,12 @@ function TopBar() {
   const {SetCurrentPage , SetSideBarState} = useApp();
   return (
     <div className={Styles['Main-Div']}>
-        <Tooltip title='Sidebar' arrow>
-          <BsLayoutSidebar size={'1.5rem'} onClick={() => {SetSideBarState()}}/>
+      <div style={{position:'absolute' , left:0 , zIndex:10 , transform:'translateY(3rem)'}}>
+          <Tooltip title='Sidebar' arrow>
+            <CiMenuBurger size={'1.5rem'} onClick={() => {SetSideBarState()}}/>
         </Tooltip>
+      </div>
+        
         
         <DateTimeDisplay />
         <div>

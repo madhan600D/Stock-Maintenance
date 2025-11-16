@@ -75,3 +75,15 @@
     padding: 1rem;
     border-radius: 20px;
 }
+
+.Dial-Div{
+    position: absolute;
+    right:0 ; 
+    bottom:0;
+    transform: translateY(-5rem);
+}
+
+.Dial-Button{
+    position: sticky;
+    right: 0;
+}
