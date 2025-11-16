@@ -1,13 +1,19 @@
 import nodemailer from 'nodemailer'
 
+
+const AppUserName = process.env.APP_MAIL_ADDRESS
+const AppPassword = process.env.APP_PASSWORD
 export const transporter = nodemailer.createTransport({
-    host: 'smtp.ethereal.email',
-    port: 587,
+    host: 'smtp.gmail.com',
+    port:465,
+    secure:true,
     auth: {
-        user: 'modesto50@ethereal.email',
-        pass: 'B3a4b2usTYV9TkeQrF'
+        user: AppUserName,
+        pass: AppPassword
     }
 });
+
+
   // Message details
 //  export const mailOptions = {
 //     from: '"Test App 👻" <no-reply@example.com>',

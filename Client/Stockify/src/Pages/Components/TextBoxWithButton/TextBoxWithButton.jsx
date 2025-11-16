@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import Styles from './TextBoxWithButton.module.css'
 
 import FallBackSpinner from '../Suspense Components/FallBackSpinner/FallBackSpinner';
-function TextBoxWithButton({Logo , ButtonLogo , IsMandatory , FloatingText , Type , ButtonCallBack , EnterCallBack , TBCallBack , Reference , IsSuspense ,ColorPallete , Width = '100%'}) {
+function TextBoxWithButton({Logo , ButtonLogo , IsMandatory , FloatingText , Type , ButtonCallBack , EnterCallBack , TBCallBack , Reference , IsSuspense ,ColorPallete , Width = '100%' , PasswordType = 'Text'}) {
     //Hooks
     const [TextBoxData , SetTextBoxData] = useState('');
     const [DataTypeRegex , SetDataTypeRegex] = useState();
@@ -49,7 +49,7 @@ function TextBoxWithButton({Logo , ButtonLogo , IsMandatory , FloatingText , Typ
             <Logo />
         </div>
         <div className = {Styles['TexBoxAndLogo-Div']}>
-            <input value={TextBoxData} ref={Reference} onChange={HandleInput} pattern = {DataTypeRegex}  className= {Styles['TextBox-Input']} onFocus={() => SetIsTextBoxFocused(true)} onBlur={() => SetIsTextBoxFocused(false)} onKeyDown={HandleEnterKey}/>
+            <input value={TextBoxData} ref={Reference} onChange={HandleInput} pattern = {DataTypeRegex}  className= {Styles['TextBox-Input']} type = {PasswordType} onFocus={() => SetIsTextBoxFocused(true)} onBlur={() => SetIsTextBoxFocused(false)} onKeyDown={HandleEnterKey}/>
 
             <p className= {Styles['TextBox-Label']} style={{color:IsTextBoxFocused ? ColorPallete[1] : "#2d2d28ff" , 
                 transform:TextBoxData.length > 0 ? "translate(0,-2rem)" : "",

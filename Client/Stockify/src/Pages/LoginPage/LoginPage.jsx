@@ -14,7 +14,6 @@ import FallBackSpinner from '../Components/Suspense Components/FallBackSpinner/F
 import { FaUser , FaLock , FaEye } from "react-icons/fa";
 import { IoIosMail } from "react-icons/io";
 import { RiMailSendFill } from "react-icons/ri";
-import { MdLogout } from "react-icons/md";
 import { FaUserAltSlash } from "react-icons/fa";
 
 //Images
@@ -24,7 +23,6 @@ import TextBoxWithButton from '../Components/TextBoxWithButton/TextBoxWithButton
 //Stores
 import useUser from '../../Stores/UserStore.js';
 import ShowToast from '../Components/Toast/Toast.js';
-import UseProduct from '../../Stores/ProductStore.js';
 
 const LoginPage = () => {
 
@@ -32,6 +30,10 @@ const LoginPage = () => {
   const [CurrentPage , SetCurrentPage] = useState('Login');
   const [FormData , SetFormData] = useState({userName:'' , userMail:'' , password:'' , confirmPassword:'' , closeSession:false });
   const [KillSession , SetKillSession] = useState(false);
+  const [ShowLoginPassword , SetShowLoginPassword] = useState('password');
+  const [ShowCreatePassword , SetShowCreatePassword] = useState('password');
+  const [ShowConfirmPassword , SetShowConfirmPassword] = useState('password');
+
   const UserNameRef = useRef();
   const UserMailRef = useRef();
   const PasswordRef = useRef();
@@ -127,15 +129,17 @@ const LoginPage = () => {
             />
             
               <TextBoxWithButton 
-              Logo={FaLock}
-              ButtonLogo={FaEye}
-              IsMandatory={false}
-              FloatingText={"PASSWORD"}
-              IsSuspense={false}
-              TBCallBack={HandleTextBoxChange}
-              Type={"STRING"}
-              Reference={PasswordRef}
-              ColorPallete={["#d53f3fff" , "#ff7e7ee7"]}
+                Logo={FaLock}
+                ButtonLogo={FaEye}
+                IsMandatory={false}
+                FloatingText={"PASSWORD"}
+                IsSuspense={false}
+                TBCallBack={HandleTextBoxChange}
+                Type={"STRING"}
+                PasswordType = {ShowLoginPassword}
+                ButtonCallBack={() => {SetShowLoginPassword(State => (State === "text" ? "password" : "text"))}}
+                Reference={PasswordRef}
+                ColorPallete={["#d53f3fff" , "#ff7e7ee7"]}
             />
           </div>
           <div className = {Styles['LoginButton-Div']} onClick={() => {HandleLoginClick()}}>
@@ -208,17 +212,22 @@ const LoginPage = () => {
                 FloatingText={"PASSWORD"}
                 IsSuspense={false}
                 TBCallBack={HandleTextBoxChange}
+                PasswordType = {ShowConfirmPassword}
+                ButtonCallBack={() => {SetShowConfirmPassword(State => (State === "text" ? "password" : "text"))}}
                 Type={"STRING"}
                 Reference={PasswordRef}
                 ColorPallete={["#d53f3fff" , "#ff7e7ee7"]}
               />
-              <TextBoxWithLogo 
+              <TextBoxWithButton 
                 Logo={FaLock}
+                ButtonLogo={FaEye}
                 IsMandatory={false}
                 FloatingText={"CONFIRM PASSWORD"}
                 TBCallBack={HandleTextBoxChange}
                 Type={"STRING"}
                 IsLoading={IsSignUpLoading}
+                PasswordType = {ShowConfirmPassword}
+                ButtonCallBack={() => {SetShowConfirmPassword(State => (State === "text" ? "password" : "text"))}}
                 Reference={ConfirmPasswordRef}
                 ColorPallete={["#d53f3fff" , "#ff7e7ee7"]}
               />

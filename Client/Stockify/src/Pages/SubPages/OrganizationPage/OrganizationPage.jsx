@@ -74,8 +74,6 @@ function OrganizationPage() {
         const HandleClick = (Event) => {
             if(FormRef.current && !FormRef.current.contains(Event.target)){
                 FormRef.current.value = ""
-                SetShowInviteDiv(false);
-                SetShowCloseDayPage(false);
             }
         }
         document.addEventListener("mousedown" , HandleClick);
@@ -93,7 +91,10 @@ function OrganizationPage() {
   return (
     <div className = {Styles['Main-Div']}>
             <div ref={FormRef} className={Styles['Form-Div']}  style={{transform: ShowInviteDiv ? "translate(25%, 10%)" : "translate(25%, -110%)"}}>
-                <InviteToOrgPage />
+                <div ref={FormRef}>
+                    <InviteToOrgPage />
+                </div>
+                
             </div>
             <div ref={FormRef} className={Styles['Form-Div']}  style={{transform: ShowCloseDayPage ? "translate(60%, 10%)" : "translate(60%, -110%)"}}>
                 <div className = {Styles['CloseDay-Div']}>

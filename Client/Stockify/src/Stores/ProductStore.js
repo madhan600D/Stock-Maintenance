@@ -126,6 +126,12 @@ import useUser from './UserStore.js';
             }
             const res = await AxiosInstance.put('api/userservice/inv/add_checkout' , Data);
             const DataFromBackEnd = res.data.data;
+            
+            //TBD:Manually subtract the quantity
+            //Update internal state
+            set()
+
+            return {success:true , message:res.data.message};
         } catch (error) {
             console.log(error);
             return {success:false , message:error?.response.data.message || "Error processing this checkout"}

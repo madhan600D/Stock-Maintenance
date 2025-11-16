@@ -9,10 +9,10 @@ export default class Simulation{
         this.Bias = 0.6 //Balanced Support for old and new values
     }
 
-    async ForecastDemand(){
+    async ForecastDemand(Transaction = null){
         try {
             //Fill Datapoints
-            await this.FillSimulationArray(this.ProductData);
+            await this.FillSimulationArray(this.ProductData , Transaction);
 
             //Validations
             const IsSuccess = this.ValidateData()
@@ -32,12 +32,13 @@ export default class Simulation{
             return {success:false , message:error};
         }
     }
-    async FillSimulationArray(ProductData){
-        try {
+    async FillSimulationArray(ProductData , Transaction = null){
+        try { 
             //Fill internal array from DB
             const SalesRecordArray = await this.DataBase.AllModels.DailyProductSales.findAll({where:            {ProductID:ProductData.ProductID} , 
                 attributes:['SaleQuantity'] , 
                 order:[['RunDate' , 'ASC']],
+                transaction:Transaction ? Transaction : '',
                 limit:100,
                 raw:true});
 
@@ -45,7 +46,7 @@ export default class Simulation{
 
             this.LeadTime = await this.DataBase.AllModels.LeadTimeTracker.findOne({where:{
                 [Op.and] : [{OrganizationID:this.ProductData.OrganizationID , VendorID:this.ProductData.VendorID}]
-            }})
+            } , transaction:Transaction ? Transaction : ''})
 
             return {success:true}
         } catch (error) {

@@ -16,6 +16,7 @@ import ShowToast from '../../Components/Toast/Toast';
 //Logos
 import { BiSolidCamera } from 'react-icons/bi';
 import { GoOrganization } from 'react-icons/go';
+import { ImProfile } from "react-icons/im";
 import { BiLock } from 'react-icons/bi';
 import { CgPassword } from 'react-icons/cg';
 import { MdPassword } from "react-icons/md";
@@ -32,6 +33,9 @@ function ProfilePage() {
 
   //States
   const [CurrentPassword , SetCurrentPassword] = useState({OldPassword:'' , NewPassword:'' , ConfimPassword:''});
+  const [OldPassword , SetShowOldPassword] = useState('password');
+  const [NewPassword , SetShowNewPassword] = useState('password');
+  const [ConfirmPassword , SetShowConfirmPassword] = useState('password');
 
   //Refs
   const ProfileImageEditRef  = useRef();
@@ -136,8 +140,8 @@ function ProfilePage() {
     }
   return (
     <div className = {Styles['Main-Div']}>
-      <div style={{display:'flex' , alignItems:'center' , justifyContent:'center' , fontSize:'1rem' , gap:'0.6rem' ,    backgroundColor:'#1E232B' , padding:'0.3rem' , borderRadius:'10px' ,width:'30%' , marginBottom:'2rem'}}>
-                <GoOrganization />
+      <div style={{display:'flex' , alignItems:'center' , justifyContent:'flex-start' , fontSize:'1rem' , gap:'0.6rem' ,    backgroundColor:'#1E232B' , padding:'0.3rem' , borderRadius:'10px' ,width:'10%' , marginBottom:'2rem'}}>
+                <ImProfile />
                 <label className={Styles['Styled-Label']}>Edit Profile</label>
       </div>
       <div className = {Styles['Top-Div']}>
@@ -192,8 +196,8 @@ function ProfilePage() {
                     Type={'STRING'}
                     Width='70%'
                     TBCallBack={() => {Dispatch({type: ProfileActions.CHANGE_PASSWORD, payload: {...ProfileState.Passwords,OldPassword: OldPasswordRef.current?.value}})}}
-
-                    ButtonCallBack={() => {console.log("Test")}}
+                    PasswordType = {OldPassword}
+                    ButtonCallBack={() => {SetShowOldPassword(State => (State === "text" ? "password" : "text"))}}
                     ColorPallete={['red' , '#a20500aa']}
                   />
               </div>
@@ -206,10 +210,9 @@ function ProfilePage() {
                     FloatingText={"New Password"}
                     Reference={NewPasswordRef}
                     Type={'STRING'}
-
+                    PasswordType = {NewPassword}
+                    ButtonCallBack={() => {SetShowNewPassword(State => (State === "text" ? "password" : "text"))}}
                     TBCallBack={() => {Dispatch({type: ProfileActions.CHANGE_PASSWORD, payload: {...ProfileState.Passwords,NewPassword: NewPasswordRef.current?.value}})}}
-
-                    ButtonCallBack={() => {console.log("Test")}}
                     ColorPallete={['red' , '#a20500aa']}
                   />
               </div>
@@ -222,10 +225,9 @@ function ProfilePage() {
                     FloatingText={"Confirm Password"}
                     Type={'STRING'}
                     Width='70%'
-
+                    PasswordType = {ConfirmPassword}
+                    ButtonCallBack={() => {SetShowConfirmPassword(State => (State === "text" ? "password" : "text"))}}
                     TBCallBack={() => {Dispatch({type: ProfileActions.CHANGE_PASSWORD, payload: {...ProfileState.Passwords,CurrentPassword: OldPasswordRef.current?.value}})}}
-
-                    ButtonCallBack={() => {console.log("Test")}}
                     ColorPallete={['red' , '#a20500aa']}
                   />
               </div>

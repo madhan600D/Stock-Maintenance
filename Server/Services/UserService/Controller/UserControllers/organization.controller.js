@@ -291,7 +291,7 @@ export const ManualCloseDay = async(req , res) => {
 
         await Transaction.commit()
 
-        return res.status(200).json({success:true , message:"Organization closed and moved to the next day...!" , data:ClientData})
+        return res.status(200).json({success:true , message:"CloseDay done.Check Orders page for newly placed orders with EWMA simulated values. " , data:ClientData})
     } catch (error) {
         await objUserDb.AllModels.userErrorLog.create({ErrorDescription:error.message , ClientorServer:'server'})
         await Transaction.rollback()

@@ -3,16 +3,14 @@ import Styles from './SideBar.module.css'
 
 import { useLocation, useNavigate } from 'react-router-dom';
 //Logos
-import { IoMdHome } from "react-icons/io";
-import { FaTasks } from "react-icons/fa";
-import { CgProfile } from "react-icons/cg";
 import { GoOrganization } from "react-icons/go";
-import { LuListTodo } from "react-icons/lu";
+
 import { IoIosArrowDown } from "react-icons/io";
 import { BiCaretRight } from "react-icons/bi";
 import { IoMdPaper } from "react-icons/io";
 
 import { IoSettings , IoPowerSharp} from "react-icons/io5";
+import { AiOutlineInfoCircle } from "react-icons/ai";
 
 import { TbReportAnalytics } from "react-icons/tb";
 import { AiOutlineStock } from "react-icons/ai";
@@ -148,8 +146,10 @@ function SideBar() {
     URL:'/checkouts'
   },
   {
-    MenuLogo: IoSettings,
-    MenuText: "Settings"
+    MenuLogo: AiOutlineInfoCircle,
+    MenuText: "Info",
+    URL:'/info',
+    Callback:HandleSubPageChange
   },
   {
     MenuLogo: IoPowerSharp,
@@ -157,18 +157,7 @@ function SideBar() {
     Callback:HandleLogout
   }]
 
-  const CreateOrJoinOrg = [{
-    MenuLogo: CgProfile,
-    MenuText: "Profile",
-    ArrayOfSubMenus: [
-      { MenuText: "Edit Profile" },
-      { MenuText: "Update Profile" }
-    ]
-  },
-  {
-    MenuLogo: IoSettings,
-    MenuText: "Settings"
-  },
+  const CreateOrJoinOrg = [
   {
     MenuLogo: IoPowerSharp,
     MenuText: "Logout",
@@ -182,7 +171,7 @@ function SideBar() {
   const {OrganizationData } = useOrg();
   const {Logout} = useUser();
   const MaxTextLimit = 10;
-  if(CurrentMenus?.length > 1){
+  if(CurrentMenus?.length > 0){
     return (
       <div className = {Styles['Main-Div']} style={{width: SideBarState === "OPEN" ? '20%' : '0%'}}>
         <div className = {Styles['Top-Div']}>

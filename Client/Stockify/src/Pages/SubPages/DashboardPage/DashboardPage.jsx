@@ -53,7 +53,8 @@ function DashboardPage() {
       <div className = {Styles['Top-Div']}>
         <div style={{display:'flex' , alignItems:'center' , justifyContent:'center' , fontSize:'1.6rem' , gap:'0.6rem' , backgroundColor:'#1E232B' , padding:'0.6rem' , borderRadius:'10px'}}>
             <FaChartPie  size={'3rem'} color='rgba(146, 73, 0, 0.73)'/>
-            <label className={Styles['Styled-Label']}>{`${OrganizationData && OrganizationData[0][0].OrganizationName} Dashboard` || NA}</label>
+            <label className={Styles['Styled-Label']}>{`${OrganizationData && OrganizationData[0][0].OrganizationName?.toUpperCase()}` || NA}</label>
+            
         </div>
       </div>
         <div className = {Styles['OrgData-Div']} >

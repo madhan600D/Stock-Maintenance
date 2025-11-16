@@ -3,58 +3,61 @@ import { ObjUserKafkaProducer } from "../../Kafka/Producer/kafkaProducer.js";
 import { ObjOrder } from "../../Class/Order.class.js";
 import { Json } from "sequelize/lib/utils";
 import { Op } from "sequelize";
+import Simulation from "../../Class/Simulation.class.js";
 
 export const AddCheckOut = async(req , res) => {
     try {
         const {ProductItems , TotalItems , TotalCost , CheckoutDate} = req?.body;
         //Key:VendorID , Value:ArrayOfProductIDs
-        var ProductsToBeOrdered = new Map()
+        // var ProductsToBeOrdered = new Map()
         var Transaction = await objInventoryDataBase.InventoryDB.transaction();
         const OrgState = await objInventoryDataBase.AllModels.OrgState.findOne({where:{OrganizationID:req.user.organizationId} , raw:true})
         
         //Update product
         //Syantax Model.decrement('columnName', { by: 1, where: { id: someId } });
         for (let CartProduct of ProductItems){
-            const NewQuantity = await objInventoryDataBase.AllModels.Products.decrement('Quantity', {
+            const [NewQuantity , NewQuantityRowCount] = await objInventoryDataBase.AllModels.Products.decrement('Quantity', {
                                 by: CartProduct.Quantity,
                                 where: { ProductID: CartProduct.ProductID },
-                                Transaction:Transaction,
+                                transaction:Transaction,
                                 returning: true
                                 });
             
             //Update Daily Sales Tracker table
-            const ProductSale = await objInventoryDataBase.AllModels.DailyProductSales.findOne({where:{[Op.and]:[{ProductID:CartProduct.ProductID , RunDate : OrgState.RunDate}]}})
+            const ProductSale = await objInventoryDataBase.AllModels.DailyProductSales.findOne({where:{[Op.and]:[{ProductID:CartProduct.ProductID , RunDate : OrgState.RunDate}]} , transaction:Transaction});
 
             if(ProductSale){
-                const [NewSale , RowCount] = await objInventoryDataBase.AllModels.DailyProductSales.increment('SaleQuantity', {
+                const [UpdatedSale , RowCount] = await objInventoryDataBase.AllModels.DailyProductSales.increment('SaleQuantity', {
                                 by: CartProduct.Quantity,
                                 where: {[Op.and]:[{ProductID:CartProduct.ProductID , RunDate : OrgState.RunDate}]},
-                                Transaction:Transaction,
+                                transaction:Transaction,
                                 returning: true
                                 });
             }
             else{
-                await objInventoryDataBase.AllModels.DailyProductSales.create({
+                const NewSale = await objInventoryDataBase.AllModels.DailyProductSales.create({
                     ProductID:CartProduct.ProductID,
                     RunDate:OrgState.RunDate,
                     SaleQuantity:CartProduct.Quantity,
                     OrganizationID:req.user.organizationId
-                })
+                } , {transaction:Transaction})
             }
 
-            //TBD:Auto Order placement If Threshold breaches, Call Kafka service.Two Mails one to the vendor and one to the admin and add a order data
+            // //Simulate and Get LTD-> LTD < Quantity = PlaceOrder()
+            // const ObjSimulation  = new Simulation(NewQuantity[0][0] , objInventoryDataBase);
+            // const LTDofProduct = await ObjSimulation.ForecastDemand(Transaction) 
             
-            if(NewQuantity[0][0][0].Quantity <= NewQuantity[0][0][0].ReorderThreshold){
-                //Add the Product ID as value to VendorID Key.
-                ProductsToBeOrdered.set(NewQuantity.VendorID,(ProductsToBeOrdered.get(NewQuantity.VendorID) || []).concat(NewQuantity.ProductID));
-            };
+            // if(NewQuantity[0][0].Quantity <= LTDofProduct.data){
+            //     //Add the Product ID as value to VendorID Key.
+            //     ProductsToBeOrdered.set(NewQuantity.VendorID,(ProductsToBeOrdered.get(NewQuantity.VendorID) || []).concat(NewQuantity.ProductID));
+            // };
         }
 
         // Update PNL
-        const [PNLUpdate] = await objInventoryDataBase.AllModels.PNL.increment(
+        const [PNLUpdate , AffectedRows] = await objInventoryDataBase.AllModels.PNL.increment(
                                 { TotalRevenue: TotalCost },
                                 { where: { OrganizationID: req.user.organizationId },
-                                Transaction:Transaction, 
+                                transaction:Transaction, 
                                 returning: true });
         
         //Add to Checkout Table
@@ -67,13 +70,20 @@ export const AddCheckOut = async(req , res) => {
             } , {transaction:Transaction});
 
         //Place Order of breached items: Iterate Key Value and place order for each vendor
-        for(let [Key , Value] of ProductsToBeOrdered){
-            ObjOrder.PlaceOrder(Key , Value , req.user)
-        }
+        // for(let [Key , Value] of ProductsToBeOrdered){
+        //     ObjOrder.PlaceOrder(Key , Value , req.user)
+        // }
         
+        const DataToClient = {
+            NewCheckOut:NewCheckOut,
+            NewPNL:PNLUpdate[0][0],
+            NewProduct:NewQuantity[0][0]
+        }
         await Transaction.commit();
 
-        return res.status(200).json({sucess:true , message: ProductsToBeOrdered.size >= 1 ? `Check out processed successfully. and ${ProductsToBeOrdered.size} new orders placed ` : `Check out processed successfully. No new orders placed.`})
+
+
+        return res.status(200).json({sucess:true , message: 'Checkout placed successfully.'})
     } catch (error) {
         console.log(error);
         await Transaction.rollback();

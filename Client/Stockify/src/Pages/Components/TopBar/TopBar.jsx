@@ -22,14 +22,15 @@ function TopBar() {
   const {SetCurrentPage , SetSideBarState} = useApp();
   return (
     <div className={Styles['Main-Div']}>
-      <div style={{position:'absolute' , left:0 , zIndex:10 , transform:'translateY(3rem)'}}>
-          <Tooltip title='Sidebar' arrow>
-            <CiMenuBurger size={'1.5rem'} onClick={() => {SetSideBarState()}}/>
-        </Tooltip>
-      </div>
-        
-        
+      <div style={{display:'flex' , flexDirection:'row' , gap:'0.2rem' , alignItems:'center'}}>
+        <div className = {Styles['TopLeft-Div']} style={{backgroundColor:'rgba(39, 39, 40, 0.09)' , padding:'0.5rem' , borderRadius:'10px' , display:'flex' , alignItems:'center' , justifyContent:'center'}}>
+            <Tooltip title='Sidebar' arrow>
+              <CiMenuBurger size={'1.5rem'} onClick={() => {SetSideBarState()}}/>
+            </Tooltip>
+        </div>
+          
         <DateTimeDisplay />
+      </div>
         <div>
           <EnventoryLogo />
           <label className = {Styles['Special-Label']}>{OrganizationData && OrganizationData.OrganizationName}</label>
