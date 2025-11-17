@@ -211,7 +211,7 @@ function OrderPage() {
             {/* About this page details */}
             <div style={{display:'flex' , alignItems:'center' , justifyContent:'center' , fontSize:'1.6rem' , gap:'0.6rem' , backgroundColor:'#1E232B' , padding:'0.6rem' , borderRadius:'10px'}}>
                 <FaShoppingCart />
-                <label className={Styles['Styled-Label']}>Orders</label>
+                <label className={Styles['Styled-Label']}>New Order</label>
             </div>
             <div className = {Styles['PageDesc-Div']}>
                 <label style={{fontSize:'0.8rem' , fontFamily:'poppins'}}>Place order to vendors to replenish inventoty, Click on:</label>
